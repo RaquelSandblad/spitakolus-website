@@ -1,6 +1,6 @@
 export default function Produkter() {
   return (
-    <div className="py-16">
+    <div className="py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
@@ -72,58 +72,52 @@ export default function Produkter() {
             </div>
           </div>
 
-          {/* Flocken */}
+          {/* Wovven (tidigare Flocken) */}
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             <div className="md:flex">
               <div className="md:flex-shrink-0 bg-gradient-to-br from-secondary to-secondary-dark md:w-1/3 flex items-center justify-center p-12">
                 <div className="text-white text-center">
                   <svg className="w-24 h-24 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                   </svg>
-                  <h2 className="text-3xl font-bold">Flocken</h2>
+                  <h2 className="text-3xl font-bold">Wovven</h2>
                 </div>
               </div>
               <div className="p-8 md:w-2/3">
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  Modern matchningsplattform
+                  Sveriges första dedikerade hundparningsplattform
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  Flocken är en innovativ mobilapplikation som hjälper användare att hitta 
-                  och koppla samman med andra baserat på gemensamma intressen och geografisk närhet.
+                  Wovven är en modern plattform som kopplar samman hundägare som söker parkamrater 
+                  för sina hundar. Med geografisk sökning, säker kommunikation och detaljerade 
+                  hundprofiler gör vi det enkelt att hitta perfekta matchningar.
                 </p>
                 
                 <div className="mb-6">
                   <h4 className="font-semibold text-gray-900 mb-2">Målgrupp:</h4>
                   <p className="text-gray-600">
-                    Privatpersoner och professionella användare i Sverige som söker meningsfulla 
-                    kopplingar baserat på intressen och närhet. Internationell lansering planeras.
+                    Privatpersoner (22 kr/mån eller 190 kr/år) med en hund och uppfödare 
+                    (60 kr/mån eller 580 kr/år) med flera hundar. Lansering i Sverige med 
+                    internationell expansion planerad.
                   </p>
                 </div>
 
                 <div className="mb-6">
-                  <h4 className="font-semibold text-gray-900 mb-2">Syfte:</h4>
-                  <p className="text-gray-600">
-                    Att skapa meningsfulla kopplingar genom att kombinera geografisk närhet 
-                    med smarta filter och säker kommunikation
-                  </p>
-                </div>
-
-                <div className="mb-6">
-                  <h4 className="font-semibold text-gray-900 mb-2">Hur appen fungerar:</h4>
+                  <h4 className="font-semibold text-gray-900 mb-2">Huvudfunktioner:</h4>
                   <ul className="list-disc list-inside text-gray-600 space-y-2">
-                    <li>Upptäck profiler på interaktiv karta eller i listvy</li>
-                    <li>Sök baserat på avstånd och filter</li>
-                    <li>Skicka meddelanden via real-time chat</li>
-                    <li>Spara favoriter för snabb åtkomst</li>
-                    <li>Hantera och redigera dina egna profiler</li>
-                    <li>Få notifikationer om nya matchningar</li>
+                    <li>🐕 Hundparning med detaljerade profiler (ras, ålder, stamtavla, hälsotester)</li>
+                    <li>🗺️ Interaktiv karta med geografisk sökning</li>
+                    <li>💬 Real-time chat mellan hundägare</li>
+                    <li>📸 Upp till 5 bilder per hundprofil</li>
+                    <li>🐾 Hundvaktstjänster och dagpassning</li>
+                    <li>⭐ Favoriter och notifikationssystem</li>
                   </ul>
                 </div>
 
                 <div className="bg-gray-50 p-4 rounded-lg">
                   <p className="text-sm text-gray-600">
-                    <strong>Status:</strong> Under utveckling för lansering i Sverige. 
-                    Prenumerationsbaserad tjänst för privatpersoner och professionella användare.
+                    <strong>Status:</strong> Under utveckling. iOS och Android med Supabase-backend, 
+                    Google Maps och säker betalning via Stripe.
                   </p>
                 </div>
               </div>

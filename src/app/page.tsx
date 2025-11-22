@@ -83,12 +83,12 @@ export default function Home() {
             {/* App 2 */}
             <div className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition-shadow">
               <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                Flocken
+                Wovven
               </h3>
               <p className="text-gray-600 mb-6">
-                Modern matchningsplattform som kopplar samman användare baserat på 
-                gemensamma intressen och geografisk närhet med kartbaserad upptäckt 
-                och real-time kommunikation.
+                Sveriges första dedikerade plattform för hundägare som söker parkamrater. 
+                Med interaktiv karta, detaljerade hundprofiler och real-time chat gör vi 
+                det enkelt att hitta perfekta matchningar för din hund.
               </p>
               <Link
                 href="/produkter"
