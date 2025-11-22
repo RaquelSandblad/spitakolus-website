@@ -96,21 +96,21 @@ export default function Produkter() {
                 <div className="mb-6">
                   <h4 className="font-semibold text-gray-900 mb-2">Målgrupp:</h4>
                   <p className="text-gray-600">
-                    Privatpersoner (22 kr/mån eller 190 kr/år) med en hund och uppfödare 
-                    (60 kr/mån eller 580 kr/år) med flera hundar. Lansering i Sverige med 
-                    internationell expansion planerad.
+                    Privatpersoner och kennlar/uppfödare. Prenumerationsbaserad tjänst med 
+                    betalning per månad eller per år. Lansering i Sverige med internationell 
+                    expansion planerad.
                   </p>
                 </div>
 
                 <div className="mb-6">
                   <h4 className="font-semibold text-gray-900 mb-2">Huvudfunktioner:</h4>
                   <ul className="list-disc list-inside text-gray-600 space-y-2">
-                    <li>🐕 Hundparning med detaljerade profiler (ras, ålder, stamtavla, hälsotester)</li>
-                    <li>🗺️ Interaktiv karta med geografisk sökning</li>
-                    <li>💬 Real-time chat mellan hundägare</li>
-                    <li>📸 Upp till 5 bilder per hundprofil</li>
-                    <li>🐾 Hundvaktstjänster och dagpassning</li>
-                    <li>⭐ Favoriter och notifikationssystem</li>
+                    <li>Hundparning med detaljerade profiler (ras, ålder, stamtavla, hälsotester)</li>
+                    <li>Interaktiv karta med geografisk sökning</li>
+                    <li>Real-time chat mellan hundägare</li>
+                    <li>Upp till 5 bilder per hundprofil</li>
+                    <li>Hundvaktstjänster och dagpassning</li>
+                    <li>Favoriter och notifikationssystem</li>
                   </ul>
                 </div>
 
