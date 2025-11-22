@@ -1,36 +1,175 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Spitakolus AB - Företagswebbplats
 
-## Getting Started
+En modern Next.js-webbplats för Spitakolus AB, utvecklad för att uppfylla Stripe-krav och visa företagets produkter och tjänster.
 
-First, run the development server:
+## 🚀 Teknologier
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Next.js 16** - React framework med App Router
+- **TypeScript** - Typsäker utveckling
+- **Tailwind CSS v4** - Modern utility-first styling
+- **React 19** - Senaste React-version
+
+## 📁 Projektstruktur
+
+```
+spitakolus-website/
+├── src/
+│   ├── app/                    # Next.js App Router sidor
+│   │   ├── page.tsx           # Startsida
+│   │   ├── produkter/         # Produktsida
+│   │   ├── kontakt/           # Kontaktsida
+│   │   ├── integritetspolicy/ # GDPR-policy
+│   │   ├── anvandarvillkor/   # Användarvillkor
+│   │   ├── aterbetalning/     # Återbetalningspolicy
+│   │   ├── om-oss/            # Om företaget
+│   │   ├── layout.tsx         # Root layout
+│   │   └── globals.css        # Global styling
+│   └── components/            # Återanvändbara komponenter
+│       ├── Header.tsx         # Navigation
+│       └── Footer.tsx         # Footer med länkar
+├── public/                    # Statiska filer
+├── package.json
+└── README.md
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🎨 Designsystem
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Webbplatsen använder ett anpassningsbart färgschema definierat i `src/app/globals.css`:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Primärfärg**: Blå (`#3B82F6`)
+- **Sekundärfärg**: Grön (`#10B981`)
 
-## Learn More
+För att ändra färgerna, uppdatera CSS-variablerna i `globals.css`:
 
-To learn more about Next.js, take a look at the following resources:
+```css
+:root {
+  --primary: #3B82F6;      /* Din primärfärg */
+  --secondary: #10B981;    /* Din sekundärfärg */
+}
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛠️ Komma igång
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Förutsättningar
 
-## Deploy on Vercel
+- Node.js 20.x eller senare
+- npm (kommer med Node.js)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Utveckling
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Starta utvecklingsservern:
+```powershell
+npm run dev
+```
+
+Öppna [http://localhost:3000](http://localhost:3000) i din webbläsare.
+
+### Bygga för produktion
+
+Bygg produktionsversionen:
+```powershell
+npm run build
+```
+
+Starta produktionsservern:
+```powershell
+npm start
+```
+
+## 📄 Sidor
+
+Webbplatsen innehåller följande sidor som uppfyller Stripe-kraven:
+
+- **Hem** (`/`) - Översikt över företaget och produkter
+- **Produkter** (`/produkter`) - Detaljerad information om Nästa Hem och Bästa Vän
+- **Om oss** (`/om-oss`) - Företagsinformation och värderingar
+- **Kontakt** (`/kontakt`) - Kontaktinformation och support
+- **Integritetspolicy** (`/integritetspolicy`) - GDPR-kompatibel dataskyddspolicy
+- **Användarvillkor** (`/anvandarvillkor`) - Villkor för tjänsteanvändning
+- **Återbetalning** (`/aterbetalning`) - Policy för återbetalning, avbokning och tvister
+
+## 🌐 Deployment
+
+### GitHub
+
+Projektet är redo att pushas till GitHub:
+
+```powershell
+git add .
+git commit -m "Initial commit: Spitakolus website"
+git remote add origin https://github.com/[DIN-USERNAME]/spitakolus-website.git
+git branch -M main
+git push -u origin main
+```
+
+### Vercel (Rekommenderat)
+
+1. Gå till [vercel.com](https://vercel.com)
+2. Logga in med GitHub
+3. Importera `spitakolus-website` repository
+4. Vercel identifierar automatiskt Next.js och deployar
+5. Få en live URL på några minuter
+
+### Domän (spitakolus.com)
+
+Efter deployment på Vercel:
+
+1. I Vercel: Gå till Settings → Domains
+2. Lägg till `spitakolus.com`
+3. Kopiera DNS-records som Vercel visar
+4. Logga in på [Loopia](https://customerzone.loopia.se/)
+5. Gå till DNS-inställningar för `spitakolus.com`
+6. Lägg till:
+   - **A Record**: `@` → Vercel IP
+   - **CNAME Record**: `www` → `cname.vercel-dns.com`
+7. Vänta 1-24 timmar för DNS-propagering
+
+## ✨ Anpassa innehåll
+
+### Ändra texter
+
+Alla texter finns i respektive page.tsx-fil. Exempel för att ändra startsidan:
+
+1. Öppna `src/app/page.tsx`
+2. Redigera text-innehållet
+3. Spara - ändringar syns direkt i dev-mode
+
+### Lägg till logotyp
+
+1. Placera logotypfil i `public/` (t.ex. `logo.svg`)
+2. Uppdatera `src/components/Header.tsx`
+
+### Ändra färger
+
+Redigera `src/app/globals.css`:
+
+```css
+:root {
+  --primary: #DIN-FÄRG;
+  --secondary: #DIN-FÄRG;
+}
+```
+
+## 📋 Stripe-krav ✅
+
+Webbplatsen uppfyller alla Stripe-krav:
+
+- ✅ Visar företagsnamn (Spitakolus AB)
+- ✅ Beskriver vad företaget säljer (mobilappar)
+- ✅ Kontaktuppgifter (e-post, org.nr)
+- ✅ Integritetspolicy (GDPR-kompatibel)
+- ✅ Användarvillkor
+- ✅ Återbetalnings- och avbokningspolicy
+- ✅ Alla sidor publika (ingen inloggning)
+- ✅ Mobilanpassad (responsiv design)
+- ✅ Snabb laddning (Next.js optimering)
+
+## 🆘 Support
+
+För problem eller frågor:
+- E-post: support@spitakolus.se
+- Org.nr: 559554-6101
+
+## 📝 Licens
+
+Copyright © 2025 Spitakolus AB. Alla rättigheter förbehållna.
