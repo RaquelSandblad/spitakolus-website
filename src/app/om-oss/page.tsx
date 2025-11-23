@@ -166,8 +166,8 @@ export default function OmOss() {
             <div className="bg-gradient-to-br from-secondary to-secondary-dark rounded-xl p-8 text-white">
               <h3 className="text-2xl font-bold mb-4">Flocken</h3>
               <p className="text-green-100 mb-6">
-                Modern matchningsplattform som skapar meningsfulla kopplingar genom 
-                geografisk närhet och gemensamma intressen
+                Kompletta plattformen för hundägare med parning, hundvakt, hundvänliga 
+                platser och GPS-promenadstråk - allt baserat på geografisk närhet
               </p>
               <a
                 href="/produkter"

@@ -72,25 +72,26 @@ export default function Produkter() {
             </div>
           </div>
 
-          {/* Wovven (tidigare Flocken) */}
+          {/* Flocken */}
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             <div className="md:flex">
               <div className="md:flex-shrink-0 bg-gradient-to-br from-secondary to-secondary-dark md:w-1/3 flex items-center justify-center p-12">
                 <div className="text-white text-center">
                   <svg className="w-24 h-24 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
-                  <h2 className="text-3xl font-bold">Wovven</h2>
+                  <h2 className="text-3xl font-bold">Flocken</h2>
                 </div>
               </div>
               <div className="p-8 md:w-2/3">
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  Sveriges första dedikerade hundparningsplattform
+                  Sveriges första kompletta plattform för hundägare
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  Wovven är en modern plattform som kopplar samman hundägare som söker parkamrater 
-                  för sina hundar. Med geografisk sökning, säker kommunikation och detaljerade 
-                  hundprofiler gör vi det enkelt att hitta perfekta matchningar.
+                  Flocken förenklar vardagen för hundägare genom att samla fyra viktiga tjänster 
+                  på ett ställe: hundparning för avelsändamål, pålitliga hundvaktstjänster, 
+                  en guide till hundvänliga platser, och GPS-spårade promenadstråk att utforska. 
+                  Allt du behöver som hundägare, baserat på geografisk närhet och lätt att använda.
                 </p>
                 
                 <div className="mb-6">
@@ -105,12 +106,12 @@ export default function Produkter() {
                 <div className="mb-6">
                   <h4 className="font-semibold text-gray-900 mb-2">Huvudfunktioner:</h4>
                   <ul className="list-disc list-inside text-gray-600 space-y-2">
-                    <li>Hundparning med detaljerade profiler (ras, ålder, stamtavla, hälsotester)</li>
-                    <li>Interaktiv karta med geografisk sökning</li>
-                    <li>Real-time chat mellan hundägare</li>
-                    <li>Upp till 5 bilder per hundprofil</li>
-                    <li>Hundvaktstjänster och dagpassning</li>
-                    <li>Favoriter och notifikationssystem</li>
+                    <li>Hitta kompisar för parning, lek och promenader</li>
+                    <li>Hundparning för avelsändamål med detaljerade profiler</li>
+                    <li>Pålitliga hundvaktstjänster och dagpassning</li>
+                    <li>Guide till hundvänliga platser i närområdet</li>
+                    <li>GPS-spårade promenadstråk att upptäcka</li>
+                    <li>Real-time chat och geografisk sökning</li>
                   </ul>
                 </div>
 
