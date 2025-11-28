@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
@@ -88,9 +88,11 @@ export default function FlockenResetPage() {
   return (
     <div className="min-h-screen bg-[#f8f9fa] px-5 py-5 text-[#3E3B32]" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif' }}>
       <div className="mx-auto w-full max-w-[600px] rounded-2xl bg-white p-10 shadow-[0_4px_20px_rgba(0,0,0,0.1)]">
-        <img 
+        <Image 
           src="/flocken-logo.png" 
           alt="Flocken" 
+          width={80}
+          height={80}
           className="mx-auto mb-5 block h-20 w-20 rounded-full" 
         />
         <h1 className="mb-2.5 text-center text-[32px] font-normal text-[#6B7A3A]">🐾 Flocken</h1>
@@ -153,6 +155,7 @@ export default function FlockenResetPage() {
             <div className="my-10 rounded-xl bg-[#E8DCC0] p-5 text-center">
               <p className="mb-5 font-semibold">Eller skanna med din telefon:</p>
               {qrDataUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img src={qrDataUrl} alt="QR-kod" className="mx-auto h-[200px] w-[200px]" />
               ) : (
                 <p className="text-sm text-[#999]">Kunde inte generera QR-kod. Använd App Store-länkarna ovan.</p>
