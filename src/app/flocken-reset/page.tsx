@@ -1,13 +1,13 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 const APP_STORE_URL = 'https://apps.apple.com/'; // Replace when listing is live
 const PLAY_STORE_URL = 'https://play.google.com/';
 
-export default function FlockenResetPage() {
+function FlockenResetContent() {
   const searchParams = useSearchParams();
   const tokenHash = searchParams.get('token_hash') ?? '';
   const typeParam = searchParams.get('type') ?? '';
@@ -175,5 +175,20 @@ export default function FlockenResetPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function FlockenResetPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#f8f9fa] flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl mb-4">🐾</div>
+          <p className="text-[#6B7A3A]">Laddar...</p>
+        </div>
+      </div>
+    }>
+      <FlockenResetContent />
+    </Suspense>
   );
 }
