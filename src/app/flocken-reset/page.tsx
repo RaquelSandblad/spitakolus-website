@@ -78,7 +78,7 @@ function FlockenResetContent() {
 
   const renderInvalidState = () => (
     <div className="mt-8 rounded-xl bg-white/90 p-6 text-center text-[#3E3B32] shadow-lg">
-      <h2 className="text-2xl font-semibold text-[#6B7A3A]">🐾 Flocken</h2>
+      <h2 className="text-2xl font-semibold text-[#6B7A3A]">Flocken</h2>
       <p className="mt-4 leading-relaxed">
         Ogiltig länk. Kontrollera att du använder den fullständiga länken från ditt email.
       </p>
@@ -95,7 +95,7 @@ function FlockenResetContent() {
           height={80}
           className="mx-auto mb-5 block h-20 w-20 rounded-full" 
         />
-        <h1 className="mb-2.5 text-center text-[32px] font-normal text-[#6B7A3A]">🐾 Flocken</h1>
+        <h1 className="mb-2.5 text-center text-[32px] font-normal text-[#6B7A3A]">Flocken</h1>
         <p className="mb-10 text-center text-[#718096]">Återställ ditt lösenord</p>
 
         {!hasValidPayload && renderInvalidState()}
@@ -110,7 +110,7 @@ function FlockenResetContent() {
               href={deepLink}
               className="mx-auto mt-5 block max-w-[300px] rounded-xl bg-gradient-to-br from-[#6B7A3A] to-[#8BA45D] px-6 py-4 text-center text-base font-semibold text-white shadow-[0_4px_12px_rgba(107,122,58,0.3)] transition-all hover:-translate-y-0.5 hover:shadow-[0_6px_16px_rgba(107,122,58,0.4)]"
             >
-              🐾 Öppna Flocken-appen
+              Öppna Flocken-appen
             </a>
 
             <div className="mt-10 rounded-xl bg-[#E8DCC0] p-5">
@@ -183,7 +183,13 @@ export default function FlockenResetPage() {
     <Suspense fallback={
       <div className="min-h-screen bg-[#f8f9fa] flex items-center justify-center">
         <div className="text-center">
-          <div className="text-4xl mb-4">🐾</div>
+          <Image 
+            src="/flocken-logo.png" 
+            alt="Flocken" 
+            width={60}
+            height={60}
+            className="mx-auto mb-4 h-15 w-15 rounded-full" 
+          />
           <p className="text-[#6B7A3A]">Laddar...</p>
         </div>
       </div>
