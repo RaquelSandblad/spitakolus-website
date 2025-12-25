@@ -11,7 +11,7 @@ export default function Home() {
               Välkommen till Spitakolus AB
             </h1>
             <p className="text-xl sm:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
-              Vi utvecklar Smarta mobilappar som hjälper användare att förenkla sin vardag
+              Vi utvecklar smarta mobilappar som hjälper användare att förenkla sin vardag
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
@@ -109,4 +109,3 @@ export default function Home() {
     </div>
   );
 }
-
