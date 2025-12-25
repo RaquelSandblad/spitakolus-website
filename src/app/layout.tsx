@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Spitakolus AB - Moderna mobilappar",
-  description: "Spitakolus AB utvecklar moderna mobilappar som hjälper användare att förenkla sin vardag.",
+  title: "Spitakolus AB - Smarta mobilappar",
+  description: "Spitakolus AB utvecklar Smarta mobilappar som hjälper användare att förenkla sin vardag.",
 };
 
 export default function RootLayout({
@@ -38,3 +38,5 @@ export default function RootLayout({
     </html>
   );
 }
+
+

@@ -11,7 +11,7 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2">
             <h3 className="text-xl font-bold mb-4">Spitakolus AB</h3>
             <p className="text-gray-400 mb-4">
-              Vi utvecklar moderna mobilappar som hjälper användare att förenkla sin vardag.
+              Vi utvecklar Smarta mobilappar som hjälper användare att förenkla sin vardag.
             </p>
             <p className="text-sm text-gray-500">
               Organisationsnummer: 559554-6101
@@ -76,3 +76,4 @@ export default function Footer() {
     </footer>
   );
 }
+
