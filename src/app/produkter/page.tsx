@@ -61,13 +61,6 @@ export default function Produkter() {
                     <li>BankID-verifiering för alla användare garanterar säkerhet</li>
                   </ul>
                 </div>
-
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600">
-                    <strong>Status:</strong> Under utveckling. Säljare väljer annonspaket (3-12 månader), 
-                    köpare använder appen gratis.
-                  </p>
-                </div>
               </div>
             </div>
           </div>
@@ -113,13 +106,6 @@ export default function Produkter() {
                     <li>GPS-spårade promenadstråk att upptäcka</li>
                     <li>Real-time chat och geografisk sökning</li>
                   </ul>
-                </div>
-
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <p className="text-sm text-gray-600">
-                    <strong>Status:</strong> Under utveckling. iOS och Android med Supabase-backend, 
-                    Google Maps och säker betalning via Stripe.
-                  </p>
                 </div>
               </div>
             </div>
