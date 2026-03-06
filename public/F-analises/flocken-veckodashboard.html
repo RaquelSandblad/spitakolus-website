@@ -475,7 +475,9 @@
         { key: 'vakt_aktivering_pct', label: 'Vakt-aktivering (procent)', derived: true, förklaring: 'Andel nya konton som skapade hundvaktprofil (procent): ' },
         { key: 'konv_per_100', label: 'Konversationer per 100 konton', derived: true, förklaring: 'Konversationer (Sitter + Tindog) per 100 nya konton: ' },
         { key: 'medd_per_konv', label: 'Meddelanden per konversation', derived: true, förklaring: 'Genomsnitt antal meddelanden per konversation per vecka: ' },
-        { key: 'reply_rate_pct', label: 'Reply rate (procent)', derived: false, förklaring: 'Andel konversationer som fick svar inom 24 timmar: ' }
+        { key: 'reply_rate_pct', label: 'Reply rate (procent)', derived: false, förklaring: 'Andel konversationer som fick svar inom 24 timmar: ' },
+        { key: 'notiser_skickade', label: 'Push-notiser skickade', derived: false, förklaring: 'Antal push-notiser skickade till användare per vecka: ' },
+        { key: 'unika_mottagare', label: 'Unika notis-mottagare', derived: false, förklaring: 'Antal unika användare som fick en push-notis per vecka: ' }
       ];
 
       function getChartValue(row, metric) {
@@ -564,6 +566,7 @@
       var lastMainData = null;
       var lastEventsData = null;
       var lastReplyData = null;
+      var lastNotifData = null;
 
       function buildChatGPTPrompt(mainData, eventsData) {
         mainData = mainData || DEFAULT_MAIN_DATA;
@@ -595,10 +598,23 @@
         });
       }
 
+      function mergeNotifData(mainData, notifData) {
+        if (!Array.isArray(notifData) || !Array.isArray(mainData)) return;
+        mainData.forEach(function(row) {
+          var match = notifData.find(function(n) { return n.label === row.label; });
+          if (match) {
+            row.notiser_skickade = match.notiser_skickade;
+            row.unika_mottagare = match.unika_mottagare;
+            row.push_tokens_aktiva = match.push_tokens_aktiva;
+          }
+        });
+      }
+
       function renderAll(mainData, eventsData) {
         mainData = mainData || DEFAULT_MAIN_DATA;
         eventsData = eventsData || DEFAULT_EVENTS_DATA;
         if (lastReplyData) mergeReplyRate(mainData, lastReplyData);
+        if (lastNotifData) mergeNotifData(mainData, lastNotifData);
         var outKpi = document.getElementById('outKpi');
         var outMain = document.getElementById('outMain');
         var outPartial = document.getElementById('outPartial');
@@ -629,12 +645,14 @@
           if (savedMain) { main = JSON.parse(savedMain); lastMainData = main; }
           if (savedEvents) { events = JSON.parse(savedEvents); lastEventsData = events; }
           if (savedReply) { lastReplyData = JSON.parse(savedReply); }
+          var savedNotif = localStorage.getItem('flocken_dashboard_notif');
+          if (savedNotif) { lastNotifData = JSON.parse(savedNotif); }
         } catch (e) {}
         renderAll(main, events);
 
         // Auto-fetch live data from Supabase
         if (statusEl) statusEl.textContent = 'Hämtar live-data...';
-        Promise.all([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate')])
+        Promise.all([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats')])
           .then(function(results) {
             var mainResult = results[0];
             var eventsResult = results[1];
@@ -654,6 +672,15 @@
             if (Array.isArray(replyArr) && replyArr.length > 0) {
               lastReplyData = replyArr;
               try { localStorage.setItem('flocken_dashboard_reply', JSON.stringify(replyArr)); } catch (e) {}
+            }
+            var notifResult = results[3];
+            var notifArr = notifResult;
+            if (Array.isArray(notifResult) && notifResult.length === 1 && notifResult[0] && notifResult[0].dashboard_notification_stats) {
+              notifArr = notifResult[0].dashboard_notification_stats;
+            }
+            if (Array.isArray(notifArr) && notifArr.length > 0) {
+              lastNotifData = notifArr;
+              try { localStorage.setItem('flocken_dashboard_notif', JSON.stringify(notifArr)); } catch (e) {}
             }
             renderAll(lastMainData, lastEventsData);
             if (statusEl) statusEl.textContent = 'Uppdaterad ' + new Date().toLocaleString('sv-SE');
