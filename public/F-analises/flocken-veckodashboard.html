@@ -591,6 +591,22 @@
         okand: 'rgba(150, 150, 150, 0.7)'
       };
 
+      function makeHatchPattern(color) {
+        var c = document.createElement('canvas');
+        c.width = 10; c.height = 10;
+        var ctx = c.getContext('2d');
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, 10, 10);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        ctx.moveTo(0, 10); ctx.lineTo(10, 0);
+        ctx.moveTo(-3, 3); ctx.lineTo(3, -3);
+        ctx.moveTo(7, 13); ctx.lineTo(13, 7);
+        ctx.stroke();
+        return ctx.createPattern(c, 'repeat');
+      }
+
       function renderAccountTypes(data) {
         var container = document.getElementById('outAccountTypes');
         var weeklyContainer = document.getElementById('outAccountWeekly');
@@ -599,7 +615,6 @@
         var byType = data.by_type || [];
         var byWeek = data.by_week || [];
 
-        // Sammanfattningstabell
         var html = '<h3>Totalt per kontotyp</h3><table><thead><tr><th>Kontotyp</th><th class="num">Totalt</th><th class="num">Bekräftad e-post</th><th class="num">Inte bekräftad</th><th class="num">Obekräftade %</th></tr></thead><tbody>';
         byType.forEach(function(t) {
           var pct = t.total > 0 ? ((t.unconfirmed / t.total) * 100).toFixed(1) : '0';
@@ -612,9 +627,8 @@
         html += '</tbody></table>';
         container.innerHTML = html;
 
-        // Veckovis stacked bar chart
         if (!weeklyContainer || byWeek.length === 0) return;
-        weeklyContainer.innerHTML = '<h3>Nya konton per vecka och kontotyp</h3><div class="chart-wrap" style="height:280px;"><canvas id="accountTypeChart"></canvas></div><h3 style="margin-top:2rem;">Obekräftade e-postadresser per vecka och kontotyp</h3><div class="chart-wrap" style="height:280px;"><canvas id="unconfirmedChart"></canvas></div>';
+        weeklyContainer.innerHTML = '<h3>Nya konton per vecka och kontotyp</h3><p class="help">Solidfärg = bekräftad e-post, skrafferad = ej bekräftad</p><div class="chart-wrap" style="height:320px;"><canvas id="accountTypeChart"></canvas></div>';
 
         var labels = byWeek.map(function(w) { return w.label; });
         var allTypes = {};
@@ -623,16 +637,36 @@
         });
         var typeKeys = Object.keys(allTypes).sort();
 
-        // New accounts chart
-        var datasets = typeKeys.map(function(type) {
-          return {
-            label: ACCOUNT_TYPE_LABELS[type] || type,
+        var datasets = [];
+        typeKeys.forEach(function(type) {
+          var solidColor = ACCOUNT_TYPE_COLORS[type] || 'rgba(150,150,150,0.7)';
+          var hatch = makeHatchPattern(solidColor);
+          var lbl = ACCOUNT_TYPE_LABELS[type] || type;
+
+          datasets.push({
+            label: lbl + ' (bekräftad)',
+            stack: 'main',
             data: byWeek.map(function(w) {
               var found = (w.breakdown || []).find(function(b) { return b.account_type === type; });
-              return found ? found.new_accounts : 0;
+              if (!found) return 0;
+              return found.new_accounts - found.new_unconfirmed;
             }),
-            backgroundColor: ACCOUNT_TYPE_COLORS[type] || 'rgba(150,150,150,0.7)'
-          };
+            backgroundColor: solidColor,
+            borderColor: solidColor,
+            borderWidth: 0
+          });
+
+          datasets.push({
+            label: lbl + ' (ej bekräftad)',
+            stack: 'main',
+            data: byWeek.map(function(w) {
+              var found = (w.breakdown || []).find(function(b) { return b.account_type === type; });
+              return found ? found.new_unconfirmed : 0;
+            }),
+            backgroundColor: hatch,
+            borderColor: solidColor,
+            borderWidth: 1
+          });
         });
 
         var ctx1 = document.getElementById('accountTypeChart').getContext('2d');
@@ -641,30 +675,32 @@
           data: { labels: labels, datasets: datasets },
           options: {
             responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { position: 'top' } },
-            scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }
-          }
-        });
-
-        // Unconfirmed chart
-        var unconfDatasets = typeKeys.map(function(type) {
-          return {
-            label: ACCOUNT_TYPE_LABELS[type] || type,
-            data: byWeek.map(function(w) {
-              var found = (w.breakdown || []).find(function(b) { return b.account_type === type; });
-              return found ? found.new_unconfirmed : 0;
-            }),
-            backgroundColor: ACCOUNT_TYPE_COLORS[type] || 'rgba(150,150,150,0.7)'
-          };
-        });
-
-        var ctx2 = document.getElementById('unconfirmedChart').getContext('2d');
-        new Chart(ctx2, {
-          type: 'bar',
-          data: { labels: labels, datasets: unconfDatasets },
-          options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { position: 'top' } },
+            plugins: {
+              legend: {
+                position: 'top',
+                labels: {
+                  filter: function(item) {
+                    return item.text.indexOf('(bekräftad)') > -1;
+                  },
+                  generateLabels: function(chart) {
+                    var orig = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                    return orig.filter(function(l) {
+                      return l.text.indexOf('(bekräftad)') > -1;
+                    }).map(function(l) {
+                      l.text = l.text.replace(' (bekräftad)', '');
+                      return l;
+                    });
+                  }
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(ctx) {
+                    return ctx.dataset.label + ': ' + ctx.parsed.y;
+                  }
+                }
+              }
+            },
             scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }
           }
         });
