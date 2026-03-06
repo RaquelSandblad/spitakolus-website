@@ -179,10 +179,10 @@
         nya_konton: 'Nya konton',
         nya_hundar: 'Nya hundar',
         nya_hundvakt_profiler: 'Nya hundvaktprofiler',
-        sitter_konversationer: 'Sitter-konv',
-        tindog_konversationer: 'Tindog-konv',
-        sitter_meddelanden: 'Sitter-medd',
-        tindog_meddelanden: 'Tindog-medd',
+        sitter_konversationer: 'Nya sitter-konversationer',
+        tindog_konversationer: 'Nya tindog-konversationer',
+        sitter_meddelanden: 'Meddelanden (sitter)',
+        tindog_meddelanden: 'Meddelanden (tindog)',
         promenader: 'Promenader',
         hundvanliga_platser: 'Hundvänliga platser',
         bokningar: 'Bokningar'
@@ -277,17 +277,27 @@
           if (previousPct == null) return null;
           return (currentPct - previousPct);
         }
+        function fmtPpChange(currPct, prevPct) {
+          var pp = currPct - prevPct;
+          return 'från ' + prevPct.toFixed(1).replace('.', ',') + '% → ' + currPct.toFixed(1).replace('.', ',') + '% (' + (pp >= 0 ? '+' : '') + pp.toFixed(1).replace('.', ',') + ' procentenheter)';
+        }
         var kontonChange = pctChange(curr.nya_konton, prev.nya_konton);
         var hundPp = ppChange(dCurr.hund_aktivering_pct, dPrev.hund_aktivering_pct);
         var vaktPp = ppChange(dCurr.vakt_aktivering_pct, dPrev.vakt_aktivering_pct);
         var html = '<div class="kpi-grid">';
         html += '<div class="kpi-card"><div class="kpi-value">' + (curr.nya_konton || 0) + '</div><div class="kpi-label">Nya konton</div>' + (kontonChange != null ? '<div class="wow ' + (kontonChange >= 0 ? 'wow-up' : 'wow-down') + '">' + (kontonChange >= 0 ? '+' : '') + kontonChange.toFixed(1) + '% vs föregående vecka</div>' : '') + '</div>';
-        html += '<div class="kpi-card"><div class="kpi-value">' + dCurr.hund_aktivering_pct.toFixed(1) + '%</div><div class="kpi-label">Hund-aktivering (' + (curr.nya_hundar || 0) + ' av ' + (curr.nya_konton || 0) + ')</div>' + (hundPp != null ? '<div class="wow ' + (hundPp >= 0 ? 'wow-up' : 'wow-down') + '">' + (hundPp >= 0 ? '+' : '') + hundPp.toFixed(1) + ' procentenheter vs föregående vecka (' + dPrev.hund_aktivering_pct.toFixed(1) + '% → ' + dCurr.hund_aktivering_pct.toFixed(1) + '%)</div>' : '') + '</div>';
-        html += '<div class="kpi-card"><div class="kpi-value">' + dCurr.vakt_aktivering_pct.toFixed(1) + '%</div><div class="kpi-label">Vakt-aktivering</div>' + (vaktPp != null ? '<div class="wow ' + (vaktPp >= 0 ? 'wow-up' : 'wow-down') + '">' + (vaktPp >= 0 ? '+' : '') + vaktPp.toFixed(1) + ' procentenheter vs föregående vecka (' + dPrev.vakt_aktivering_pct.toFixed(1) + '% → ' + dCurr.vakt_aktivering_pct.toFixed(1) + '%)</div>' : '') + '</div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + dCurr.hund_aktivering_pct.toFixed(1).replace('.', ',') + '%</div><div class="kpi-label">Hund-aktivering (' + (curr.nya_hundar || 0) + ' av ' + (curr.nya_konton || 0) + ')</div>' + (hundPp != null ? '<div class="wow ' + (hundPp >= 0 ? 'wow-up' : 'wow-down') + '">Jämfört med förra veckan: ' + fmtPpChange(dCurr.hund_aktivering_pct, dPrev.hund_aktivering_pct) + '</div>' : '') + '</div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + dCurr.vakt_aktivering_pct.toFixed(1).replace('.', ',') + '%</div><div class="kpi-label">Vakt-aktivering</div>' + (vaktPp != null ? '<div class="wow ' + (vaktPp >= 0 ? 'wow-up' : 'wow-down') + '">Jämfört med förra veckan: ' + fmtPpChange(dCurr.vakt_aktivering_pct, dPrev.vakt_aktivering_pct) + '</div>' : '') + '</div>';
         html += '<div class="kpi-card"><div class="kpi-value">' + dCurr.konv_per_100.toFixed(2) + '</div><div class="kpi-label">Konv per 100 konton</div></div>';
         html += '<div class="kpi-card"><div class="kpi-value">' + (dCurr.medd_per_konv ? dCurr.medd_per_konv.toFixed(1) : '–') + '</div><div class="kpi-label">Medd per konv</div></div>';
         html += '<div class="kpi-card"><div class="kpi-value">' + listingRate.toFixed(1) + '%</div><div class="kpi-label">Listing-rate (annons/konton)</div></div>';
-        html += '<div class="kpi-card"><div class="kpi-value">' + (currPivot.login_unika != null ? currPivot.login_unika : '–') + '</div><div class="kpi-label">WAU (unika login)</div></div>';
+        var aktiva = (currPivot.app_opened_unika != null) ? currPivot.app_opened_unika : (currPivot.login_unika != null ? currPivot.login_unika : null);
+        html += '<div class="kpi-card"><div class="kpi-value">' + (aktiva != null ? aktiva : '–') + '</div><div class="kpi-label">Aktiva användare (unika)</div><div class="copy-hint">Mätt som unika app-öppningar (fallback: unika login)</div></div>';
+        var sitterU = currPivot.sitter_contacted_unika != null ? currPivot.sitter_contacted_unika : null;
+        if (aktiva != null && sitterU != null) {
+          var contactRate = (sitterU / aktiva) * 100;
+          html += '<div class="kpi-card"><div class="kpi-value">' + contactRate.toFixed(1) + '%</div><div class="kpi-label">Kontakt med hundvakt</div><div class="copy-hint">' + sitterU + ' av ' + aktiva + ' aktiva (endast sitter_contacted)</div></div>';
+        }
         var bokningar = curr.bokningar != null ? curr.bokningar : 0;
         html += '<div class="kpi-card"><div class="kpi-value">' + (bokningar === 0 ? '⚠️ 0' : bokningar) + '</div><div class="kpi-label">Bokningar</div></div>';
         html += '</div>';
@@ -359,60 +369,92 @@
 
       function buildRuleBasedAnalysis(mainData, eventsData) {
         var full = getFullWeeks(mainData || []);
-        var good = [], attention = [], bad = [];
-        var i, row, d, prev, prevD, pp, label, minHundPct = Infinity, minHundWeek = null;
-        for (i = 0; i < full.length; i++) {
-          row = full[i];
-          d = computeDerived(row);
-          if (row.nya_konton > 0 && d.hund_aktivering_pct < minHundPct) { minHundPct = d.hund_aktivering_pct; minHundWeek = (row.label || ''); }
+        if (full.length < 2) return '<p class="copy-hint">Minst 2 fulla veckor krävs.</p>';
+
+        var curr = full[full.length - 1];
+        var prev = full[full.length - 2];
+        var dCurr = computeDerived(curr);
+        var dPrev = computeDerived(prev);
+
+        var konvCurr = (curr.sitter_konversationer || 0) + (curr.tindog_konversationer || 0);
+        var konvPrev = (prev.sitter_konversationer || 0) + (prev.tindog_konversationer || 0);
+        var meddCurr = (curr.sitter_meddelanden || 0) + (curr.tindog_meddelanden || 0);
+        var meddPrev = (prev.sitter_meddelanden || 0) + (prev.tindog_meddelanden || 0);
+
+        var pivot = pivotEvents(eventsData || []);
+        var currPivot = pivot.find(function(p) { return p.label === curr.label; }) || {};
+        var aktiva = (currPivot.app_opened_unika != null) ? currPivot.app_opened_unika : (currPivot.login_unika != null ? currPivot.login_unika : currPivot.user_signed_in_unika);
+        var sitterContacted = currPivot.sitter_contacted_unika != null ? currPivot.sitter_contacted_unika : null;
+        var contactRate = (aktiva && sitterContacted != null) ? (sitterContacted / aktiva) * 100 : null;
+
+        function pp(a, b) { return (a - b); }
+        function pct(a, b) { return (b ? ((a - b) / b) * 100 : null); }
+        function fmtPp(currPct, prevPct) {
+          var pp = currPct - prevPct;
+          return 'från ' + prevPct.toFixed(1).replace('.', ',') + '% → ' + currPct.toFixed(1).replace('.', ',') + '% (' + (pp >= 0 ? '+' : '') + pp.toFixed(1).replace('.', ',') + ' procentenheter)';
         }
-        for (i = 0; i < full.length; i++) {
-          row = full[i];
-          d = computeDerived(row);
-          label = row.label || '';
-          var a = row.nya_hundar || 0, b = row.nya_konton || 0;
-          var pctStr = b ? d.hund_aktivering_pct.toFixed(1) : '0';
-          var base = 'Hund-aktivering vecka ' + label + ': ' + pctStr + '% (' + a + ' av ' + b + ' nya konton skapade hundprofil).';
-          var forandring = '';
-          if (i > 0) {
-            prev = full[i - 1];
-            prevD = computeDerived(prev);
-            pp = (d.hund_aktivering_pct - prevD.hund_aktivering_pct);
-            forandring = ' Förändring vs föregående vecka: ' + (pp >= 0 ? '+' : '') + pp.toFixed(1) + ' procentenheter (' + prevD.hund_aktivering_pct.toFixed(1) + '% → ' + pctStr + '%).';
-            if (pp >= 10) good.push(base + forandring + ' Stor återhämtning.');
-            else if (pp >= 5 && d.hund_aktivering_pct >= 15) good.push(base + forandring);
-            else if (pp < -2) attention.push('⚠️ ' + base + forandring + (label === minHundWeek ? ' Lägsta nivån i perioden.' : ' Viktigt att förstå varför aktiveringen föll.'));
-            else if (label === minHundWeek && full.length > 1) attention.push('⚠️ ' + base + forandring + ' Lägsta nivån i perioden.');
-            else if (d.hund_aktivering_pct >= 20) good.push(base + forandring);
-          } else {
-            if (d.hund_aktivering_pct >= 20) good.push(base);
-          }
-          var konv = (row.sitter_konversationer || 0) + (row.tindog_konversationer || 0);
-          if (konv > 0 && d.medd_per_konv < 1.5) attention.push('⚠️ Chatt startas men dör (' + label + '): ' + d.medd_per_konv.toFixed(1) + ' medd/konv.');
-          if ((row.promenader || 0) === 0 && (row.hundvanliga_platser || 0) === 0 && i === full.length - 1) attention.push('Promenader och hundvänliga platser används lite – överväg synlighet eller onboarding.');
-        }
-        var zeroBokn = full.filter(function(r) { return (r.bokningar || 0) === 0; }).length;
-        if (zeroBokn >= 3 && full.length >= 3) bad.push('⚠️ Ingen bokning på ' + zeroBokn + ' veckor – definiera nästa commit-step.');
-        if (getPartialWeek(mainData || [])) attention.push('Obs: Raden «5 mar (1 dag)» (eller annan ofullständig vecka) är bara en dag och ska inte jämföras rakt av med 7-dagarsveckor.');
-        var uniques = {};
-        good.forEach(function(g) { uniques[g] = true; });
-        attention.forEach(function(a) { uniques[a] = true; });
-        bad.forEach(function(b) { uniques[b] = true; });
-        good = Object.keys(uniques).filter(function(k) { return good.indexOf(k) !== -1; });
+
+        var hundPp = pp(dCurr.hund_aktivering_pct, dPrev.hund_aktivering_pct);
+        var vaktPp = pp(dCurr.vakt_aktivering_pct, dPrev.vakt_aktivering_pct);
+        var kontonPct = pct(curr.nya_konton || 0, prev.nya_konton || 0);
+
+        var bottleneck = null;
+        if (dCurr.hund_aktivering_pct < 15) bottleneck = 'Aktivering: för få nya konton lägger upp hund (mål: ≥15–25%).';
+        else if (dCurr.konv_per_100 < 3) bottleneck = 'Matchning: för få startar kontakt (mål: ≥3–10 konv per 100 konton).';
+        else if (dCurr.medd_per_konv < 2) bottleneck = 'Dialog: chats startas men dör (mål: ≥2 medd/konv eller mät reply rate).';
+
+        var replyRatePct = (curr.reply_rate_pct != null && !isNaN(curr.reply_rate_pct)) ? curr.reply_rate_pct : null;
+
         var html = '';
-        if (good.length) { html += '<h3>Bra indikatorer</h3><ul class="good">'; good.slice(0, 8).forEach(function(g) { html += '<li>' + g + '</li>'; }); html += '</ul>'; }
-        if (attention.length) { html += '<h3>Uppmärksamhet</h3><ul class="attention">'; attention.slice(0, 8).forEach(function(a) { html += '<li>' + a + '</li>'; }); html += '</ul>'; }
-        if (bad.length) { html += '<h3>Risker</h3><ul class="bad">'; bad.slice(0, 4).forEach(function(b) { html += '<li>' + b + '</li>'; }); html += '</ul>'; }
-        if (!html) html = '<p class="copy-hint">För få veckor eller ingen data – klistra in ny JSON för att se regelbaserad analys.</p>';
+
+        html += '<h3>Veckans läge (' + (curr.label || 'senaste veckan') + ')</h3><ul class="good">';
+        html += '<li><strong>Nya konton:</strong> ' + (curr.nya_konton || 0) + (kontonPct != null ? ' (' + (kontonPct >= 0 ? '+' : '') + kontonPct.toFixed(1) + '% vs föregående vecka)' : '') + '</li>';
+        html += '<li><strong>Hund-aktivering:</strong> ' + dCurr.hund_aktivering_pct.toFixed(1).replace('.', ',') + '% (' + (curr.nya_hundar || 0) + ' av ' + (curr.nya_konton || 0) + ') – ' + (hundPp != null ? fmtPp(dCurr.hund_aktivering_pct, dPrev.hund_aktivering_pct) : '') + '</li>';
+        html += '<li><strong>Vakt-aktivering:</strong> ' + dCurr.vakt_aktivering_pct.toFixed(1).replace('.', ',') + '% – ' + (vaktPp != null ? fmtPp(dCurr.vakt_aktivering_pct, dPrev.vakt_aktivering_pct) : '') + '</li>';
+        html += '<li><strong>Nya konversationer:</strong> ' + konvCurr + ' (Sitter+Tindog) • <strong>' + dCurr.konv_per_100.toFixed(2) + '</strong> per 100 konton</li>';
+        html += '<li><strong>Dialogdjup:</strong> ' + (dCurr.medd_per_konv ? dCurr.medd_per_konv.toFixed(1) : '–') + ' medd/konv (tot ' + meddCurr + ' medd)</li>';
+        if (aktiva != null) html += '<li><strong>Aktiva användare (unika):</strong> ' + aktiva + (contactRate != null ? ' • <strong>Kontakt med hundvakt:</strong> ' + sitterContacted + ' av ' + aktiva + ' (' + contactRate.toFixed(1).replace('.', ',') + '%, endast sitter_contacted)</li>' : '</li>');
+        if (replyRatePct != null) html += '<li><strong>Reply rate:</strong> ' + replyRatePct.toFixed(1).replace('.', ',') + '% (' + (curr.reply_with || 0) + ' av ' + (curr.reply_total || 0) + ' konversationer fick svar inom 24h)</li>';
+        else html += '<li><strong>Reply rate:</strong> – (data hämtas automatiskt om RPC är skapad)</li>';
+        html += '</ul>';
+
+        html += '<h3>Tre tolkningar</h3><ul class="attention">';
+        if (hundPp >= 8) html += '<li>✅ <strong>Aktivering förbättras kraftigt.</strong> Det ni ändrade i hundprofil-flödet verkar ha effekt.</li>';
+        if (dCurr.konv_per_100 > dPrev.konv_per_100) html += '<li>✅ <strong>Kontakt ökar.</strong> Fler tar första steget att skriva.</li>';
+        if (dCurr.medd_per_konv < 2 && konvCurr > 0) html += '<li>⚠️ <strong>Chats dör tidigt.</strong> Nästa steg är reply rate / "få svar".</li>';
+        html += '</ul>';
+
+        html += '<h3>Veckans fokus</h3><ul class="bad">';
+        html += '<li><strong>Flaskhals:</strong> ' + (bottleneck || 'Ingen tydlig flaskhals – följ trenden 1–2 veckor till.') + '</li>';
+        html += '<li><strong>Gör nästa steg lätt:</strong> förifyllt första meddelande + tydlig CTA "Ställ en fråga" efter match/kontakt.</li>';
+        if (replyRatePct != null && replyRatePct < 50) html += '<li><strong>Reply rate:</strong> Bara ' + replyRatePct.toFixed(0) + '% får svar inom 24h – överväg push-notis / påminnelser för snabbare svar.</li>';
+        else if (replyRatePct != null) html += '<li><strong>Reply rate:</strong> ' + replyRatePct.toFixed(0) + '% – bra nivå! Fortsätt följa.</li>';
+        else html += '<li><strong>Reply rate:</strong> Visas automatiskt när RPC dashboard_reply_rate är skapad i Supabase.</li>';
+        html += '</ul>';
+
+        if (getPartialWeek(mainData || [])) {
+          html += '<p class="copy-hint">Obs: pågående vecka är ofullständig – jämför inte rakt av med 7 dagar.</p>';
+        }
         return html;
       }
 
       function runSanityChecks(mainData) {
         var alerts = [];
+        var everHadConversations = (mainData || []).some(function(row) {
+          var konv = (row.sitter_konversationer || 0) + (row.tindog_konversationer || 0);
+          return konv > 0;
+        });
+
         (mainData || []).forEach(function(row) {
           var konv = (row.sitter_konversationer || 0) + (row.tindog_konversationer || 0);
           var medd = (row.sitter_meddelanden || 0) + (row.tindog_meddelanden || 0);
-          if (medd > 0 && konv === 0) alerts.push('Event mismatch ' + (row.label || '') + ': meddelanden > 0 men konversationer = 0.');
+
+          if (medd > 0 && konv === 0 && everHadConversations) {
+            alerts.push('Info ' + (row.label || '') + ': meddelanden skickades, men inga *nya* konversationer startades denna vecka (troligen aktivitet i äldre trådar).');
+          }
+          if (medd > 0 && konv === 0 && !everHadConversations) {
+            alerts.push('⚠️ Datamismatch ' + (row.label || '') + ': meddelanden finns men konversationer är alltid 0. Kolla event/SQL.');
+          }
         });
         return alerts;
       }
@@ -432,7 +474,8 @@
         { key: 'hund_aktivering_pct', label: 'Hund-aktivering (procent)', derived: true, förklaring: 'Andel nya konton som lade till minst en hund (procent): ' },
         { key: 'vakt_aktivering_pct', label: 'Vakt-aktivering (procent)', derived: true, förklaring: 'Andel nya konton som skapade hundvaktprofil (procent): ' },
         { key: 'konv_per_100', label: 'Konversationer per 100 konton', derived: true, förklaring: 'Konversationer (Sitter + Tindog) per 100 nya konton: ' },
-        { key: 'medd_per_konv', label: 'Meddelanden per konversation', derived: true, förklaring: 'Genomsnitt antal meddelanden per konversation per vecka: ' }
+        { key: 'medd_per_konv', label: 'Meddelanden per konversation', derived: true, förklaring: 'Genomsnitt antal meddelanden per konversation per vecka: ' },
+        { key: 'reply_rate_pct', label: 'Reply rate (procent)', derived: false, förklaring: 'Andel konversationer som fick svar inom 24 timmar: ' }
       ];
 
       function getChartValue(row, metric) {
@@ -520,6 +563,7 @@
 
       var lastMainData = null;
       var lastEventsData = null;
+      var lastReplyData = null;
 
       function buildChatGPTPrompt(mainData, eventsData) {
         mainData = mainData || DEFAULT_MAIN_DATA;
@@ -539,9 +583,22 @@
         if (el) el.value = buildChatGPTPrompt(lastMainData, lastEventsData);
       }
 
+      function mergeReplyRate(mainData, replyData) {
+        if (!Array.isArray(replyData) || !Array.isArray(mainData)) return;
+        mainData.forEach(function(row) {
+          var match = replyData.find(function(r) { return r.label === row.label; });
+          if (match) {
+            row.reply_rate_pct = match.reply_rate_pct;
+            row.reply_total = match.total_conversations;
+            row.reply_with = match.with_reply;
+          }
+        });
+      }
+
       function renderAll(mainData, eventsData) {
         mainData = mainData || DEFAULT_MAIN_DATA;
         eventsData = eventsData || DEFAULT_EVENTS_DATA;
+        if (lastReplyData) mergeReplyRate(mainData, lastReplyData);
         var outKpi = document.getElementById('outKpi');
         var outMain = document.getElementById('outMain');
         var outPartial = document.getElementById('outPartial');
@@ -568,17 +625,20 @@
         try {
           var savedMain = localStorage.getItem('flocken_dashboard_main');
           var savedEvents = localStorage.getItem('flocken_dashboard_events');
+          var savedReply = localStorage.getItem('flocken_dashboard_reply');
           if (savedMain) { main = JSON.parse(savedMain); lastMainData = main; }
           if (savedEvents) { events = JSON.parse(savedEvents); lastEventsData = events; }
+          if (savedReply) { lastReplyData = JSON.parse(savedReply); }
         } catch (e) {}
         renderAll(main, events);
 
         // Auto-fetch live data from Supabase
         if (statusEl) statusEl.textContent = 'Hämtar live-data...';
-        Promise.all([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events')])
+        Promise.all([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate')])
           .then(function(results) {
             var mainResult = results[0];
             var eventsResult = results[1];
+            var replyResult = results[2];
             if (Array.isArray(mainResult) && mainResult.length > 0) {
               lastMainData = mainResult;
               try { localStorage.setItem('flocken_dashboard_main', JSON.stringify(mainResult)); } catch (e) {}
@@ -586,6 +646,14 @@
             if (Array.isArray(eventsResult) && eventsResult.length > 0) {
               lastEventsData = eventsResult;
               try { localStorage.setItem('flocken_dashboard_events', JSON.stringify(eventsResult)); } catch (e) {}
+            }
+            var replyArr = replyResult;
+            if (Array.isArray(replyResult) && replyResult.length === 1 && replyResult[0] && replyResult[0].dashboard_reply_rate) {
+              replyArr = replyResult[0].dashboard_reply_rate;
+            }
+            if (Array.isArray(replyArr) && replyArr.length > 0) {
+              lastReplyData = replyArr;
+              try { localStorage.setItem('flocken_dashboard_reply', JSON.stringify(replyArr)); } catch (e) {}
             }
             renderAll(lastMainData, lastEventsData);
             if (statusEl) statusEl.textContent = 'Uppdaterad ' + new Date().toLocaleString('sv-SE');
