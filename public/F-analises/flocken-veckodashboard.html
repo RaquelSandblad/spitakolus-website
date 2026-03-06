@@ -102,10 +102,10 @@
   <script>if(!sessionStorage.getItem('dashboard_ok')){location.replace('index.html');}</script>
   <h1>Flocken – Veckovis aktivitet</h1>
   <p class="help"><strong>Här nedan ser du:</strong> antal nya konton, hundar, hundvaktprofiler, konversationer, meddelanden, promenader och hundvänliga platser vecka för vecka – plus app-events (inloggningar, annonser skapade, kontakt med hundvakt). Alla siffror exkluderar Raquel, Torbjörn och tb.sandblad.</p>
-  <p class="help" style="margin-bottom:0;"><strong>Live-data</strong> – hämtas automatiskt från Supabase vid sidladdning (Ctrl+R för att uppdatera). <span id="fetchStatus" style="font-weight:600;"></span></p>
+  <p class="help" style="margin-bottom:0;"><strong>Live-data</strong> <span id="fetchStatus" style="font-weight:600;"></span></p>
 
   <div class="card">
-    <h2>KPI – senaste fulla veckan (beslutsbar på 10 sek)</h2>
+    <h2>KPI – senaste fulla veckan</h2>
     <div id="outKpi"></div>
   </div>
 
@@ -124,9 +124,16 @@
   </div>
 
   <div class="card">
-    <h2>Grafer per parameter (en i taget)</h2>
-    <p class="help">Samma data som tabellen ovan, en stapeldiagram per mått. Fullständiga namn – inga förkortningar.</p>
+    <h2>Grafer per parameter</h2>
+    <p class="help">Samma data som tabellen ovan, ett stapeldiagram per mått. Fullständiga namn – inga förkortningar.</p>
     <div id="outCharts"></div>
+  </div>
+
+  <div class="card">
+    <h2>Kontotyper – fördelning och e-postbekräftelse</h2>
+    <p class="help">Totalt antal konton per typ, hur många som bekräftat sin e-post, och nya konton per vecka uppdelat på typ.</p>
+    <div id="outAccountTypes"></div>
+    <div id="outAccountWeekly"></div>
   </div>
 
   <div class="card">
@@ -567,6 +574,101 @@
       var lastEventsData = null;
       var lastReplyData = null;
       var lastNotifData = null;
+      var lastAccountData = null;
+
+      var ACCOUNT_TYPE_LABELS = {
+        dog_owner: 'Hundägare',
+        dog_sitter: 'Hundvakt',
+        kennel: 'Kennel',
+        dog_daycare: 'Hunddagis',
+        okand: 'Okänd'
+      };
+      var ACCOUNT_TYPE_COLORS = {
+        dog_owner: 'rgba(45, 90, 39, 0.7)',
+        dog_sitter: 'rgba(54, 162, 235, 0.7)',
+        kennel: 'rgba(255, 159, 64, 0.7)',
+        dog_daycare: 'rgba(153, 102, 255, 0.7)',
+        okand: 'rgba(150, 150, 150, 0.7)'
+      };
+
+      function renderAccountTypes(data) {
+        var container = document.getElementById('outAccountTypes');
+        var weeklyContainer = document.getElementById('outAccountWeekly');
+        if (!container || !data) return;
+
+        var byType = data.by_type || [];
+        var byWeek = data.by_week || [];
+
+        // Sammanfattningstabell
+        var html = '<h3>Totalt per kontotyp</h3><table><thead><tr><th>Kontotyp</th><th class="num">Totalt</th><th class="num">Bekräftad e-post</th><th class="num">Inte bekräftad</th><th class="num">Obekräftade %</th></tr></thead><tbody>';
+        byType.forEach(function(t) {
+          var pct = t.total > 0 ? ((t.unconfirmed / t.total) * 100).toFixed(1) : '0';
+          html += '<tr><td>' + (ACCOUNT_TYPE_LABELS[t.account_type] || t.account_type) + '</td>';
+          html += '<td class="num">' + t.total + '</td>';
+          html += '<td class="num">' + t.confirmed + '</td>';
+          html += '<td class="num">' + (t.unconfirmed > 0 ? '<strong style="color:#b02a37">' + t.unconfirmed + '</strong>' : '0') + '</td>';
+          html += '<td class="num">' + pct + '%</td></tr>';
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+
+        // Veckovis stacked bar chart
+        if (!weeklyContainer || byWeek.length === 0) return;
+        weeklyContainer.innerHTML = '<h3>Nya konton per vecka och kontotyp</h3><div class="chart-wrap" style="height:280px;"><canvas id="accountTypeChart"></canvas></div><h3 style="margin-top:2rem;">Obekräftade e-postadresser per vecka och kontotyp</h3><div class="chart-wrap" style="height:280px;"><canvas id="unconfirmedChart"></canvas></div>';
+
+        var labels = byWeek.map(function(w) { return w.label; });
+        var allTypes = {};
+        byWeek.forEach(function(w) {
+          (w.breakdown || []).forEach(function(b) { allTypes[b.account_type] = true; });
+        });
+        var typeKeys = Object.keys(allTypes).sort();
+
+        // New accounts chart
+        var datasets = typeKeys.map(function(type) {
+          return {
+            label: ACCOUNT_TYPE_LABELS[type] || type,
+            data: byWeek.map(function(w) {
+              var found = (w.breakdown || []).find(function(b) { return b.account_type === type; });
+              return found ? found.new_accounts : 0;
+            }),
+            backgroundColor: ACCOUNT_TYPE_COLORS[type] || 'rgba(150,150,150,0.7)'
+          };
+        });
+
+        var ctx1 = document.getElementById('accountTypeChart').getContext('2d');
+        new Chart(ctx1, {
+          type: 'bar',
+          data: { labels: labels, datasets: datasets },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'top' } },
+            scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }
+          }
+        });
+
+        // Unconfirmed chart
+        var unconfDatasets = typeKeys.map(function(type) {
+          return {
+            label: ACCOUNT_TYPE_LABELS[type] || type,
+            data: byWeek.map(function(w) {
+              var found = (w.breakdown || []).find(function(b) { return b.account_type === type; });
+              return found ? found.new_unconfirmed : 0;
+            }),
+            backgroundColor: ACCOUNT_TYPE_COLORS[type] || 'rgba(150,150,150,0.7)'
+          };
+        });
+
+        var ctx2 = document.getElementById('unconfirmedChart').getContext('2d');
+        new Chart(ctx2, {
+          type: 'bar',
+          data: { labels: labels, datasets: unconfDatasets },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'top' } },
+            scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }
+          }
+        });
+      }
 
       function buildChatGPTPrompt(mainData, eventsData) {
         mainData = mainData || DEFAULT_MAIN_DATA;
@@ -629,6 +731,7 @@
         var sanity = runSanityChecks(mainData);
         if (sanityAlerts) sanityAlerts.innerHTML = sanity.length ? sanity.map(function(s) { return '<div class="sanity-alert">' + s + '</div>'; }).join('') : '';
         renderCharts(mainData);
+        renderAccountTypes(lastAccountData);
         updatePrompt();
       }
 
@@ -647,12 +750,14 @@
           if (savedReply) { lastReplyData = JSON.parse(savedReply); }
           var savedNotif = localStorage.getItem('flocken_dashboard_notif');
           if (savedNotif) { lastNotifData = JSON.parse(savedNotif); }
+          var savedAcct = localStorage.getItem('flocken_dashboard_accounts');
+          if (savedAcct) { lastAccountData = JSON.parse(savedAcct); }
         } catch (e) {}
         renderAll(main, events);
 
         // Auto-fetch live data from Supabase
         if (statusEl) statusEl.textContent = 'Hämtar live-data...';
-        Promise.all([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats')])
+        Promise.all([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types')])
           .then(function(results) {
             var mainResult = results[0];
             var eventsResult = results[1];
@@ -681,6 +786,15 @@
             if (Array.isArray(notifArr) && notifArr.length > 0) {
               lastNotifData = notifArr;
               try { localStorage.setItem('flocken_dashboard_notif', JSON.stringify(notifArr)); } catch (e) {}
+            }
+            var acctResult = results[4];
+            var acctObj = acctResult;
+            if (Array.isArray(acctResult) && acctResult.length === 1 && acctResult[0] && acctResult[0].dashboard_account_types) {
+              acctObj = acctResult[0].dashboard_account_types;
+            }
+            if (acctObj && acctObj.by_type) {
+              lastAccountData = acctObj;
+              try { localStorage.setItem('flocken_dashboard_accounts', JSON.stringify(acctObj)); } catch (e) {}
             }
             renderAll(lastMainData, lastEventsData);
             if (statusEl) statusEl.textContent = 'Uppdaterad ' + new Date().toLocaleString('sv-SE');
