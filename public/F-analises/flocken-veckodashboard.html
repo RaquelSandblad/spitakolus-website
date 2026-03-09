@@ -269,25 +269,19 @@
         };
       }
 
-      function renderHighlights(mainData, accountData) {
+      function renderHighlights(mainData, todayData) {
         var container = document.getElementById('outHighlights');
         if (!container) return;
-        mainData = mainData || [];
-        var full = getFullWeeks(mainData);
-        if (full.length === 0) {
-          container.innerHTML = '<p class="help">Ingen data tillgänglig än.</p>';
+        
+        if (!todayData || !todayData.date) {
+          container.innerHTML = '<p class="help">Ingen data för idag tillgänglig än.</p>';
           return;
-        }
-        var curr = full[full.length - 1];
-        var acctWeek = null;
-        if (accountData && accountData.by_week) {
-          acctWeek = accountData.by_week[accountData.by_week.length - 1];
         }
 
         var html = '<div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; margin-bottom:1rem;">';
         html += '<div><div class="kpi-grid" style="grid-template-columns: repeat(2, 1fr);">';
-        html += '<div class="kpi-card"><div class="kpi-value">' + (curr.nya_hundar || 0) + '</div><div class="kpi-label">Nya hundar</div></div>';
-        html += '<div class="kpi-card"><div class="kpi-value">' + (curr.nya_hundvakt_profiler || 0) + '</div><div class="kpi-label">Nya hundvaktprofiler</div></div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + (todayData.new_dogs || 0) + '</div><div class="kpi-label">Nya hundar</div></div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + (todayData.new_sitters || 0) + '</div><div class="kpi-label">Nya hundvaktprofiler</div></div>';
         html += '</div></div>';
         
         html += '<div><canvas id="highlightsChart" style="max-height:180px;"></canvas></div>';
@@ -295,28 +289,31 @@
         
         container.innerHTML = html;
 
-        if (!acctWeek || !acctWeek.breakdown) return;
+        if (!todayData.accounts || todayData.accounts.length === 0) return;
 
-        var ownerAcct = acctWeek.breakdown.find(function(b) { return b.account_type === 'dog_owner'; });
-        var sitterAcct = acctWeek.breakdown.find(function(b) { return b.account_type === 'dog_sitter'; });
-        var kennelAcct = acctWeek.breakdown.find(function(b) { return b.account_type === 'kennel'; });
-        var daycareAcct = acctWeek.breakdown.find(function(b) { return b.account_type === 'dog_daycare'; });
+        var ownerAcct = todayData.accounts.find(function(a) { return a.account_type === 'dog_owner'; });
+        var sitterAcct = todayData.accounts.find(function(a) { return a.account_type === 'dog_sitter'; });
+        var kennelAcct = todayData.accounts.find(function(a) { return a.account_type === 'kennel'; });
+        var daycareAcct = todayData.accounts.find(function(a) { return a.account_type === 'dog_daycare'; });
 
         var labels = ['Hundägare', 'Hundvakt', 'Kennel', 'Hunddagis'];
-        var newDogs = curr.nya_hundar || 0;
-        var newSitters = curr.nya_hundvakt_profiler || 0;
+        
         var ownerTotal = (ownerAcct && ownerAcct.new_accounts) || 0;
+        var ownerWithProfile = (ownerAcct && ownerAcct.with_profile) || 0;
+        var ownerNoProfile = Math.max(0, ownerTotal - ownerWithProfile);
+        
         var sitterTotal = (sitterAcct && sitterAcct.new_accounts) || 0;
+        var sitterWithProfile = (sitterAcct && sitterAcct.with_profile) || 0;
+        var sitterNoProfile = Math.max(0, sitterTotal - sitterWithProfile);
+        
         var kennelTotal = (kennelAcct && kennelAcct.new_accounts) || 0;
+        var kennelWithProfile = (kennelAcct && kennelAcct.with_profile) || 0;
+        
         var daycareTotal = (daycareAcct && daycareAcct.new_accounts) || 0;
+        var daycareWithProfile = (daycareAcct && daycareAcct.with_profile) || 0;
 
-        var ownerWithProfile = newDogs;
-        var ownerNoProfile = Math.max(0, ownerTotal - newDogs);
-        var sitterWithProfile = newSitters;
-        var sitterNoProfile = Math.max(0, sitterTotal - newSitters);
-
-        var solidData = [ownerWithProfile, sitterWithProfile, kennelTotal, daycareTotal];
-        var hatchData = [ownerNoProfile, sitterNoProfile, 0, 0];
+        var solidData = [ownerWithProfile, sitterWithProfile, kennelWithProfile, daycareWithProfile];
+        var hatchData = [ownerNoProfile, sitterNoProfile, Math.max(0, kennelTotal - kennelWithProfile), Math.max(0, daycareTotal - daycareWithProfile)];
 
         var colors = [
           ACCOUNT_TYPE_COLORS.dog_owner,
@@ -681,6 +678,7 @@
       var lastReplyData = null;
       var lastNotifData = null;
       var lastAccountData = null;
+      var lastTodayData = null;
 
       var ACCOUNT_TYPE_LABELS = {
         dog_owner: 'Hundägare',
@@ -872,7 +870,7 @@
         if (analysisDynamic) analysisDynamic.innerHTML = buildRuleBasedAnalysis(mainData, eventsData);
         var sanity = runSanityChecks(mainData);
         if (sanityAlerts) sanityAlerts.innerHTML = sanity.length ? sanity.map(function(s) { return '<div class="sanity-alert">' + s + '</div>'; }).join('') : '';
-        renderHighlights(mainData, lastAccountData);
+        renderHighlights(mainData, lastTodayData);
         renderCharts(mainData);
         renderAccountTypes(lastAccountData);
         updatePrompt();
@@ -895,12 +893,14 @@
           if (savedNotif) { lastNotifData = JSON.parse(savedNotif); }
           var savedAcct = localStorage.getItem('flocken_dashboard_accounts');
           if (savedAcct) { lastAccountData = JSON.parse(savedAcct); }
+          var savedToday = localStorage.getItem('flocken_dashboard_today');
+          if (savedToday) { lastTodayData = JSON.parse(savedToday); }
         } catch (e) {}
         renderAll(main, events);
 
         // Auto-fetch live data from Supabase
         if (statusEl) statusEl.textContent = 'Hämtar live-data...';
-        Promise.all([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types')])
+        Promise.all([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types'), rpc('dashboard_today_highlights')])
           .then(function(results) {
             var mainResult = results[0];
             var eventsResult = results[1];
@@ -938,6 +938,15 @@
             if (acctObj && acctObj.by_type) {
               lastAccountData = acctObj;
               try { localStorage.setItem('flocken_dashboard_accounts', JSON.stringify(acctObj)); } catch (e) {}
+            }
+            var todayResult = results[5];
+            var todayObj = todayResult;
+            if (Array.isArray(todayResult) && todayResult.length === 1 && todayResult[0] && todayResult[0].dashboard_today_highlights) {
+              todayObj = todayResult[0].dashboard_today_highlights;
+            }
+            if (todayObj && todayObj.date) {
+              lastTodayData = todayObj;
+              try { localStorage.setItem('flocken_dashboard_today', JSON.stringify(todayObj)); } catch (e) {}
             }
             renderAll(lastMainData, lastEventsData);
             if (statusEl) statusEl.textContent = 'Uppdaterad ' + new Date().toLocaleString('sv-SE');
