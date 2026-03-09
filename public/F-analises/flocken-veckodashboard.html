@@ -279,7 +279,16 @@
         }
 
         var html = '<div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; margin-bottom:1rem;">';
-        html += '<div><div class="kpi-grid" style="grid-template-columns: repeat(2, 1fr);">';
+        html += '<div><div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr);">';
+        
+        var totalNewAccounts = 0;
+        if (todayData.accounts && todayData.accounts.length > 0) {
+          todayData.accounts.forEach(function(a) {
+            totalNewAccounts += a.new_accounts || 0;
+          });
+        }
+        
+        html += '<div class="kpi-card"><div class="kpi-value">' + totalNewAccounts + '</div><div class="kpi-label">Nya konton</div></div>';
         html += '<div class="kpi-card"><div class="kpi-value">' + (todayData.new_dogs || 0) + '</div><div class="kpi-label">Nya hundar</div></div>';
         html += '<div class="kpi-card"><div class="kpi-value">' + (todayData.new_sitters || 0) + '</div><div class="kpi-label">Nya hundvaktprofiler</div></div>';
         html += '</div></div>';
