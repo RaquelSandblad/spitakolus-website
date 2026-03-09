@@ -284,23 +284,89 @@
           acctWeek = accountData.by_week[accountData.by_week.length - 1];
         }
 
-        var html = '<div class="kpi-grid">';
+        var html = '<div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; margin-bottom:1rem;">';
+        html += '<div><div class="kpi-grid" style="grid-template-columns: repeat(2, 1fr);">';
         html += '<div class="kpi-card"><div class="kpi-value">' + (curr.nya_hundar || 0) + '</div><div class="kpi-label">Nya hundar</div></div>';
         html += '<div class="kpi-card"><div class="kpi-value">' + (curr.nya_hundvakt_profiler || 0) + '</div><div class="kpi-label">Nya hundvaktprofiler</div></div>';
+        html += '</div></div>';
         
-        if (acctWeek && acctWeek.breakdown) {
-          var kennelAcct = acctWeek.breakdown.find(function(b) { return b.account_type === 'kennel'; });
-          var daycareAcct = acctWeek.breakdown.find(function(b) { return b.account_type === 'dog_daycare'; });
-          var ownerAcct = acctWeek.breakdown.find(function(b) { return b.account_type === 'dog_owner'; });
-          var sitterAcct = acctWeek.breakdown.find(function(b) { return b.account_type === 'dog_sitter'; });
-          
-          html += '<div class="kpi-card"><div class="kpi-value">' + ((kennelAcct && kennelAcct.new_accounts) || 0) + '</div><div class="kpi-label">Nya kennelkonton</div></div>';
-          html += '<div class="kpi-card"><div class="kpi-value">' + ((daycareAcct && daycareAcct.new_accounts) || 0) + '</div><div class="kpi-label">Nya hunddagiskonton</div></div>';
-          html += '<div class="kpi-card"><div class="kpi-value">' + ((ownerAcct && ownerAcct.new_accounts) || 0) + '</div><div class="kpi-label">Konton som hundägare</div></div>';
-          html += '<div class="kpi-card"><div class="kpi-value">' + ((sitterAcct && sitterAcct.new_accounts) || 0) + '</div><div class="kpi-label">Konton som hundvakt</div></div>';
-        }
+        html += '<div><canvas id="highlightsChart" style="max-height:180px;"></canvas></div>';
         html += '</div>';
+        
         container.innerHTML = html;
+
+        if (!acctWeek || !acctWeek.breakdown) return;
+
+        var ownerAcct = acctWeek.breakdown.find(function(b) { return b.account_type === 'dog_owner'; });
+        var sitterAcct = acctWeek.breakdown.find(function(b) { return b.account_type === 'dog_sitter'; });
+        var kennelAcct = acctWeek.breakdown.find(function(b) { return b.account_type === 'kennel'; });
+        var daycareAcct = acctWeek.breakdown.find(function(b) { return b.account_type === 'dog_daycare'; });
+
+        var labels = ['Hundägare', 'Hundvakt', 'Kennel', 'Hunddagis'];
+        var newDogs = curr.nya_hundar || 0;
+        var newSitters = curr.nya_hundvakt_profiler || 0;
+        var ownerTotal = (ownerAcct && ownerAcct.new_accounts) || 0;
+        var sitterTotal = (sitterAcct && sitterAcct.new_accounts) || 0;
+        var kennelTotal = (kennelAcct && kennelAcct.new_accounts) || 0;
+        var daycareTotal = (daycareAcct && daycareAcct.new_accounts) || 0;
+
+        var ownerWithProfile = newDogs;
+        var ownerNoProfile = Math.max(0, ownerTotal - newDogs);
+        var sitterWithProfile = newSitters;
+        var sitterNoProfile = Math.max(0, sitterTotal - newSitters);
+
+        var solidData = [ownerWithProfile, sitterWithProfile, kennelTotal, daycareTotal];
+        var hatchData = [ownerNoProfile, sitterNoProfile, 0, 0];
+
+        var colors = [
+          ACCOUNT_TYPE_COLORS.dog_owner,
+          ACCOUNT_TYPE_COLORS.dog_sitter,
+          ACCOUNT_TYPE_COLORS.kennel,
+          ACCOUNT_TYPE_COLORS.dog_daycare
+        ];
+
+        var hatchPatterns = colors.map(function(c) { return makeHatchPattern(c); });
+
+        var ctx = document.getElementById('highlightsChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Med profil',
+                data: solidData,
+                backgroundColor: colors,
+                borderWidth: 0
+              },
+              {
+                label: 'Utan profil',
+                data: hatchData,
+                backgroundColor: hatchPatterns,
+                borderColor: colors,
+                borderWidth: 1
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: true, position: 'top' },
+              tooltip: {
+                callbacks: {
+                  label: function(ctx) {
+                    return ctx.dataset.label + ': ' + ctx.parsed.y;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: { stacked: true },
+              y: { stacked: true, beginAtZero: true }
+            }
+          }
+        });
       }
 
       function renderKpiCards(mainData, eventsData) {
