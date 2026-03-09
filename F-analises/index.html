@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Logga in – Flocken dashboard</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8f9fa;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .box {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.08);
+      max-width: 320px;
+      width: 100%;
+    }
+    h1 { font-size: 1.25rem; margin: 0 0 1rem 0; color: #2d5a27; }
+    label { display: block; font-size: 0.9rem; color: #555; margin-bottom: 0.35rem; }
+    input[type="password"] {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      margin-top: 1rem;
+      padding: 0.65rem;
+      background: #2d5a27;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    button:hover { opacity: 0.9; }
+    .error { color: #b02a37; font-size: 0.9rem; margin-top: 0.75rem; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Flocken dashboard</h1>
+    <p style="color:#6c757d; font-size:0.9rem; margin:0 0 1rem 0;">Ange lösenord för att öppna veckodashboarden.</p>
+    <form id="form" method="get" action="flocken-veckodashboard.html">
+      <label for="pw">Lösenord</label>
+      <input type="password" id="pw" name="pw" autocomplete="current-password" placeholder="Lösenord">
+      <button type="submit">Öppna dashboard</button>
+    </form>
+    <p id="err" class="error" style="display:none;" aria-live="polite">Fel lösenord. Försök igen.</p>
+  </div>
+  <script>
+    (function() {
+      // Byt till ett eget starkt lösenord och spara filen. Dela bara med de som ska ha åtkomst.
+      var RATT_LOSENORD = 'Mingau';
+
+      var form = document.getElementById('form');
+      var pw = document.getElementById('pw');
+      var err = document.getElementById('err');
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        err.style.display = 'none';
+        if (pw.value === RATT_LOSENORD) {
+          sessionStorage.setItem('dashboard_ok', '1');
+          window.location.href = 'flocken-veckodashboard.html';
+        } else {
+          err.style.display = 'block';
+          pw.focus();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
