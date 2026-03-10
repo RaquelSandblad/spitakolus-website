@@ -735,7 +735,7 @@
               var g = Math.round(90 + (1-intensity) * 150);
               var b = Math.round(39 + (1-intensity) * 200);
               var bg = 'rgba(' + r + ',' + g + ',' + b + ',' + (0.15 + intensity * 0.6) + ')';
-              html += '<td class="num" style="background:' + bg + '; font-weight:600;">' + pct.toFixed(0) + '%</td>';
+              html += '<td class="num" style="background:' + bg + '; font-weight:600;">' + count + ' <span style="font-weight:400;font-size:0.8em;color:#555;">(' + pct.toFixed(0) + '%)</span></td>';
             }
           });
           html += '</tr>';
