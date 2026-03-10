@@ -112,7 +112,7 @@
 
   <div class="card">
     <h2>Daily Retention</h2>
-    <p class="help">Av de som skapade konto en given dag – hur många öppnade appen igen dag 1, 2, 3... upp till dag 30? Visar % av kohorten. Tomma celler = datan finns inte än (för nära idag).</p>
+    <p class="help">Av de som skapade konto en given dag – hur många öppnade appen igen? Dag 0 = senare samma dag. ~Dag 14/21/30 räknar ±1–2 dagar runt exakt dag för att fånga upp folk som kom tillbaka strax innan/efter. Visar antal och % av kohorten.</p>
     <div id="outRetention"></div>
   </div>
 
@@ -704,26 +704,35 @@
           return;
         }
 
-        var days = [0,1,2,3,4,5,6,7,14,30];
+        var days = [
+          { key: 'day_0',  label: 'Dag 0',   offset: 0  },
+          { key: 'day_1',  label: 'Dag 1',   offset: 1  },
+          { key: 'day_2',  label: 'Dag 2',   offset: 2  },
+          { key: 'day_3',  label: 'Dag 3',   offset: 3  },
+          { key: 'day_4',  label: 'Dag 4',   offset: 4  },
+          { key: 'day_5',  label: 'Dag 5',   offset: 5  },
+          { key: 'day_6',  label: 'Dag 6',   offset: 6  },
+          { key: 'day_7',  label: 'Dag 7',   offset: 7  },
+          { key: 'day_14', label: '~Dag 14', offset: 14 },
+          { key: 'day_21', label: '~Dag 21', offset: 21 },
+          { key: 'day_30', label: '~Dag 30', offset: 30 }
+        ];
         var html = '<div class="table-wrap"><table><thead><tr>';
         html += '<th>Datum</th><th class="num">Nya konton</th>';
-        days.forEach(function(d) { html += '<th class="num">Dag ' + d + '</th>'; });
+        days.forEach(function(d) { html += '<th class="num">' + d.label + '</th>'; });
         html += '</tr></thead><tbody>';
 
         data.forEach(function(row) {
           var cohortDate = row.cohort_date;
           var size = row.cohort_size;
-          var today = new Date().toISOString().slice(0,10);
+          var todayMs = new Date().setHours(0,0,0,0);
           html += '<tr><td>' + cohortDate + '</td><td class="num">' + size + '</td>';
           days.forEach(function(d) {
-            var key = 'day_' + d;
-            var count = row[key] || 0;
+            var count = row[d.key] || 0;
             var pct = size > 0 ? (count / size * 100) : 0;
 
-            // Beräkna om dagen ens har inträffat ännu
             var cohortMs = new Date(cohortDate).getTime();
-            var dayMs = cohortMs + d * 86400000;
-            var todayMs = new Date(today).getTime();
+            var dayMs = cohortMs + d.offset * 86400000;
 
             if (dayMs > todayMs) {
               html += '<td class="num" style="color:#ccc;">–</td>';
