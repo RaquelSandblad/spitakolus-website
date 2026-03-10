@@ -722,19 +722,23 @@
         days.forEach(function(d) { html += '<th class="num">' + d.label + '</th>'; });
         html += '</tr></thead><tbody>';
 
+        function addDays(dateStr, n) {
+          var d = new Date(dateStr + 'T12:00:00');
+          d.setDate(d.getDate() + n);
+          return d.toISOString().slice(0, 10);
+        }
+        var todayStr = new Date().toLocaleDateString('sv-SE');
+
         data.forEach(function(row) {
           var cohortDate = row.cohort_date;
           var size = row.cohort_size;
-          var todayMs = new Date().setHours(0,0,0,0);
           html += '<tr><td>' + cohortDate + '</td><td class="num">' + size + '</td>';
           days.forEach(function(d) {
             var count = row[d.key] || 0;
             var pct = size > 0 ? (count / size * 100) : 0;
+            var dayDateStr = addDays(cohortDate, d.offset);
 
-            var cohortMs = new Date(cohortDate).getTime();
-            var dayMs = cohortMs + d.offset * 86400000;
-
-            if (dayMs > todayMs) {
+            if (dayDateStr > todayStr) {
               html += '<td class="num" style="color:#ccc;">–</td>';
             } else if (count === 0) {
               html += '<td class="num" style="color:#ccc;">0%</td>';
