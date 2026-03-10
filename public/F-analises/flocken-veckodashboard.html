@@ -111,6 +111,12 @@
   </div>
 
   <div class="card">
+    <h2>Daily Retention</h2>
+    <p class="help">Av de som skapade konto en given dag – hur många öppnade appen igen dag 1, 2, 3... upp till dag 30? Visar % av kohorten. Tomma celler = datan finns inte än (för nära idag).</p>
+    <div id="outRetention"></div>
+  </div>
+
+  <div class="card">
     <h2>KPI – senaste fulla veckan</h2>
     <div id="outKpi"></div>
   </div>
@@ -688,6 +694,56 @@
       var lastNotifData = null;
       var lastAccountData = null;
       var lastTodayData = null;
+      var lastRetentionData = null;
+
+      function renderRetention(data) {
+        var container = document.getElementById('outRetention');
+        if (!container) return;
+        if (!data || data.length === 0) {
+          container.innerHTML = '<p class="help">Ingen retentionsdata tillgänglig än.</p>';
+          return;
+        }
+
+        var days = [0,1,2,3,4,5,6,7,14,30];
+        var html = '<div class="table-wrap"><table><thead><tr>';
+        html += '<th>Datum</th><th class="num">Nya konton</th>';
+        days.forEach(function(d) { html += '<th class="num">Dag ' + d + '</th>'; });
+        html += '</tr></thead><tbody>';
+
+        data.forEach(function(row) {
+          var cohortDate = row.cohort_date;
+          var size = row.cohort_size;
+          var today = new Date().toISOString().slice(0,10);
+          html += '<tr><td>' + cohortDate + '</td><td class="num">' + size + '</td>';
+          days.forEach(function(d) {
+            var key = 'day_' + d;
+            var count = row[key] || 0;
+            var pct = size > 0 ? (count / size * 100) : 0;
+
+            // Beräkna om dagen ens har inträffat ännu
+            var cohortMs = new Date(cohortDate).getTime();
+            var dayMs = cohortMs + d * 86400000;
+            var todayMs = new Date(today).getTime();
+
+            if (dayMs > todayMs) {
+              html += '<td class="num" style="color:#ccc;">–</td>';
+            } else if (count === 0) {
+              html += '<td class="num" style="color:#ccc;">0%</td>';
+            } else {
+              var intensity = Math.min(pct / 30, 1);
+              var r = Math.round(45 + (1-intensity) * 200);
+              var g = Math.round(90 + (1-intensity) * 150);
+              var b = Math.round(39 + (1-intensity) * 200);
+              var bg = 'rgba(' + r + ',' + g + ',' + b + ',' + (0.15 + intensity * 0.6) + ')';
+              html += '<td class="num" style="background:' + bg + '; font-weight:600;">' + pct.toFixed(0) + '%</td>';
+            }
+          });
+          html += '</tr>';
+        });
+
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
+      }
 
       var ACCOUNT_TYPE_LABELS = {
         dog_owner: 'Hundägare',
@@ -880,6 +936,7 @@
         var sanity = runSanityChecks(mainData);
         if (sanityAlerts) sanityAlerts.innerHTML = sanity.length ? sanity.map(function(s) { return '<div class="sanity-alert">' + s + '</div>'; }).join('') : '';
         renderHighlights(mainData, lastTodayData);
+        renderRetention(lastRetentionData);
         renderCharts(mainData);
         renderAccountTypes(lastAccountData);
         updatePrompt();
@@ -904,12 +961,14 @@
           if (savedAcct) { lastAccountData = JSON.parse(savedAcct); }
           var savedToday = localStorage.getItem('flocken_dashboard_today');
           if (savedToday) { lastTodayData = JSON.parse(savedToday); }
+          var savedRetention = localStorage.getItem('flocken_dashboard_retention');
+          if (savedRetention) { lastRetentionData = JSON.parse(savedRetention); }
         } catch (e) {}
         renderAll(main, events);
 
         // Auto-fetch live data from Supabase
         if (statusEl) statusEl.textContent = 'Hämtar live-data...';
-        Promise.all([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types'), rpc('dashboard_today_highlights')])
+        Promise.all([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types'), rpc('dashboard_today_highlights'), rpc('dashboard_retention')])
           .then(function(results) {
             var mainResult = results[0];
             var eventsResult = results[1];
@@ -956,6 +1015,15 @@
             if (todayObj && todayObj.date) {
               lastTodayData = todayObj;
               try { localStorage.setItem('flocken_dashboard_today', JSON.stringify(todayObj)); } catch (e) {}
+            }
+            var retentionResult = results[6];
+            var retentionArr = retentionResult;
+            if (Array.isArray(retentionResult) && retentionResult.length === 1 && retentionResult[0] && retentionResult[0].dashboard_retention) {
+              retentionArr = retentionResult[0].dashboard_retention;
+            }
+            if (Array.isArray(retentionArr) && retentionArr.length > 0) {
+              lastRetentionData = retentionArr;
+              try { localStorage.setItem('flocken_dashboard_retention', JSON.stringify(retentionArr)); } catch (e) {}
             }
             renderAll(lastMainData, lastEventsData);
             if (statusEl) statusEl.textContent = 'Uppdaterad ' + new Date().toLocaleString('sv-SE');
