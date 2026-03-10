@@ -111,12 +111,6 @@
   </div>
 
   <div class="card">
-    <h2>Daily Retention</h2>
-    <p class="help">Av de som skapade konto en given dag – hur många öppnade appen igen? Dag 0 = senare samma dag. ~Dag 14/21/30 räknar ±1–2 dagar runt exakt dag för att fånga upp folk som kom tillbaka strax innan/efter. Visar antal och % av kohorten.</p>
-    <div id="outRetention"></div>
-  </div>
-
-  <div class="card">
     <h2>KPI – senaste fulla veckan</h2>
     <div id="outKpi"></div>
   </div>
@@ -172,6 +166,12 @@
       <button type="button" id="btnCopyPrompt">Kopiera prompt till urklipp</button>
       <span id="copyFeedback" style="margin-left:0.5rem; font-size:0.9rem; color:var(--accent);"></span>
     </details>
+  </div>
+
+  <div class="card">
+    <h2>Daglig återkomst (retention per kohort)</h2>
+    <p class="help">Av de som skapade konto en given dag – hur många öppnade appen igen? Dag 0 = senare samma dag. ~Dag 14/21/30 räknar ±1–2 dagar runt exakt dag för att fånga upp folk som kom tillbaka strax innan/efter. Visar antal och % av kohorten.</p>
+    <div id="outRetention"></div>
   </div>
 
   <p class="disclaimer">Alla siffror exkluderar Raquel Sandblad, Torbjörn Sandblad och tb.sandblad-konton (analytics_excluded_users).</p>
