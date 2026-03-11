@@ -112,7 +112,7 @@
 
   <div class="card">
     <h2>Användare per prenumerationstyp</h2>
-    <p class="help">Totalt antal användare: gratiskonto, gratis-erbjudande på premium (trial), betalande.</p>
+    <p class="help">Totalt antal användare: gratiskonto, gratis-premium (trial), betalande.</p>
     <div id="outSubscriptionBars"></div>
   </div>
 
@@ -721,7 +721,7 @@
         var pct = function(n) { return total > 0 ? (n / total * 100).toFixed(1).replace('.', ',') : '0'; };
         var labels = [
           'Gratiskonto (' + pct(gratis) + ' %)',
-          'Gratis-erbjudande premium (' + pct(trial) + ' %)',
+          'Gratis-premium (' + pct(trial) + ' %)',
           'Betalande (' + pct(betalande) + ' %)'
         ];
         var values = [gratis, trial, betalande];
