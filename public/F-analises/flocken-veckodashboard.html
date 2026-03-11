@@ -717,7 +717,13 @@
         var gratis = data.gratis_konto || 0;
         var trial = data.gratis_erbjudande_premium || 0;
         var betalande = data.betalande || 0;
-        var labels = ['Gratiskonto', 'Gratis-erbjudande premium', 'Betalande'];
+        var total = gratis + trial + betalande;
+        var pct = function(n) { return total > 0 ? (n / total * 100).toFixed(1).replace('.', ',') : '0'; };
+        var labels = [
+          'Gratiskonto (' + pct(gratis) + ' %)',
+          'Gratis-erbjudande premium (' + pct(trial) + ' %)',
+          'Betalande (' + pct(betalande) + ' %)'
+        ];
         var values = [gratis, trial, betalande];
         var colors = ['rgba(100, 100, 100, 0.6)', 'rgba(255, 152, 0, 0.6)', 'rgba(45, 90, 39, 0.6)'];
         var borderColors = ['rgb(80,80,80)', 'rgb(255, 152, 0)', 'rgb(45, 90, 39)'];
@@ -738,7 +744,18 @@
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function(ctx) {
+                    var v = ctx.parsed.y;
+                    var p = total > 0 ? (v / total * 100).toFixed(1).replace('.', ',') : '0';
+                    return v + ' st (' + p + ' %)';
+                  }
+                }
+              }
+            },
             scales: { x: { }, y: { beginAtZero: true } }
           }
         });
