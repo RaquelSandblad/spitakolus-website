@@ -630,7 +630,8 @@
           return;
         }
 
-        var allWeeks = full.slice();
+        // Visa alltid den pågående veckan + de 6 senaste fulla veckorna (totalt 7 staplar)
+        var allWeeks = full.slice(-6);
         if (partial) allWeeks.push(partial);
         var labels = allWeeks.map(function(r) { return r.label || ''; });
 
