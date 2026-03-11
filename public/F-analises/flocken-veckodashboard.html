@@ -630,9 +630,12 @@
           return;
         }
 
-        // Visa alltid den pågående veckan + de 6 senaste fulla veckorna (totalt 7 staplar)
-        var allWeeks = full.slice(-6);
-        if (partial) allWeeks.push(partial);
+        // Alltid 7 staplar: de 6 föregående veckorna (gröna) + sista veckan (orange = pågående)
+        var allData = full.slice();
+        if (partial) allData.push(partial);
+        allData.sort(function(a,b) { return (a.week_num||0) - (b.week_num||0); });
+        var allWeeks = allData.slice(-7);
+        var lastIdx = allWeeks.length - 1;
         var labels = allWeeks.map(function(r) { return r.label || ''; });
 
         CHART_METRICS.forEach(function(metric) {
@@ -641,10 +644,10 @@
           if (!hasAny) return;
 
           var backgroundColors = allWeeks.map(function(row, idx) {
-            return (partial && idx === allWeeks.length - 1) ? 'rgba(255, 152, 0, 0.6)' : 'rgba(45, 90, 39, 0.6)';
+            return idx === lastIdx ? 'rgba(255, 152, 0, 0.6)' : 'rgba(45, 90, 39, 0.6)';
           });
           var borderColors = allWeeks.map(function(row, idx) {
-            return (partial && idx === allWeeks.length - 1) ? 'rgb(255, 152, 0)' : 'rgb(45, 90, 39)';
+            return idx === lastIdx ? 'rgb(255, 152, 0)' : 'rgb(45, 90, 39)';
           });
 
           var wrap = document.createElement('div');
