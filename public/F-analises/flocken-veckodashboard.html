@@ -111,6 +111,12 @@
   </div>
 
   <div class="card">
+    <h2>Användare per prenumerationstyp</h2>
+    <p class="help">Totalt antal användare: gratiskonto, gratis-erbjudande på premium (trial), betalande.</p>
+    <div id="outSubscriptionBars"></div>
+  </div>
+
+  <div class="card">
     <h2>KPI – senaste fulla veckan</h2>
     <div id="outKpi"></div>
   </div>
@@ -699,6 +705,44 @@
       var lastAccountData = null;
       var lastTodayData = null;
       var lastRetentionData = null;
+      var lastSubscriptionData = null;
+
+      function renderSubscriptionBars(data) {
+        var container = document.getElementById('outSubscriptionBars');
+        if (!container) return;
+        if (!data || (data.gratis_konto == null && data.gratis_erbjudande_premium == null && data.betalande == null)) {
+          container.innerHTML = '<p class="help">Ingen data tillgänglig än.</p>';
+          return;
+        }
+        var gratis = data.gratis_konto || 0;
+        var trial = data.gratis_erbjudande_premium || 0;
+        var betalande = data.betalande || 0;
+        var labels = ['Gratiskonto', 'Gratis-erbjudande premium', 'Betalande'];
+        var values = [gratis, trial, betalande];
+        var colors = ['rgba(100, 100, 100, 0.6)', 'rgba(255, 152, 0, 0.6)', 'rgba(45, 90, 39, 0.6)'];
+        var borderColors = ['rgb(80,80,80)', 'rgb(255, 152, 0)', 'rgb(45, 90, 39)'];
+        container.innerHTML = '<div class="chart-wrap" style="height:200px;"><canvas id="subscriptionBarsChart"></canvas></div>';
+        var ctx = document.getElementById('subscriptionBarsChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Antal användare',
+              data: values,
+              backgroundColor: colors,
+              borderColor: borderColors,
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { x: { }, y: { beginAtZero: true } }
+          }
+        });
+      }
 
       function renderRetention(data) {
         var container = document.getElementById('outRetention');
@@ -953,6 +997,7 @@
         var sanity = runSanityChecks(mainData);
         if (sanityAlerts) sanityAlerts.innerHTML = sanity.length ? sanity.map(function(s) { return '<div class="sanity-alert">' + s + '</div>'; }).join('') : '';
         renderHighlights(mainData, lastTodayData);
+        renderSubscriptionBars(lastSubscriptionData);
         renderRetention(lastRetentionData);
         renderCharts(mainData);
         renderAccountTypes(lastAccountData);
@@ -980,12 +1025,14 @@
           if (savedToday) { lastTodayData = JSON.parse(savedToday); }
           var savedRetention = localStorage.getItem('flocken_dashboard_retention');
           if (savedRetention) { lastRetentionData = JSON.parse(savedRetention); }
+          var savedSubscription = localStorage.getItem('flocken_dashboard_subscription');
+          if (savedSubscription) { lastSubscriptionData = JSON.parse(savedSubscription); }
         } catch (e) {}
         renderAll(main, events);
 
         // Auto-fetch live data from Supabase
         if (statusEl) statusEl.textContent = 'Hämtar live-data...';
-        Promise.all([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types'), rpc('dashboard_today_highlights'), rpc('dashboard_retention')])
+        Promise.all([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types'), rpc('dashboard_today_highlights'), rpc('dashboard_retention'), rpc('dashboard_subscription_bars')])
           .then(function(results) {
             var mainResult = results[0];
             var eventsResult = results[1];
@@ -1041,6 +1088,15 @@
             if (Array.isArray(retentionArr) && retentionArr.length > 0) {
               lastRetentionData = retentionArr;
               try { localStorage.setItem('flocken_dashboard_retention', JSON.stringify(retentionArr)); } catch (e) {}
+            }
+            var subResult = results[7];
+            var subObj = subResult;
+            if (Array.isArray(subResult) && subResult.length === 1 && subResult[0] && subResult[0].dashboard_subscription_bars) {
+              subObj = subResult[0].dashboard_subscription_bars;
+            }
+            if (subObj && (subObj.gratis_konto != null || subObj.betalande != null)) {
+              lastSubscriptionData = subObj;
+              try { localStorage.setItem('flocken_dashboard_subscription', JSON.stringify(subObj)); } catch (e) {}
             }
             renderAll(lastMainData, lastEventsData);
             if (statusEl) statusEl.textContent = 'Uppdaterad ' + new Date().toLocaleString('sv-SE');
