@@ -1140,12 +1140,18 @@
             }
             var todayResult = results[5];
             var todayObj = todayResult;
-            if (Array.isArray(todayResult) && todayResult.length === 1 && todayResult[0] && todayResult[0].dashboard_today_highlights) {
-              todayObj = todayResult[0].dashboard_today_highlights;
-            }
+            // Om det är ett direkt objekt från REST API
             if (todayObj && todayObj.date) {
               lastTodayData = todayObj;
               try { localStorage.setItem('flocken_dashboard_today', JSON.stringify(todayObj)); } catch (e) {}
+            }
+            // Om det är wrappat i array med function name
+            else if (Array.isArray(todayResult) && todayResult.length === 1 && todayResult[0] && todayResult[0].dashboard_today_highlights) {
+              todayObj = todayResult[0].dashboard_today_highlights;
+              if (todayObj && todayObj.date) {
+                lastTodayData = todayObj;
+                try { localStorage.setItem('flocken_dashboard_today', JSON.stringify(todayObj)); } catch (e) {}
+              }
             }
             var retentionResult = results[6];
             var retentionArr = retentionResult;
