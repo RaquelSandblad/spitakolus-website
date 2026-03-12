@@ -13,7 +13,23 @@
       --muted: #6c757d;
       --accent: #2d5a27;
       --accent-light: #e8f0e6;
+      --tr-hover: #f8f9fa;
+      --input-bg: #fff;
     }
+    [data-theme="dark"] {
+      --bg: #1a1d21;
+      --card: #25282c;
+      --border: #3d4248;
+      --text: #e4e6eb;
+      --muted: #b0b3b8;
+      --accent: #7cb87c;
+      --accent-light: #2d3d2d;
+      --tr-hover: #2d3136;
+      --input-bg: #1a1d21;
+    }
+    [data-theme="dark"] .analysis-box { background: #1e2a1e; border-left-color: var(--accent); }
+    [data-theme="dark"] .sanity-alert { background: #3d3500; border-color: #665500; }
+    [data-theme="dark"] .error { background: #4a2020; color: #f8d7da; }
     * { box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -49,6 +65,8 @@
       border: 1px solid var(--border);
       border-radius: 6px;
       resize: vertical;
+      background: var(--input-bg);
+      color: var(--text);
     }
     button {
       background: var(--accent);
@@ -70,7 +88,7 @@
     }
     th, td { padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
     th { background: var(--accent-light); color: var(--accent); font-weight: 600; }
-    tr:hover { background: #f8f9fa; }
+    tr:hover { background: var(--tr-hover); }
     td.num { text-align: right; font-variant-numeric: tabular-nums; }
     .section-events table { font-size: 0.85rem; }
     .section-events th { white-space: nowrap; }
@@ -99,7 +117,33 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <script>if(!sessionStorage.getItem('dashboard_ok')){location.replace('index.html');}</script>
+  <script>
+    if(!sessionStorage.getItem('dashboard_ok')){location.replace('index.html');}
+    (function(){
+      var t = localStorage.getItem('dashboard_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <p style="margin:0 0 0.5rem 0; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+    <span></span>
+    <button type="button" id="themeToggle" style="margin:0;">Mörkt tema</button>
+  </p>
+  <script>
+    (function(){
+      var btn = document.getElementById('themeToggle');
+      function updateBtn() {
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        btn.textContent = isDark ? 'Ljust tema' : 'Mörkt tema';
+      }
+      btn.onclick = function() {
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+        localStorage.setItem('dashboard_theme', isDark ? 'light' : 'dark');
+        updateBtn();
+      };
+      updateBtn();
+    })();
+  </script>
   <h1>Flocken – Veckovis aktivitet</h1>
   <p class="help"><strong>Här nedan ser du:</strong> antal nya konton, hundar, hundvaktprofiler, konversationer, meddelanden, promenader och hundvänliga platser vecka för vecka – plus app-events (inloggningar, annonser skapade, kontakt med hundvakt). Alla siffror exkluderar Raquel, Torbjörn och tb.sandblad.</p>
   <p class="help" style="margin-bottom:0;"><strong>Live-data</strong> <span id="fetchStatus" style="font-weight:600;"></span></p>
@@ -122,20 +166,6 @@
   </div>
 
   <div class="card">
-    <h2>Veckovis översikt (råtal + andelar)</h2>
-    <div class="table-wrap"><div id="outMain"></div></div>
-    <div id="outPartial" style="margin-top:1rem;"></div>
-    <p style="margin-top:0.75rem;"><button type="button" id="btnExportCsv">Exportera huvudtabell som CSV</button></p>
-    <details style="margin-top:1rem;">
-      <summary style="cursor:pointer; color:var(--muted); font-size:0.9rem;">Uppdatera med ny data från Supabase</summary>
-      <p class="help">Kör huvudfrågan i Supabase SQL Editor, kopiera resultatet som JSON och klistra in här, klicka sedan på knappen. Data sparas lokalt (localStorage) så du slipper klistra in nästa gång.</p>
-      <textarea id="jsonMain" placeholder='Klistra in JSON här...' style="min-height:80px;"></textarea>
-      <button type="button" id="btnMain">Visa uppdaterad huvudtabell</button>
-      <div id="errMain" class="error" style="display:none;"></div>
-    </details>
-  </div>
-
-  <div class="card">
     <h2>Grafer per parameter</h2>
     <p class="help">Samma data som tabellen ovan, ett stapeldiagram per mått. Fullständiga namn – inga förkortningar.</p>
     <div id="outCharts"></div>
@@ -150,8 +180,10 @@
 
   <div class="card">
     <h2>App-events veckovis (pivoterat – en rad per vecka)</h2>
-    <p class="help">Unika användare per event och vecka. Enklare att skanna trenden.</p>
+    <p class="help">Unika användare per event och vecka. Visar senaste tre fulla veckor.</p>
     <div class="table-wrap"><div id="outEvents"></div></div>
+    <h3 style="margin-top:1.5rem; font-size:1rem;">Pågående vecka (dag för dag)</h3>
+    <div class="table-wrap"><div id="outEventsDaily"></div></div>
     <details style="margin-top:1rem;">
       <summary style="cursor:pointer; color:var(--muted); font-size:0.9rem;">Uppdatera med ny data från Supabase</summary>
       <textarea id="jsonEvents" placeholder='Klistra in JSON här...' style="min-height:80px;"></textarea>
@@ -161,23 +193,23 @@
   </div>
 
   <div class="card">
-    <h2>Data-driven analys (regelbaserad – uppdateras med siffrorna)</h2>
-    <p class="help">Automatiska varningar och indikatorer utifrån nuvarande data. Ingen statisk text.</p>
-    <div id="sanityAlerts"></div>
-    <div id="analysisDynamic" class="analysis-box"></div>
-    <details style="margin-top:1rem;">
-      <summary style="cursor:pointer; color:var(--muted); font-size:0.9rem;">Få ny analys med ChatGPT</summary>
-      <p class="help">Kopiera prompten nedan (den innehåller dina senaste siffror), gå till <a href="https://chat.openai.com" target="_blank" rel="noopener">ChatGPT</a> och klistra in. Be sedan ChatGPT analysera siffrorna och ge råd om bra/dåliga indikatorer och vad du ska vara uppmärksam på.</p>
-      <textarea id="chatgptPrompt" readonly style="min-height:140px; font-size:0.8rem;"></textarea>
-      <button type="button" id="btnCopyPrompt">Kopiera prompt till urklipp</button>
-      <span id="copyFeedback" style="margin-left:0.5rem; font-size:0.9rem; color:var(--accent);"></span>
-    </details>
-  </div>
-
-  <div class="card">
     <h2>Daglig återkomst (retention per kohort)</h2>
     <p class="help">Av de som skapade konto en given dag – hur många öppnade appen igen? Dag 0 = senare samma dag. ~Dag 14/21/30 räknar ±1–2 dagar runt exakt dag för att fånga upp folk som kom tillbaka strax innan/efter. Visar antal och % av kohorten.</p>
     <div id="outRetention"></div>
+  </div>
+
+  <div class="card">
+    <h2>Veckovis översikt (råtal + andelar)</h2>
+    <div class="table-wrap"><div id="outMain"></div></div>
+    <div id="outPartial" style="margin-top:1rem;"></div>
+    <p style="margin-top:0.75rem;"><button type="button" id="btnExportCsv">Exportera huvudtabell som CSV</button></p>
+    <details style="margin-top:1rem;">
+      <summary style="cursor:pointer; color:var(--muted); font-size:0.9rem;">Uppdatera med ny data från Supabase</summary>
+      <p class="help">Kör huvudfrågan i Supabase SQL Editor, kopiera resultatet som JSON och klistra in här, klicka sedan på knappen. Data sparas lokalt (localStorage) så du slipper klistra in nästa gång.</p>
+      <textarea id="jsonMain" placeholder='Klistra in JSON här...' style="min-height:80px;"></textarea>
+      <button type="button" id="btnMain">Visa uppdaterad huvudtabell</button>
+      <div id="errMain" class="error" style="display:none;"></div>
+    </details>
   </div>
 
   <p class="disclaimer">Alla siffror exkluderar Raquel Sandblad, Torbjörn Sandblad och tb.sandblad-konton (analytics_excluded_users).</p>
@@ -481,16 +513,39 @@
         return html;
       }
 
+      function isPartialEventWeek(label) {
+        if (!label || label.indexOf('–') === -1) return false;
+        var parts = label.split('–').map(function(s) { return s.trim(); });
+        return parts.length === 2 && parts[0] === parts[1];
+      }
+
       function renderEventsTable(data) {
         var pivot = pivotEvents(Array.isArray(data) ? data : []);
-        if (pivot.length === 0) return '<p>Inga rader.</p>';
+        var fullOnly = pivot.filter(function(r) { return !isPartialEventWeek(r.label); });
+        var threeWeeks = fullOnly.slice(-3);
         var cols = ['app_opened_unika','login_unika','listing_created_unika','sitter_contacted_unika'];
         var colLabels = { app_opened_unika: 'App öppnad (unika)', login_unika: 'Login (unika)', listing_created_unika: 'Listing skapad (unika)', sitter_contacted_unika: 'Sitter kontaktad (unika)' };
-        var html = '<table><thead><tr><th>Vecka</th>';
+        var html = '<p class="help">Senaste tre fulla veckor.</p><table><thead><tr><th>Vecka</th>';
         cols.forEach(function(c) { html += '<th class="num">' + (colLabels[c] || c) + '</th>'; });
         html += '</tr></thead><tbody>';
-        pivot.forEach(function(row) {
+        (threeWeeks.length ? threeWeeks : pivot).forEach(function(row) {
           html += '<tr><td>' + (row.label || '') + '</td>';
+          cols.forEach(function(c) { html += '<td class="num">' + (row[c] != null ? row[c] : '–') + '</td>'; });
+          html += '</tr>';
+        });
+        html += '</tbody></table>';
+        return html;
+      }
+
+      function renderEventsDailyTable(data) {
+        if (!data || data.length === 0) return '<p class="help">Ingen dagvis data för pågående vecka.</p>';
+        var cols = ['app_opened_unika','login_unika','listing_created_unika','sitter_contacted_unika'];
+        var colLabels = { app_opened_unika: 'App öppnad (unika)', login_unika: 'Login (unika)', listing_created_unika: 'Listing skapad (unika)', sitter_contacted_unika: 'Sitter kontaktad (unika)' };
+        var html = '<p class="help">Pågående vecka, dag för dag.</p><table><thead><tr><th>Dag</th>';
+        cols.forEach(function(c) { html += '<th class="num">' + (colLabels[c] || c) + '</th>'; });
+        html += '</tr></thead><tbody>';
+        data.forEach(function(row) {
+          html += '<tr><td>' + (row.day_label || '') + '</td>';
           cols.forEach(function(c) { html += '<td class="num">' + (row[c] != null ? row[c] : '–') + '</td>'; });
           html += '</tr>';
         });
@@ -706,6 +761,7 @@
       var lastTodayData = null;
       var lastRetentionData = null;
       var lastSubscriptionData = null;
+      var lastEventsDailyData = null;
 
       function renderSubscriptionBars(data) {
         var container = document.getElementById('outSubscriptionBars');
@@ -769,19 +825,10 @@
           return;
         }
 
-        var days = [
-          { key: 'day_0',  label: 'Dag 0',   offset: 0  },
-          { key: 'day_1',  label: 'Dag 1',   offset: 1  },
-          { key: 'day_2',  label: 'Dag 2',   offset: 2  },
-          { key: 'day_3',  label: 'Dag 3',   offset: 3  },
-          { key: 'day_4',  label: 'Dag 4',   offset: 4  },
-          { key: 'day_5',  label: 'Dag 5',   offset: 5  },
-          { key: 'day_6',  label: 'Dag 6',   offset: 6  },
-          { key: 'day_7',  label: 'Dag 7',   offset: 7  },
-          { key: 'day_14', label: '~Dag 14', offset: 14 },
-          { key: 'day_21', label: '~Dag 21', offset: 21 },
-          { key: 'day_30', label: '~Dag 30', offset: 30 }
-        ];
+        var days = [];
+        for (var i = 0; i <= 30; i++) {
+          days.push({ key: 'day_' + i, label: 'Dag ' + i, offset: i });
+        }
         var html = '<div class="table-wrap"><table><thead><tr>';
         html += '<th>Datum</th><th class="num">Nya konton</th>';
         days.forEach(function(d) { html += '<th class="num">' + d.label + '</th>'; });
@@ -1004,21 +1051,17 @@
         var outMain = document.getElementById('outMain');
         var outPartial = document.getElementById('outPartial');
         var outEvents = document.getElementById('outEvents');
-        var analysisDynamic = document.getElementById('analysisDynamic');
-        var sanityAlerts = document.getElementById('sanityAlerts');
         if (outKpi) outKpi.innerHTML = renderKpiCards(mainData, eventsData);
         if (outMain) outMain.innerHTML = renderMainTable(mainData);
         if (outPartial) outPartial.innerHTML = renderPartialSection(getPartialWeek(mainData));
         if (outEvents) outEvents.innerHTML = renderEventsTable(eventsData);
-        if (analysisDynamic) analysisDynamic.innerHTML = buildRuleBasedAnalysis(mainData, eventsData);
-        var sanity = runSanityChecks(mainData);
-        if (sanityAlerts) sanityAlerts.innerHTML = sanity.length ? sanity.map(function(s) { return '<div class="sanity-alert">' + s + '</div>'; }).join('') : '';
+        var outEventsDaily = document.getElementById('outEventsDaily');
+        if (outEventsDaily) outEventsDaily.innerHTML = renderEventsDailyTable(lastEventsDailyData);
         renderHighlights(mainData, lastTodayData);
         renderSubscriptionBars(lastSubscriptionData);
         renderRetention(lastRetentionData);
         renderCharts(mainData);
         renderAccountTypes(lastAccountData);
-        updatePrompt();
       }
 
       document.addEventListener('DOMContentLoaded', function() {
@@ -1049,7 +1092,7 @@
 
         // Auto-fetch live data from Supabase
         if (statusEl) statusEl.textContent = 'Hämtar live-data...';
-        Promise.all([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types'), rpc('dashboard_today_highlights'), rpc('dashboard_retention'), rpc('dashboard_subscription_bars')])
+        Promise.all([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types'), rpc('dashboard_today_highlights'), rpc('dashboard_retention'), rpc('dashboard_subscription_bars'), rpc('dashboard_events_daily_current_week')])
           .then(function(results) {
             var mainResult = results[0];
             var eventsResult = results[1];
@@ -1115,6 +1158,7 @@
               lastSubscriptionData = subObj;
               try { localStorage.setItem('flocken_dashboard_subscription', JSON.stringify(subObj)); } catch (e) {}
             }
+            lastEventsDailyData = Array.isArray(results[8]) ? results[8] : [];
             renderAll(lastMainData, lastEventsData);
             if (statusEl) statusEl.textContent = 'Uppdaterad ' + new Date().toLocaleString('sv-SE');
             if (statusEl) statusEl.style.color = '#0d6832';
@@ -1125,16 +1169,6 @@
             if (statusEl) statusEl.style.color = '#b02a37';
           });
       });
-
-      document.getElementById('btnCopyPrompt').onclick = function() {
-        var el = document.getElementById('chatgptPrompt');
-        var fb = document.getElementById('copyFeedback');
-        if (!el || !el.value) return;
-        navigator.clipboard.writeText(el.value).then(function() {
-          fb.textContent = 'Kopierat!';
-          setTimeout(function() { fb.textContent = ''; }, 2000);
-        }).catch(function() { fb.textContent = 'Kopiera manuellt från rutan.'; });
-      };
 
       document.getElementById('btnExportCsv').onclick = function() {
         var data = lastMainData || DEFAULT_MAIN_DATA;
