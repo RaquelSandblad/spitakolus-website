@@ -1166,6 +1166,9 @@
               try { localStorage.setItem('flocken_dashboard_subscription', JSON.stringify(subObj)); } catch (e) {}
             }
             lastEventsDailyData = Array.isArray(results[8]) ? results[8] : [];
+            if (Array.isArray(results[8]) && results[8].length === 1 && results[8][0] && results[8][0].dashboard_events_daily_current_week) {
+              lastEventsDailyData = results[8][0].dashboard_events_daily_current_week;
+            }
             renderAll(lastMainData, lastEventsData);
             if (statusEl) statusEl.textContent = 'Uppdaterad ' + new Date().toLocaleString('sv-SE');
             if (statusEl) statusEl.style.color = '#0d6832';
