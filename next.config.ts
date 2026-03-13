@@ -8,8 +8,12 @@ const nextConfig: NextConfig = {
     if (!supportAdminUrl) return [];
     return [
       {
-        source: '/admin/support-system/:path*',
-        destination: `${supportAdminUrl}/admin/support-system/:path*`,
+        source: '/admin/support-system',
+        destination: `${supportAdminUrl}/admin/support-system`,
+      },
+      {
+        source: '/admin/support-system/:path+',
+        destination: `${supportAdminUrl}/admin/support-system/:path+`,
       },
     ];
   },
