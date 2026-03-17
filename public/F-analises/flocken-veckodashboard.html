@@ -100,6 +100,7 @@
     .section-events table { font-size: 0.85rem; }
     .section-events th { white-space: nowrap; }
     .disclaimer { font-size: 0.8rem; color: var(--muted); margin-top: 1.5rem; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }
     .analysis-box { background: #f0f4ff; border-left: 4px solid #2d5a27; padding: 1rem 1.25rem; margin: 0.75rem 0; border-radius: 0 8px 8px 0; font-size: 0.95rem; }
     .analysis-box h3 { margin: 0 0 0.5rem 0; font-size: 1rem; color: var(--accent); }
     .analysis-box ul { margin: 0.25rem 0; padding-left: 1.25rem; }
@@ -152,6 +153,7 @@
     })();
   </script>
   <h1>Flocken – Veckovis aktivitet</h1>
+  <div id="textSummary" class="sr-only" role="region" aria-label="Textsammanfattning för skärmläsare och AI"></div>
   <p class="help"><strong>Här nedan ser du:</strong> antal nya konton, hundar, hundvaktprofiler, konversationer, meddelanden, promenader och hundvänliga platser vecka för vecka – plus app-events (inloggningar, annonser skapade, kontakt med hundvakt). Alla siffror exkluderar Raquel, Torbjörn och tb.sandblad.</p>
   <p class="help" style="margin-bottom:0;"><strong>Live-data</strong> <span id="fetchStatus" style="font-weight:600;"></span></p>
 
@@ -1049,6 +1051,59 @@
         });
       }
 
+      function renderTextSummary(mainData, eventsData) {
+        var container = document.getElementById('textSummary');
+        if (!container) return;
+        var full = getFullWeeks(mainData || []);
+        if (full.length < 2) {
+          container.textContent = 'Minst 2 fulla veckor krävs för textsammanfattning.';
+          return;
+        }
+        var curr = full[full.length - 1];
+        var prev = full[full.length - 2];
+        var dCurr = computeDerived(curr);
+        var pivot = pivotEvents(eventsData || []);
+        var currPivot = pivot.find(function(p) { return p.label === curr.label; }) || {};
+        
+        var text = 'Flocken Dashboard Textsammanfattning (för AI/screen readers):\n\n';
+        text += 'SENASTE FULLA VECKAN (' + curr.label + '):\n';
+        text += '- Nya konton: ' + (curr.nya_konton || 0) + '\n';
+        text += '- Nya hundar: ' + (curr.nya_hundar || 0) + ' (aktivering: ' + dCurr.hund_aktivering_pct.toFixed(1) + '%)\n';
+        text += '- Nya hundvaktprofiler: ' + (curr.nya_hundvakt_profiler || 0) + ' (aktivering: ' + dCurr.vakt_aktivering_pct.toFixed(1) + '%)\n';
+        text += '- Sitter-konversationer: ' + (curr.sitter_konversationer || 0) + '\n';
+        text += '- Tindog-konversationer: ' + (curr.tindog_konversationer || 0) + '\n';
+        text += '- Sitter-meddelanden: ' + (curr.sitter_meddelanden || 0) + '\n';
+        text += '- Tindog-meddelanden: ' + (curr.tindog_meddelanden || 0) + '\n';
+        text += '- Promenader: ' + (curr.promenader || 0) + '\n';
+        text += '- Hundvänliga platser: ' + (curr.hundvanliga_platser || 0) + '\n';
+        text += '- Bokningar: ' + (curr.bokningar || 0) + '\n';
+        text += '- Konversationer per 100 konton: ' + dCurr.konv_per_100.toFixed(2) + '\n';
+        text += '- Meddelanden per konversation: ' + (dCurr.medd_per_konv ? dCurr.medd_per_konv.toFixed(1) : 'N/A') + '\n\n';
+        
+        text += 'APP-EVENTS (senaste fulla veckan):\n';
+        text += '- App öppnad (unika): ' + (currPivot.app_opened_unika || 0) + '\n';
+        text += '- Login (unika): ' + (currPivot.login_unika || 0) + '\n';
+        text += '- Listing skapad (unika): ' + (currPivot.listing_created_unika || 0) + '\n';
+        text += '- Sitter kontaktad (unika): ' + (currPivot.sitter_contacted_unika || 0) + '\n\n';
+        
+        if (lastTodayData && lastTodayData.date) {
+          text += 'DAGENS HÖJDPUNKTER (' + lastTodayData.date + '):\n';
+          var totalToday = 0;
+          (lastTodayData.accounts || []).forEach(function(a) { totalToday += a.new_accounts || 0; });
+          text += '- Nya konton idag: ' + totalToday + '\n';
+          text += '- Nya hundar idag: ' + (lastTodayData.new_dogs || 0) + '\n';
+          text += '- Nya hundvaktprofiler idag: ' + (lastTodayData.new_sitters || 0) + '\n\n';
+        }
+        
+        text += 'HISTORIK (alla fulla veckor):\n';
+        full.forEach(function(row) {
+          var d = computeDerived(row);
+          text += row.label + ': ' + (row.nya_konton || 0) + ' konton, ' + (row.nya_hundar || 0) + ' hundar, ' + (row.nya_hundvakt_profiler || 0) + ' vaktprofiler, hund-akt ' + d.hund_aktivering_pct.toFixed(1) + '%, vakt-akt ' + d.vakt_aktivering_pct.toFixed(1) + '%\n';
+        });
+        
+        container.textContent = text;
+      }
+
       function renderAll(mainData, eventsData) {
         mainData = mainData || DEFAULT_MAIN_DATA;
         eventsData = eventsData || DEFAULT_EVENTS_DATA;
@@ -1069,6 +1124,7 @@
         renderRetention(lastRetentionData);
         renderCharts(mainData);
         renderAccountTypes(lastAccountData);
+        renderTextSummary(mainData, eventsData);
       }
 
       document.addEventListener('DOMContentLoaded', function() {
