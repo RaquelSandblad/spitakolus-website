@@ -839,7 +839,7 @@
           days.push({ key: 'day_' + i, label: 'Dag ' + i, offset: i });
         }
         var html = '<div class="table-wrap"><table><thead><tr>';
-        html += '<th>Datum</th><th class="num">Nya konton</th>';
+        html += '<th>Datum</th><th class="num">Nya konton</th><th class="num" title="Genomsnittligt antal enheter per användare i kohortet (första veckan)">Devices</th>';
         days.forEach(function(d) { html += '<th class="num">' + d.label + '</th>'; });
         html += '</tr></thead><tbody>';
 
@@ -853,7 +853,8 @@
         data.forEach(function(row) {
           var cohortDate = row.cohort_date;
           var size = row.cohort_size;
-          html += '<tr><td>' + cohortDate + '</td><td class="num">' + size + '</td>';
+          var devices = row.avg_devices != null ? row.avg_devices : '–';
+          html += '<tr><td>' + cohortDate + '</td><td class="num">' + size + '</td><td class="num">' + devices + '</td>';
           days.forEach(function(d) {
             var count = row[d.key] || 0;
             var pct = size > 0 ? (count / size * 100) : 0;
@@ -876,7 +877,7 @@
         });
 
         // Genomsnittsrad
-        var avgRow = '<tr style="border-top:2px solid var(--border); font-weight:600; background:var(--accent-light);"><td>Genomsnitt</td><td class="num">–</td>';
+        var avgRow = '<tr style="border-top:2px solid var(--border); font-weight:600; background:var(--accent-light);"><td>Genomsnitt</td><td class="num">–</td><td class="num">–</td>';
         days.forEach(function(d) {
           var totalPct = 0;
           var validCount = 0;
