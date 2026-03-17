@@ -875,6 +875,31 @@
           html += '</tr>';
         });
 
+        // Genomsnittsrad
+        var avgRow = '<tr style="border-top:2px solid var(--border); font-weight:600; background:var(--accent-light);"><td>Genomsnitt</td><td class="num">–</td>';
+        days.forEach(function(d) {
+          var totalPct = 0;
+          var validCount = 0;
+          data.forEach(function(row) {
+            var cohortDate = row.cohort_date;
+            var size = row.cohort_size;
+            var count = row[d.key] || 0;
+            var dayDateStr = addDays(cohortDate, d.offset);
+            if (dayDateStr <= todayStr && size > 0) {
+              totalPct += (count / size * 100);
+              validCount++;
+            }
+          });
+          var avgPct = validCount > 0 ? (totalPct / validCount) : 0;
+          if (validCount === 0) {
+            avgRow += '<td class="num" style="color:#ccc;">–</td>';
+          } else {
+            avgRow += '<td class="num">' + avgPct.toFixed(1) + '%</td>';
+          }
+        });
+        avgRow += '</tr>';
+        html += avgRow;
+
         html += '</tbody></table></div>';
         container.innerHTML = html;
       }
