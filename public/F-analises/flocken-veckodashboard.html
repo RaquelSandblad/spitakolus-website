@@ -211,7 +211,10 @@
     <h2>Veckovis översikt (råtal + andelar)</h2>
     <div class="table-wrap"><div id="outMain"></div></div>
     <div id="outPartial" style="margin-top:1rem;"></div>
-    <p style="margin-top:0.75rem;"><button type="button" id="btnExportCsv">Exportera huvudtabell som CSV</button></p>
+    <p style="margin-top:0.75rem;">
+      <button type="button" id="btnExportCsv">Exportera huvudtabell som CSV</button>
+      <button type="button" id="btnClearCache" style="margin-left:0.5rem; background:#dc3545;">Rensa cache & ladda om</button>
+    </p>
     <details style="margin-top:1rem;">
       <summary style="cursor:pointer; color:var(--muted); font-size:0.9rem;">Uppdatera med ny data från Supabase</summary>
       <p class="help">Kör huvudfrågan i Supabase SQL Editor, kopiera resultatet som JSON och klistra in här, klicka sedan på knappen. Data sparas lokalt (localStorage) så du slipper klistra in nästa gång.</p>
@@ -497,7 +500,7 @@
         full.sort(function(a,b) { return (a.week_num != null && b.week_num != null) ? a.week_num - b.week_num : 0; });
         var html = '<table><thead><tr><th>Vecka</th>';
         keys.forEach(function(k) { html += '<th class="num">' + (mainLabels[k] || k) + '</th>'; });
-        html += '<th class="num">Hund-akt %</th><th class="num">Vakt-akt %</th><th class="num">Konv/100</th><th class="num">Medd/konv</th></tr></thead><tbody>';
+        html += '<th class="num">Hund-akt %</th><th class="num">Vakt-akt %</th><th class="num">Konv/100</th><th class="num">Medd/konv</th><th class="num">Push-notiser</th><th class="num">Unika mottagare</th></tr></thead><tbody>';
         full.forEach(function(row) {
           var d = computeDerived(row);
           html += '<tr><td>' + (row.label || '') + '</td>';
@@ -505,7 +508,9 @@
           html += '<td class="num">' + (d.hund_aktivering_pct ? d.hund_aktivering_pct.toFixed(1) + '%' : '–') + '</td>';
           html += '<td class="num">' + (d.vakt_aktivering_pct ? d.vakt_aktivering_pct.toFixed(1) + '%' : '–') + '</td>';
           html += '<td class="num">' + (d.konv_per_100 != null ? d.konv_per_100.toFixed(2) : '–') + '</td>';
-          html += '<td class="num">' + (d.medd_per_konv != null ? d.medd_per_konv.toFixed(1) : '–') + '</td></tr>';
+          html += '<td class="num">' + (d.medd_per_konv != null ? d.medd_per_konv.toFixed(1) : '–') + '</td>';
+          html += '<td class="num">' + (row.notiser_skickade != null ? row.notiser_skickade : '–') + '</td>';
+          html += '<td class="num">' + (row.unika_mottagare != null ? row.unika_mottagare : '–') + '</td></tr>';
         });
         html += '</tbody></table>';
         return html;
@@ -1066,15 +1071,28 @@
       }
 
       function mergeNotifData(mainData, notifData) {
-        if (!Array.isArray(notifData) || !Array.isArray(mainData)) return;
+        if (!Array.isArray(notifData) || !Array.isArray(mainData)) {
+          console.warn('mergeNotifData: invalid data', { notifData, mainData });
+          return;
+        }
+        console.log('mergeNotifData: starting merge', { 
+          mainRows: mainData.length, 
+          notifRows: notifData.length,
+          notifLabels: notifData.map(function(n) { return n.label; }),
+          mainLabels: mainData.map(function(m) { return m.label; })
+        });
+        var mergedCount = 0;
         mainData.forEach(function(row) {
           var match = notifData.find(function(n) { return n.label === row.label; });
           if (match) {
             row.notiser_skickade = match.notiser_skickade;
             row.unika_mottagare = match.unika_mottagare;
             row.push_tokens_aktiva = match.push_tokens_aktiva;
+            mergedCount++;
+            console.log('Merged notification data for week:', row.label, match);
           }
         });
+        console.log('mergeNotifData: merged ' + mergedCount + ' weeks');
       }
 
       function renderTextSummary(mainData, eventsData) {
@@ -1103,6 +1121,8 @@
         text += '- Promenader: ' + (curr.promenader || 0) + '\n';
         text += '- Hundvänliga platser: ' + (curr.hundvanliga_platser || 0) + '\n';
         text += '- Bokningar: ' + (curr.bokningar || 0) + '\n';
+        text += '- Push-notiser skickade: ' + (curr.notiser_skickade || 0) + '\n';
+        text += '- Unika notis-mottagare: ' + (curr.unika_mottagare || 0) + '\n';
         text += '- Konversationer per 100 konton: ' + dCurr.konv_per_100.toFixed(2) + '\n';
         text += '- Meddelanden per konversation: ' + (dCurr.medd_per_konv ? dCurr.medd_per_konv.toFixed(1) : 'N/A') + '\n\n';
         
@@ -1203,10 +1223,24 @@
               try { localStorage.setItem('flocken_dashboard_reply', JSON.stringify(replyArr)); } catch (e) {}
             }
             var notifResult = results[3];
-            var notifArr = notifResult;
-            if (Array.isArray(notifResult) && notifResult.length === 1 && notifResult[0] && notifResult[0].dashboard_notification_stats) {
+            var notifArr = null;
+            // RPC returns JSONB → REST wraps as [{ dashboard_notification_stats: [...] }]
+            if (Array.isArray(notifResult) && notifResult.length >= 1 && notifResult[0] && notifResult[0].dashboard_notification_stats) {
               notifArr = notifResult[0].dashboard_notification_stats;
             }
+            // Direct object with key
+            else if (notifResult && !Array.isArray(notifResult) && notifResult.dashboard_notification_stats) {
+              notifArr = notifResult.dashboard_notification_stats;
+            }
+            // Already a flat array of week objects (has label field)
+            else if (Array.isArray(notifResult) && notifResult.length > 0 && notifResult[0] && notifResult[0].label) {
+              notifArr = notifResult;
+            }
+            // String that needs parsing
+            if (typeof notifArr === 'string') {
+              try { notifArr = JSON.parse(notifArr); } catch(e) { notifArr = null; }
+            }
+            console.log('notifArr after unwrap:', JSON.stringify(notifArr ? notifArr.slice(0,2) : null));
             if (Array.isArray(notifArr) && notifArr.length > 0) {
               lastNotifData = notifArr;
               try { localStorage.setItem('flocken_dashboard_notif', JSON.stringify(notifArr)); } catch (e) {}
@@ -1272,7 +1306,7 @@
         var data = lastMainData || DEFAULT_MAIN_DATA;
         var full = getFullWeeks(data);
         if (full.length === 0) return;
-        var headers = ['Vecka','Nya konton','Nya hundar','Nya vaktprofiler','Sitter-konv','Tindog-konv','Sitter-medd','Tindog-medd','Promenader','Platser','Bokningar','Hund-akt %','Vakt-akt %','Konv/100','Medd/konv'];
+        var headers = ['Vecka','Nya konton','Nya hundar','Nya vaktprofiler','Sitter-konv','Tindog-konv','Sitter-medd','Tindog-medd','Promenader','Platser','Bokningar','Hund-akt %','Vakt-akt %','Konv/100','Medd/konv','Push-notiser','Unika mottagare'];
         var rows = [headers.join(';')];
         full.forEach(function(row) {
           var d = computeDerived(row);
@@ -1291,7 +1325,9 @@
             d.hund_aktivering_pct ? d.hund_aktivering_pct.toFixed(1) : '',
             d.vakt_aktivering_pct ? d.vakt_aktivering_pct.toFixed(1) : '',
             d.konv_per_100 != null ? d.konv_per_100.toFixed(2) : '',
-            d.medd_per_konv != null ? d.medd_per_konv.toFixed(1) : ''
+            d.medd_per_konv != null ? d.medd_per_konv.toFixed(1) : '',
+            row.notiser_skickade ?? '',
+            row.unika_mottagare ?? ''
           ].join(';'));
         });
         var csv = rows.join('\n');
@@ -1301,6 +1337,21 @@
         a.download = 'flocken-veckodata.csv';
         a.click();
         URL.revokeObjectURL(a.href);
+      };
+
+      document.getElementById('btnClearCache').onclick = function() {
+        if (!confirm('Detta raderar all cachad dashboard-data och laddar om från Supabase. Fortsätt?')) return;
+        console.log('🗑️ Clearing localStorage cache...');
+        localStorage.removeItem('flocken_dashboard_main');
+        localStorage.removeItem('flocken_dashboard_events');
+        localStorage.removeItem('flocken_dashboard_reply');
+        localStorage.removeItem('flocken_dashboard_notif');
+        localStorage.removeItem('flocken_dashboard_accounts');
+        localStorage.removeItem('flocken_dashboard_today');
+        localStorage.removeItem('flocken_dashboard_retention');
+        localStorage.removeItem('flocken_dashboard_subscription');
+        console.log('✅ Cache cleared. Reloading page...');
+        location.reload();
       };
 
       document.getElementById('btnMain').onclick = function() {

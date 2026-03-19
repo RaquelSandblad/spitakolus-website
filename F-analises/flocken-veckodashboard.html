@@ -13,7 +13,30 @@
       --muted: #6c757d;
       --accent: #2d5a27;
       --accent-light: #e8f0e6;
+      --tr-hover: #f8f9fa;
+      --input-bg: #fff;
     }
+    [data-theme="dark"] {
+      --bg: #1a1d21;
+      --card: #25282c;
+      --border: #3d4248;
+      --text: #f0f2f5;
+      --muted: #d0d3d8;
+      --accent: #8fd38f;
+      --accent-light: #2d3d2d;
+      --tr-hover: #2d3136;
+      --input-bg: #1a1d21;
+    }
+    [data-theme="dark"] .analysis-box { background: #1e2a1e; border-left-color: var(--accent); }
+    [data-theme="dark"] .sanity-alert { background: #3d3500; border-color: #665500; color: #ffd700; }
+    [data-theme="dark"] .error { background: #4a2020; color: #ffb3ba; }
+    [data-theme="dark"] .kpi-card .kpi-value { color: #f0f2f5; }
+    [data-theme="dark"] .kpi-card .kpi-label { color: #d0d3d8; }
+    [data-theme="dark"] th { color: #8fd38f; }
+    [data-theme="dark"] .help { color: #d0d3d8; }
+    [data-theme="dark"] td.num { color: #f0f2f5; }
+    [data-theme="dark"] .copy-hint { color: #c0c3c8; }
+    [data-theme="dark"] .disclaimer { color: #d0d3d8; }
     * { box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -49,6 +72,8 @@
       border: 1px solid var(--border);
       border-radius: 6px;
       resize: vertical;
+      background: var(--input-bg);
+      color: var(--text);
     }
     button {
       background: var(--accent);
@@ -70,11 +95,12 @@
     }
     th, td { padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
     th { background: var(--accent-light); color: var(--accent); font-weight: 600; }
-    tr:hover { background: #f8f9fa; }
+    tr:hover { background: var(--tr-hover); }
     td.num { text-align: right; font-variant-numeric: tabular-nums; }
     .section-events table { font-size: 0.85rem; }
     .section-events th { white-space: nowrap; }
     .disclaimer { font-size: 0.8rem; color: var(--muted); margin-top: 1.5rem; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }
     .analysis-box { background: #f0f4ff; border-left: 4px solid #2d5a27; padding: 1rem 1.25rem; margin: 0.75rem 0; border-radius: 0 8px 8px 0; font-size: 0.95rem; }
     .analysis-box h3 { margin: 0 0 0.5rem 0; font-size: 1rem; color: var(--accent); }
     .analysis-box ul { margin: 0.25rem 0; padding-left: 1.25rem; }
@@ -99,34 +125,53 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <script>if(!sessionStorage.getItem('dashboard_ok')){location.replace('index.html');}</script>
+  <script>
+    if(!sessionStorage.getItem('dashboard_ok')){location.replace('index.html');}
+    (function(){
+      var t = localStorage.getItem('dashboard_theme') || 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+  <p style="margin:0 0 0.5rem 0; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+    <span></span>
+    <button type="button" id="themeToggle" style="margin:0;">Mörkt tema</button>
+  </p>
+  <script>
+    (function(){
+      var btn = document.getElementById('themeToggle');
+      function updateBtn() {
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        btn.textContent = isDark ? 'Ljust tema' : 'Mörkt tema';
+      }
+      btn.onclick = function() {
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+        localStorage.setItem('dashboard_theme', isDark ? 'light' : 'dark');
+        updateBtn();
+      };
+      updateBtn();
+    })();
+  </script>
   <h1>Flocken – Veckovis aktivitet</h1>
+  <div id="textSummary" class="sr-only" role="region" aria-label="Textsammanfattning för skärmläsare och AI"></div>
   <p class="help"><strong>Här nedan ser du:</strong> antal nya konton, hundar, hundvaktprofiler, konversationer, meddelanden, promenader och hundvänliga platser vecka för vecka – plus app-events (inloggningar, annonser skapade, kontakt med hundvakt). Alla siffror exkluderar Raquel, Torbjörn och tb.sandblad.</p>
   <p class="help" style="margin-bottom:0;"><strong>Live-data</strong> <span id="fetchStatus" style="font-weight:600;"></span></p>
 
   <div class="card">
     <h2>Dagens höjdpunkter</h2>
-    <p class="help">Senaste fullständiga veckans nyckeltal</p>
+    <p class="help">Dagens nyckeltal</p>
     <div id="outHighlights"></div>
+  </div>
+
+  <div class="card">
+    <h2>Användare per prenumerationstyp</h2>
+    <p class="help">Totalt antal användare: gratiskonto, gratis-premium (trial), betalande.</p>
+    <div id="outSubscriptionBars"></div>
   </div>
 
   <div class="card">
     <h2>KPI – senaste fulla veckan</h2>
     <div id="outKpi"></div>
-  </div>
-
-  <div class="card">
-    <h2>Veckovis översikt (råtal + andelar)</h2>
-    <div class="table-wrap"><div id="outMain"></div></div>
-    <div id="outPartial" style="margin-top:1rem;"></div>
-    <p style="margin-top:0.75rem;"><button type="button" id="btnExportCsv">Exportera huvudtabell som CSV</button></p>
-    <details style="margin-top:1rem;">
-      <summary style="cursor:pointer; color:var(--muted); font-size:0.9rem;">Uppdatera med ny data från Supabase</summary>
-      <p class="help">Kör huvudfrågan i Supabase SQL Editor, kopiera resultatet som JSON och klistra in här, klicka sedan på knappen. Data sparas lokalt (localStorage) så du slipper klistra in nästa gång.</p>
-      <textarea id="jsonMain" placeholder='Klistra in JSON här...' style="min-height:80px;"></textarea>
-      <button type="button" id="btnMain">Visa uppdaterad huvudtabell</button>
-      <div id="errMain" class="error" style="display:none;"></div>
-    </details>
   </div>
 
   <div class="card">
@@ -144,8 +189,10 @@
 
   <div class="card">
     <h2>App-events veckovis (pivoterat – en rad per vecka)</h2>
-    <p class="help">Unika användare per event och vecka. Enklare att skanna trenden.</p>
+    <p class="help">Unika användare per event och vecka. Visar senaste tre fulla veckor.</p>
     <div class="table-wrap"><div id="outEvents"></div></div>
+    <h3 style="margin-top:1.5rem; font-size:1rem;">Pågående vecka (dag för dag)</h3>
+    <div class="table-wrap"><div id="outEventsDaily"></div></div>
     <details style="margin-top:1rem;">
       <summary style="cursor:pointer; color:var(--muted); font-size:0.9rem;">Uppdatera med ny data från Supabase</summary>
       <textarea id="jsonEvents" placeholder='Klistra in JSON här...' style="min-height:80px;"></textarea>
@@ -155,16 +202,25 @@
   </div>
 
   <div class="card">
-    <h2>Data-driven analys (regelbaserad – uppdateras med siffrorna)</h2>
-    <p class="help">Automatiska varningar och indikatorer utifrån nuvarande data. Ingen statisk text.</p>
-    <div id="sanityAlerts"></div>
-    <div id="analysisDynamic" class="analysis-box"></div>
+    <h2>Daglig återkomst (retention per kohort)</h2>
+    <p class="help">Av de som skapade konto en given dag – hur många öppnade appen igen? Dag 0 = senare samma dag. ~Dag 14/21/30 räknar ±1–2 dagar runt exakt dag för att fånga upp folk som kom tillbaka strax innan/efter. Visar antal och % av kohorten.</p>
+    <div id="outRetention"></div>
+  </div>
+
+  <div class="card">
+    <h2>Veckovis översikt (råtal + andelar)</h2>
+    <div class="table-wrap"><div id="outMain"></div></div>
+    <div id="outPartial" style="margin-top:1rem;"></div>
+    <p style="margin-top:0.75rem;">
+      <button type="button" id="btnExportCsv">Exportera huvudtabell som CSV</button>
+      <button type="button" id="btnClearCache" style="margin-left:0.5rem; background:#dc3545;">Rensa cache & ladda om</button>
+    </p>
     <details style="margin-top:1rem;">
-      <summary style="cursor:pointer; color:var(--muted); font-size:0.9rem;">Få ny analys med ChatGPT</summary>
-      <p class="help">Kopiera prompten nedan (den innehåller dina senaste siffror), gå till <a href="https://chat.openai.com" target="_blank" rel="noopener">ChatGPT</a> och klistra in. Be sedan ChatGPT analysera siffrorna och ge råd om bra/dåliga indikatorer och vad du ska vara uppmärksam på.</p>
-      <textarea id="chatgptPrompt" readonly style="min-height:140px; font-size:0.8rem;"></textarea>
-      <button type="button" id="btnCopyPrompt">Kopiera prompt till urklipp</button>
-      <span id="copyFeedback" style="margin-left:0.5rem; font-size:0.9rem; color:var(--accent);"></span>
+      <summary style="cursor:pointer; color:var(--muted); font-size:0.9rem;">Uppdatera med ny data från Supabase</summary>
+      <p class="help">Kör huvudfrågan i Supabase SQL Editor, kopiera resultatet som JSON och klistra in här, klicka sedan på knappen. Data sparas lokalt (localStorage) så du slipper klistra in nästa gång.</p>
+      <textarea id="jsonMain" placeholder='Klistra in JSON här...' style="min-height:80px;"></textarea>
+      <button type="button" id="btnMain">Visa uppdaterad huvudtabell</button>
+      <div id="errMain" class="error" style="display:none;"></div>
     </details>
   </div>
 
@@ -269,25 +325,28 @@
         };
       }
 
-      function renderHighlights(mainData, accountData) {
+      function renderHighlights(mainData, todayData) {
         var container = document.getElementById('outHighlights');
         if (!container) return;
-        mainData = mainData || [];
-        var full = getFullWeeks(mainData);
-        if (full.length === 0) {
-          container.innerHTML = '<p class="help">Ingen data tillgänglig än.</p>';
+        
+        if (!todayData || !todayData.date) {
+          container.innerHTML = '<p class="help">Ingen data för idag tillgänglig än.</p>';
           return;
-        }
-        var curr = full[full.length - 1];
-        var acctWeek = null;
-        if (accountData && accountData.by_week) {
-          acctWeek = accountData.by_week[accountData.by_week.length - 1];
         }
 
         var html = '<div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; margin-bottom:1rem;">';
-        html += '<div><div class="kpi-grid" style="grid-template-columns: repeat(2, 1fr);">';
-        html += '<div class="kpi-card"><div class="kpi-value">' + (curr.nya_hundar || 0) + '</div><div class="kpi-label">Nya hundar</div></div>';
-        html += '<div class="kpi-card"><div class="kpi-value">' + (curr.nya_hundvakt_profiler || 0) + '</div><div class="kpi-label">Nya hundvaktprofiler</div></div>';
+        html += '<div><div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr);">';
+        
+        var totalNewAccounts = 0;
+        if (todayData.accounts && todayData.accounts.length > 0) {
+          todayData.accounts.forEach(function(a) {
+            totalNewAccounts += a.new_accounts || 0;
+          });
+        }
+        
+        html += '<div class="kpi-card"><div class="kpi-value">' + totalNewAccounts + '</div><div class="kpi-label">Nya konton</div></div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + (todayData.new_dogs || 0) + '</div><div class="kpi-label">Nya hundar</div></div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + (todayData.new_sitters || 0) + '</div><div class="kpi-label">Nya hundvaktprofiler</div></div>';
         html += '</div></div>';
         
         html += '<div><canvas id="highlightsChart" style="max-height:180px;"></canvas></div>';
@@ -295,28 +354,31 @@
         
         container.innerHTML = html;
 
-        if (!acctWeek || !acctWeek.breakdown) return;
+        if (!todayData.accounts || todayData.accounts.length === 0) return;
 
-        var ownerAcct = acctWeek.breakdown.find(function(b) { return b.account_type === 'dog_owner'; });
-        var sitterAcct = acctWeek.breakdown.find(function(b) { return b.account_type === 'dog_sitter'; });
-        var kennelAcct = acctWeek.breakdown.find(function(b) { return b.account_type === 'kennel'; });
-        var daycareAcct = acctWeek.breakdown.find(function(b) { return b.account_type === 'dog_daycare'; });
+        var ownerAcct = todayData.accounts.find(function(a) { return a.account_type === 'dog_owner'; });
+        var sitterAcct = todayData.accounts.find(function(a) { return a.account_type === 'dog_sitter'; });
+        var kennelAcct = todayData.accounts.find(function(a) { return a.account_type === 'kennel'; });
+        var daycareAcct = todayData.accounts.find(function(a) { return a.account_type === 'dog_daycare'; });
 
         var labels = ['Hundägare', 'Hundvakt', 'Kennel', 'Hunddagis'];
-        var newDogs = curr.nya_hundar || 0;
-        var newSitters = curr.nya_hundvakt_profiler || 0;
+        
         var ownerTotal = (ownerAcct && ownerAcct.new_accounts) || 0;
+        var ownerWithProfile = (ownerAcct && ownerAcct.with_profile) || 0;
+        var ownerNoProfile = Math.max(0, ownerTotal - ownerWithProfile);
+        
         var sitterTotal = (sitterAcct && sitterAcct.new_accounts) || 0;
+        var sitterWithProfile = (sitterAcct && sitterAcct.with_profile) || 0;
+        var sitterNoProfile = Math.max(0, sitterTotal - sitterWithProfile);
+        
         var kennelTotal = (kennelAcct && kennelAcct.new_accounts) || 0;
+        var kennelWithProfile = (kennelAcct && kennelAcct.with_profile) || 0;
+        
         var daycareTotal = (daycareAcct && daycareAcct.new_accounts) || 0;
+        var daycareWithProfile = (daycareAcct && daycareAcct.with_profile) || 0;
 
-        var ownerWithProfile = newDogs;
-        var ownerNoProfile = Math.max(0, ownerTotal - newDogs);
-        var sitterWithProfile = newSitters;
-        var sitterNoProfile = Math.max(0, sitterTotal - newSitters);
-
-        var solidData = [ownerWithProfile, sitterWithProfile, kennelTotal, daycareTotal];
-        var hatchData = [ownerNoProfile, sitterNoProfile, 0, 0];
+        var solidData = [ownerWithProfile, sitterWithProfile, kennelWithProfile, daycareWithProfile];
+        var hatchData = [ownerNoProfile, sitterNoProfile, Math.max(0, kennelTotal - kennelWithProfile), Math.max(0, daycareTotal - daycareWithProfile)];
 
         var colors = [
           ACCOUNT_TYPE_COLORS.dog_owner,
@@ -438,7 +500,7 @@
         full.sort(function(a,b) { return (a.week_num != null && b.week_num != null) ? a.week_num - b.week_num : 0; });
         var html = '<table><thead><tr><th>Vecka</th>';
         keys.forEach(function(k) { html += '<th class="num">' + (mainLabels[k] || k) + '</th>'; });
-        html += '<th class="num">Hund-akt %</th><th class="num">Vakt-akt %</th><th class="num">Konv/100</th><th class="num">Medd/konv</th></tr></thead><tbody>';
+        html += '<th class="num">Hund-akt %</th><th class="num">Vakt-akt %</th><th class="num">Konv/100</th><th class="num">Medd/konv</th><th class="num">Push-notiser</th><th class="num">Unika mottagare</th></tr></thead><tbody>';
         full.forEach(function(row) {
           var d = computeDerived(row);
           html += '<tr><td>' + (row.label || '') + '</td>';
@@ -446,7 +508,9 @@
           html += '<td class="num">' + (d.hund_aktivering_pct ? d.hund_aktivering_pct.toFixed(1) + '%' : '–') + '</td>';
           html += '<td class="num">' + (d.vakt_aktivering_pct ? d.vakt_aktivering_pct.toFixed(1) + '%' : '–') + '</td>';
           html += '<td class="num">' + (d.konv_per_100 != null ? d.konv_per_100.toFixed(2) : '–') + '</td>';
-          html += '<td class="num">' + (d.medd_per_konv != null ? d.medd_per_konv.toFixed(1) : '–') + '</td></tr>';
+          html += '<td class="num">' + (d.medd_per_konv != null ? d.medd_per_konv.toFixed(1) : '–') + '</td>';
+          html += '<td class="num">' + (row.notiser_skickade != null ? row.notiser_skickade : '–') + '</td>';
+          html += '<td class="num">' + (row.unika_mottagare != null ? row.unika_mottagare : '–') + '</td></tr>';
         });
         html += '</tbody></table>';
         return html;
@@ -463,16 +527,39 @@
         return html;
       }
 
+      function isPartialEventWeek(label) {
+        if (!label || label.indexOf('–') === -1) return false;
+        var parts = label.split('–').map(function(s) { return s.trim(); });
+        return parts.length === 2 && parts[0] === parts[1];
+      }
+
       function renderEventsTable(data) {
         var pivot = pivotEvents(Array.isArray(data) ? data : []);
-        if (pivot.length === 0) return '<p>Inga rader.</p>';
+        var fullOnly = pivot.filter(function(r) { return !isPartialEventWeek(r.label); });
+        var threeWeeks = fullOnly.slice(-3);
         var cols = ['app_opened_unika','login_unika','listing_created_unika','sitter_contacted_unika'];
         var colLabels = { app_opened_unika: 'App öppnad (unika)', login_unika: 'Login (unika)', listing_created_unika: 'Listing skapad (unika)', sitter_contacted_unika: 'Sitter kontaktad (unika)' };
-        var html = '<table><thead><tr><th>Vecka</th>';
+        var html = '<p class="help">Senaste tre fulla veckor.</p><table><thead><tr><th>Vecka</th>';
         cols.forEach(function(c) { html += '<th class="num">' + (colLabels[c] || c) + '</th>'; });
         html += '</tr></thead><tbody>';
-        pivot.forEach(function(row) {
+        (threeWeeks.length ? threeWeeks : pivot).forEach(function(row) {
           html += '<tr><td>' + (row.label || '') + '</td>';
+          cols.forEach(function(c) { html += '<td class="num">' + (row[c] != null ? row[c] : '–') + '</td>'; });
+          html += '</tr>';
+        });
+        html += '</tbody></table>';
+        return html;
+      }
+
+      function renderEventsDailyTable(data) {
+        if (!data || data.length === 0) return '<p class="help">Ingen dagvis data för pågående vecka.</p>';
+        var cols = ['app_opened_unika','login_unika','listing_created_unika','sitter_contacted_unika'];
+        var colLabels = { app_opened_unika: 'App öppnad (unika)', login_unika: 'Login (unika)', listing_created_unika: 'Listing skapad (unika)', sitter_contacted_unika: 'Sitter kontaktad (unika)' };
+        var html = '<p class="help">Pågående vecka, dag för dag.</p><table><thead><tr><th>Dag</th>';
+        cols.forEach(function(c) { html += '<th class="num">' + (colLabels[c] || c) + '</th>'; });
+        html += '</tr></thead><tbody>';
+        data.forEach(function(row) {
+          html += '<tr><td>' + (row.day_label || '') + '</td>';
           cols.forEach(function(c) { html += '<td class="num">' + (row[c] != null ? row[c] : '–') + '</td>'; });
           html += '</tr>';
         });
@@ -618,8 +705,12 @@
           return;
         }
 
-        var allWeeks = full.slice();
-        if (partial) allWeeks.push(partial);
+        // Alltid 7 staplar: de 6 föregående veckorna (gröna) + sista veckan (orange = pågående)
+        var allData = full.slice();
+        if (partial) allData.push(partial);
+        allData.sort(function(a,b) { return (a.week_num||0) - (b.week_num||0); });
+        var allWeeks = allData.slice(-7);
+        var lastIdx = allWeeks.length - 1;
         var labels = allWeeks.map(function(r) { return r.label || ''; });
 
         CHART_METRICS.forEach(function(metric) {
@@ -628,10 +719,10 @@
           if (!hasAny) return;
 
           var backgroundColors = allWeeks.map(function(row, idx) {
-            return (partial && idx === allWeeks.length - 1) ? 'rgba(255, 152, 0, 0.6)' : 'rgba(45, 90, 39, 0.6)';
+            return idx === lastIdx ? 'rgba(255, 152, 0, 0.6)' : 'rgba(45, 90, 39, 0.6)';
           });
           var borderColors = allWeeks.map(function(row, idx) {
-            return (partial && idx === allWeeks.length - 1) ? 'rgb(255, 152, 0)' : 'rgb(45, 90, 39)';
+            return idx === lastIdx ? 'rgb(255, 152, 0)' : 'rgb(45, 90, 39)';
           });
 
           var wrap = document.createElement('div');
@@ -681,6 +772,143 @@
       var lastReplyData = null;
       var lastNotifData = null;
       var lastAccountData = null;
+      var lastTodayData = null;
+      var lastRetentionData = null;
+      var lastSubscriptionData = null;
+      var lastEventsDailyData = null;
+
+      function renderSubscriptionBars(data) {
+        var container = document.getElementById('outSubscriptionBars');
+        if (!container) return;
+        if (!data || (data.gratis_konto == null && data.gratis_erbjudande_premium == null && data.betalande == null)) {
+          container.innerHTML = '<p class="help">Ingen data tillgänglig än.</p>';
+          return;
+        }
+        var gratis = data.gratis_konto || 0;
+        var trial = data.gratis_erbjudande_premium || 0;
+        var betalande = data.betalande || 0;
+        var total = gratis + trial + betalande;
+        var pct = function(n) { return total > 0 ? (n / total * 100).toFixed(1).replace('.', ',') : '0'; };
+        var labels = [
+          'Gratiskonto (' + pct(gratis) + ' %)',
+          'Gratis-premium (' + pct(trial) + ' %)',
+          'Betalande (' + pct(betalande) + ' %)'
+        ];
+        var values = [gratis, trial, betalande];
+        var colors = ['rgba(100, 100, 100, 0.6)', 'rgba(255, 152, 0, 0.6)', 'rgba(45, 90, 39, 0.6)'];
+        var borderColors = ['rgb(80,80,80)', 'rgb(255, 152, 0)', 'rgb(45, 90, 39)'];
+        container.innerHTML = '<div class="chart-wrap" style="height:200px;"><canvas id="subscriptionBarsChart"></canvas></div>';
+        var ctx = document.getElementById('subscriptionBarsChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Antal användare',
+              data: values,
+              backgroundColor: colors,
+              borderColor: borderColors,
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function(ctx) {
+                    var v = ctx.parsed.y;
+                    var p = total > 0 ? (v / total * 100).toFixed(1).replace('.', ',') : '0';
+                    return v + ' st (' + p + ' %)';
+                  }
+                }
+              }
+            },
+            scales: { x: { }, y: { beginAtZero: true } }
+          }
+        });
+      }
+
+      function renderRetention(data) {
+        var container = document.getElementById('outRetention');
+        if (!container) return;
+        if (!data || data.length === 0) {
+          container.innerHTML = '<p class="help">Ingen retentionsdata tillgänglig än.</p>';
+          return;
+        }
+
+        var days = [];
+        for (var i = 0; i <= 30; i++) {
+          days.push({ key: 'day_' + i, label: 'Dag ' + i, offset: i });
+        }
+        var html = '<div class="table-wrap"><table><thead><tr>';
+        html += '<th>Datum</th><th class="num">Nya konton</th><th class="num" title="Genomsnittligt antal enheter per användare i kohortet (första veckan)">Devices</th>';
+        days.forEach(function(d) { html += '<th class="num">' + d.label + '</th>'; });
+        html += '</tr></thead><tbody>';
+
+        function addDays(dateStr, n) {
+          var d = new Date(dateStr + 'T12:00:00');
+          d.setDate(d.getDate() + n);
+          return d.toISOString().slice(0, 10);
+        }
+        var todayStr = new Date().toLocaleDateString('sv-SE');
+
+        // Genomsnittsrad FÖRST (överst)
+        var avgRow = '<tr style="font-weight:600; background:var(--accent-light);"><td>Genomsnitt</td><td class="num">–</td><td class="num">–</td>';
+        days.forEach(function(d) {
+          var totalPct = 0;
+          var validCount = 0;
+          data.forEach(function(row) {
+            var cohortDate = row.cohort_date;
+            var size = row.cohort_size;
+            var count = row[d.key] || 0;
+            var dayDateStr = addDays(cohortDate, d.offset);
+            if (dayDateStr <= todayStr && size > 0) {
+              totalPct += (count / size * 100);
+              validCount++;
+            }
+          });
+          var avgPct = validCount > 0 ? (totalPct / validCount) : 0;
+          if (validCount === 0) {
+            avgRow += '<td class="num" style="color:#ccc;">–</td>';
+          } else {
+            avgRow += '<td class="num">' + avgPct.toFixed(1) + '%</td>';
+          }
+        });
+        avgRow += '</tr>';
+        html += avgRow;
+
+        data.forEach(function(row) {
+          var cohortDate = row.cohort_date;
+          var size = row.cohort_size;
+          var devices = row.avg_devices != null ? row.avg_devices : '–';
+          html += '<tr><td>' + cohortDate + '</td><td class="num">' + size + '</td><td class="num">' + devices + '</td>';
+          days.forEach(function(d) {
+            var count = row[d.key] || 0;
+            var pct = size > 0 ? (count / size * 100) : 0;
+            var dayDateStr = addDays(cohortDate, d.offset);
+
+            if (dayDateStr > todayStr) {
+              html += '<td class="num" style="color:#ccc;">–</td>';
+            } else if (count === 0) {
+              html += '<td class="num" style="color:#ccc;">0%</td>';
+            } else {
+              var intensity = Math.min(pct / 30, 1);
+              var r = Math.round(45 + (1-intensity) * 200);
+              var g = Math.round(90 + (1-intensity) * 150);
+              var b = Math.round(39 + (1-intensity) * 200);
+              var bg = 'rgba(' + r + ',' + g + ',' + b + ',' + (0.15 + intensity * 0.6) + ')';
+              html += '<td class="num" style="background:' + bg + '; font-weight:600;">' + count + ' <span style="font-weight:400;font-size:0.8em;color:#555;">(' + pct.toFixed(0) + '%)</span></td>';
+            }
+          });
+          html += '</tr>';
+        });
+
+        html += '</tbody></table></div>';
+        container.innerHTML = html;
+      }
 
       var ACCOUNT_TYPE_LABELS = {
         dog_owner: 'Hundägare',
@@ -843,15 +1071,83 @@
       }
 
       function mergeNotifData(mainData, notifData) {
-        if (!Array.isArray(notifData) || !Array.isArray(mainData)) return;
+        if (!Array.isArray(notifData) || !Array.isArray(mainData)) {
+          console.warn('mergeNotifData: invalid data', { notifData, mainData });
+          return;
+        }
+        console.log('mergeNotifData: starting merge', { 
+          mainRows: mainData.length, 
+          notifRows: notifData.length,
+          notifLabels: notifData.map(function(n) { return n.label; }),
+          mainLabels: mainData.map(function(m) { return m.label; })
+        });
+        var mergedCount = 0;
         mainData.forEach(function(row) {
           var match = notifData.find(function(n) { return n.label === row.label; });
           if (match) {
             row.notiser_skickade = match.notiser_skickade;
             row.unika_mottagare = match.unika_mottagare;
             row.push_tokens_aktiva = match.push_tokens_aktiva;
+            mergedCount++;
+            console.log('Merged notification data for week:', row.label, match);
           }
         });
+        console.log('mergeNotifData: merged ' + mergedCount + ' weeks');
+      }
+
+      function renderTextSummary(mainData, eventsData) {
+        var container = document.getElementById('textSummary');
+        if (!container) return;
+        var full = getFullWeeks(mainData || []);
+        if (full.length < 2) {
+          container.textContent = 'Minst 2 fulla veckor krävs för textsammanfattning.';
+          return;
+        }
+        var curr = full[full.length - 1];
+        var prev = full[full.length - 2];
+        var dCurr = computeDerived(curr);
+        var pivot = pivotEvents(eventsData || []);
+        var currPivot = pivot.find(function(p) { return p.label === curr.label; }) || {};
+        
+        var text = 'Flocken Dashboard Textsammanfattning (för AI/screen readers):\n\n';
+        text += 'SENASTE FULLA VECKAN (' + curr.label + '):\n';
+        text += '- Nya konton: ' + (curr.nya_konton || 0) + '\n';
+        text += '- Nya hundar: ' + (curr.nya_hundar || 0) + ' (aktivering: ' + dCurr.hund_aktivering_pct.toFixed(1) + '%)\n';
+        text += '- Nya hundvaktprofiler: ' + (curr.nya_hundvakt_profiler || 0) + ' (aktivering: ' + dCurr.vakt_aktivering_pct.toFixed(1) + '%)\n';
+        text += '- Sitter-konversationer: ' + (curr.sitter_konversationer || 0) + '\n';
+        text += '- Tindog-konversationer: ' + (curr.tindog_konversationer || 0) + '\n';
+        text += '- Sitter-meddelanden: ' + (curr.sitter_meddelanden || 0) + '\n';
+        text += '- Tindog-meddelanden: ' + (curr.tindog_meddelanden || 0) + '\n';
+        text += '- Promenader: ' + (curr.promenader || 0) + '\n';
+        text += '- Hundvänliga platser: ' + (curr.hundvanliga_platser || 0) + '\n';
+        text += '- Bokningar: ' + (curr.bokningar || 0) + '\n';
+        text += '- Push-notiser skickade: ' + (curr.notiser_skickade || 0) + '\n';
+        text += '- Unika notis-mottagare: ' + (curr.unika_mottagare || 0) + '\n';
+        text += '- Konversationer per 100 konton: ' + dCurr.konv_per_100.toFixed(2) + '\n';
+        text += '- Meddelanden per konversation: ' + (dCurr.medd_per_konv ? dCurr.medd_per_konv.toFixed(1) : 'N/A') + '\n\n';
+        
+        text += 'APP-EVENTS (senaste fulla veckan):\n';
+        text += '- App öppnad (unika): ' + (currPivot.app_opened_unika || 0) + '\n';
+        text += '- Login (unika): ' + (currPivot.login_unika || 0) + '\n';
+        text += '- Listing skapad (unika): ' + (currPivot.listing_created_unika || 0) + '\n';
+        text += '- Sitter kontaktad (unika): ' + (currPivot.sitter_contacted_unika || 0) + '\n\n';
+        
+        if (lastTodayData && lastTodayData.date) {
+          text += 'DAGENS HÖJDPUNKTER (' + lastTodayData.date + '):\n';
+          var totalToday = 0;
+          (lastTodayData.accounts || []).forEach(function(a) { totalToday += a.new_accounts || 0; });
+          text += '- Nya konton idag: ' + totalToday + '\n';
+          text += '- Nya hundar idag: ' + (lastTodayData.new_dogs || 0) + '\n';
+          text += '- Nya hundvaktprofiler idag: ' + (lastTodayData.new_sitters || 0) + '\n\n';
+        }
+        
+        text += 'HISTORIK (alla fulla veckor):\n';
+        full.forEach(function(row) {
+          var d = computeDerived(row);
+          text += row.label + ': ' + (row.nya_konton || 0) + ' konton, ' + (row.nya_hundar || 0) + ' hundar, ' + (row.nya_hundvakt_profiler || 0) + ' vaktprofiler, hund-akt ' + d.hund_aktivering_pct.toFixed(1) + '%, vakt-akt ' + d.vakt_aktivering_pct.toFixed(1) + '%\n';
+        });
+        
+        container.textContent = text;
       }
 
       function renderAll(mainData, eventsData) {
@@ -863,19 +1159,18 @@
         var outMain = document.getElementById('outMain');
         var outPartial = document.getElementById('outPartial');
         var outEvents = document.getElementById('outEvents');
-        var analysisDynamic = document.getElementById('analysisDynamic');
-        var sanityAlerts = document.getElementById('sanityAlerts');
         if (outKpi) outKpi.innerHTML = renderKpiCards(mainData, eventsData);
         if (outMain) outMain.innerHTML = renderMainTable(mainData);
         if (outPartial) outPartial.innerHTML = renderPartialSection(getPartialWeek(mainData));
         if (outEvents) outEvents.innerHTML = renderEventsTable(eventsData);
-        if (analysisDynamic) analysisDynamic.innerHTML = buildRuleBasedAnalysis(mainData, eventsData);
-        var sanity = runSanityChecks(mainData);
-        if (sanityAlerts) sanityAlerts.innerHTML = sanity.length ? sanity.map(function(s) { return '<div class="sanity-alert">' + s + '</div>'; }).join('') : '';
-        renderHighlights(mainData, lastAccountData);
+        var outEventsDaily = document.getElementById('outEventsDaily');
+        if (outEventsDaily) outEventsDaily.innerHTML = renderEventsDailyTable(lastEventsDailyData);
+        renderHighlights(mainData, lastTodayData);
+        renderSubscriptionBars(lastSubscriptionData);
+        renderRetention(lastRetentionData);
         renderCharts(mainData);
         renderAccountTypes(lastAccountData);
-        updatePrompt();
+        renderTextSummary(mainData, eventsData);
       }
 
       document.addEventListener('DOMContentLoaded', function() {
@@ -895,12 +1190,18 @@
           if (savedNotif) { lastNotifData = JSON.parse(savedNotif); }
           var savedAcct = localStorage.getItem('flocken_dashboard_accounts');
           if (savedAcct) { lastAccountData = JSON.parse(savedAcct); }
+          var savedToday = localStorage.getItem('flocken_dashboard_today');
+          if (savedToday) { lastTodayData = JSON.parse(savedToday); }
+          var savedRetention = localStorage.getItem('flocken_dashboard_retention');
+          if (savedRetention) { lastRetentionData = JSON.parse(savedRetention); }
+          var savedSubscription = localStorage.getItem('flocken_dashboard_subscription');
+          if (savedSubscription) { lastSubscriptionData = JSON.parse(savedSubscription); }
         } catch (e) {}
         renderAll(main, events);
 
         // Auto-fetch live data from Supabase
         if (statusEl) statusEl.textContent = 'Hämtar live-data...';
-        Promise.all([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types')])
+        Promise.all([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types'), rpc('dashboard_today_highlights'), rpc('dashboard_retention'), rpc('dashboard_subscription_bars'), rpc('dashboard_events_daily_current_week')])
           .then(function(results) {
             var mainResult = results[0];
             var eventsResult = results[1];
@@ -922,10 +1223,24 @@
               try { localStorage.setItem('flocken_dashboard_reply', JSON.stringify(replyArr)); } catch (e) {}
             }
             var notifResult = results[3];
-            var notifArr = notifResult;
-            if (Array.isArray(notifResult) && notifResult.length === 1 && notifResult[0] && notifResult[0].dashboard_notification_stats) {
+            var notifArr = null;
+            // RPC returns JSONB → REST wraps as [{ dashboard_notification_stats: [...] }]
+            if (Array.isArray(notifResult) && notifResult.length >= 1 && notifResult[0] && notifResult[0].dashboard_notification_stats) {
               notifArr = notifResult[0].dashboard_notification_stats;
             }
+            // Direct object with key
+            else if (notifResult && !Array.isArray(notifResult) && notifResult.dashboard_notification_stats) {
+              notifArr = notifResult.dashboard_notification_stats;
+            }
+            // Already a flat array of week objects (has label field)
+            else if (Array.isArray(notifResult) && notifResult.length > 0 && notifResult[0] && notifResult[0].label) {
+              notifArr = notifResult;
+            }
+            // String that needs parsing
+            if (typeof notifArr === 'string') {
+              try { notifArr = JSON.parse(notifArr); } catch(e) { notifArr = null; }
+            }
+            console.log('notifArr after unwrap:', JSON.stringify(notifArr ? notifArr.slice(0,2) : null));
             if (Array.isArray(notifArr) && notifArr.length > 0) {
               lastNotifData = notifArr;
               try { localStorage.setItem('flocken_dashboard_notif', JSON.stringify(notifArr)); } catch (e) {}
@@ -939,6 +1254,43 @@
               lastAccountData = acctObj;
               try { localStorage.setItem('flocken_dashboard_accounts', JSON.stringify(acctObj)); } catch (e) {}
             }
+            var todayResult = results[5];
+            var todayObj = todayResult;
+            // Om det är ett direkt objekt från REST API
+            if (todayObj && todayObj.date) {
+              lastTodayData = todayObj;
+              try { localStorage.setItem('flocken_dashboard_today', JSON.stringify(todayObj)); } catch (e) {}
+            }
+            // Om det är wrappat i array med function name
+            else if (Array.isArray(todayResult) && todayResult.length === 1 && todayResult[0] && todayResult[0].dashboard_today_highlights) {
+              todayObj = todayResult[0].dashboard_today_highlights;
+              if (todayObj && todayObj.date) {
+                lastTodayData = todayObj;
+                try { localStorage.setItem('flocken_dashboard_today', JSON.stringify(todayObj)); } catch (e) {}
+              }
+            }
+            var retentionResult = results[6];
+            var retentionArr = retentionResult;
+            if (Array.isArray(retentionResult) && retentionResult.length === 1 && retentionResult[0] && retentionResult[0].dashboard_retention) {
+              retentionArr = retentionResult[0].dashboard_retention;
+            }
+            if (Array.isArray(retentionArr) && retentionArr.length > 0) {
+              lastRetentionData = retentionArr;
+              try { localStorage.setItem('flocken_dashboard_retention', JSON.stringify(retentionArr)); } catch (e) {}
+            }
+            var subResult = results[7];
+            var subObj = subResult;
+            if (Array.isArray(subResult) && subResult.length === 1 && subResult[0] && subResult[0].dashboard_subscription_bars) {
+              subObj = subResult[0].dashboard_subscription_bars;
+            }
+            if (subObj && (subObj.gratis_konto != null || subObj.betalande != null)) {
+              lastSubscriptionData = subObj;
+              try { localStorage.setItem('flocken_dashboard_subscription', JSON.stringify(subObj)); } catch (e) {}
+            }
+            lastEventsDailyData = Array.isArray(results[8]) ? results[8] : [];
+            if (Array.isArray(results[8]) && results[8].length === 1 && results[8][0] && results[8][0].dashboard_events_daily_current_week) {
+              lastEventsDailyData = results[8][0].dashboard_events_daily_current_week;
+            }
             renderAll(lastMainData, lastEventsData);
             if (statusEl) statusEl.textContent = 'Uppdaterad ' + new Date().toLocaleString('sv-SE');
             if (statusEl) statusEl.style.color = '#0d6832';
@@ -950,21 +1302,11 @@
           });
       });
 
-      document.getElementById('btnCopyPrompt').onclick = function() {
-        var el = document.getElementById('chatgptPrompt');
-        var fb = document.getElementById('copyFeedback');
-        if (!el || !el.value) return;
-        navigator.clipboard.writeText(el.value).then(function() {
-          fb.textContent = 'Kopierat!';
-          setTimeout(function() { fb.textContent = ''; }, 2000);
-        }).catch(function() { fb.textContent = 'Kopiera manuellt från rutan.'; });
-      };
-
       document.getElementById('btnExportCsv').onclick = function() {
         var data = lastMainData || DEFAULT_MAIN_DATA;
         var full = getFullWeeks(data);
         if (full.length === 0) return;
-        var headers = ['Vecka','Nya konton','Nya hundar','Nya vaktprofiler','Sitter-konv','Tindog-konv','Sitter-medd','Tindog-medd','Promenader','Platser','Bokningar','Hund-akt %','Vakt-akt %','Konv/100','Medd/konv'];
+        var headers = ['Vecka','Nya konton','Nya hundar','Nya vaktprofiler','Sitter-konv','Tindog-konv','Sitter-medd','Tindog-medd','Promenader','Platser','Bokningar','Hund-akt %','Vakt-akt %','Konv/100','Medd/konv','Push-notiser','Unika mottagare'];
         var rows = [headers.join(';')];
         full.forEach(function(row) {
           var d = computeDerived(row);
@@ -983,7 +1325,9 @@
             d.hund_aktivering_pct ? d.hund_aktivering_pct.toFixed(1) : '',
             d.vakt_aktivering_pct ? d.vakt_aktivering_pct.toFixed(1) : '',
             d.konv_per_100 != null ? d.konv_per_100.toFixed(2) : '',
-            d.medd_per_konv != null ? d.medd_per_konv.toFixed(1) : ''
+            d.medd_per_konv != null ? d.medd_per_konv.toFixed(1) : '',
+            row.notiser_skickade ?? '',
+            row.unika_mottagare ?? ''
           ].join(';'));
         });
         var csv = rows.join('\n');
@@ -993,6 +1337,21 @@
         a.download = 'flocken-veckodata.csv';
         a.click();
         URL.revokeObjectURL(a.href);
+      };
+
+      document.getElementById('btnClearCache').onclick = function() {
+        if (!confirm('Detta raderar all cachad dashboard-data och laddar om från Supabase. Fortsätt?')) return;
+        console.log('🗑️ Clearing localStorage cache...');
+        localStorage.removeItem('flocken_dashboard_main');
+        localStorage.removeItem('flocken_dashboard_events');
+        localStorage.removeItem('flocken_dashboard_reply');
+        localStorage.removeItem('flocken_dashboard_notif');
+        localStorage.removeItem('flocken_dashboard_accounts');
+        localStorage.removeItem('flocken_dashboard_today');
+        localStorage.removeItem('flocken_dashboard_retention');
+        localStorage.removeItem('flocken_dashboard_subscription');
+        console.log('✅ Cache cleared. Reloading page...');
+        location.reload();
       };
 
       document.getElementById('btnMain').onclick = function() {
