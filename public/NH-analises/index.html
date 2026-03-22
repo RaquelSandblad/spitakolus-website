@@ -52,7 +52,7 @@
   <div class="box">
     <h1>Nästa Hem dashboard</h1>
     <p style="color:#6c757d; font-size:0.9rem; margin:0 0 1rem 0;">Ange lösenord för att öppna veckodashboarden.</p>
-    <form id="form" method="get" action="nastahem-dashboard.html">
+    <form id="form" method="get" action="/NH-analises/nastahem-dashboard.html">
       <label for="pw">Lösenord</label>
       <input type="password" id="pw" name="pw" autocomplete="current-password" placeholder="Lösenord">
       <button type="submit">Öppna dashboard</button>
@@ -72,7 +72,7 @@
         err.style.display = 'none';
         if (pw.value === RATT_LOSENORD) {
           sessionStorage.setItem('dashboard_ok', '1');
-          window.location.href = 'nastahem-dashboard.html';
+          window.location.href = '/NH-analises/nastahem-dashboard.html';
         } else {
           err.style.display = 'block';
           pw.focus();
