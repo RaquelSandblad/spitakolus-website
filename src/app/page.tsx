@@ -34,7 +34,7 @@ function StoreBadges({ ios, android }: { ios: string; android: string }) {
         className="inline-flex items-center gap-2 bg-black text-white px-4 py-2.5 rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium"
       >
         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M3.18 23.04c-.35 0-.7-.12-.98-.37-.49-.44-.56-1.18-.15-1.7L5.7 16.5H2.25c-.46 0-.87-.27-1.06-.69s-.1-.9.22-1.23L15.3.69c.49-.44 1.23-.4 1.68.09.44.49.4 1.23-.09 1.68L8.06 11.5h4.19c.46 0 .87.27 1.06.69s.1.9-.22 1.23L4.2 22.67c-.28.25-.64.37-1.02.37z" />
+          <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.608 1.51a.999.999 0 010 1.764l-2.608 1.509-2.533-2.533 2.533-2.25zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z" />
         </svg>
         Google Play
       </a>
