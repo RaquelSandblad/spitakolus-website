@@ -158,8 +158,7 @@ export default function Produkter() {
                   <h4 className="font-semibold text-gray-900 mb-2">Målgrupp:</h4>
                   <p className="text-gray-600">
                     Privatpersoner och kennlar/uppfödare. Prenumerationsbaserad tjänst med
-                    betalning per månad eller per år. Lanserad i Sverige med internationell
-                    expansion planerad.
+                    betalning per månad eller per år. Lanserad i Sverige, Norge och Danmark.
                   </p>
                 </div>
 
