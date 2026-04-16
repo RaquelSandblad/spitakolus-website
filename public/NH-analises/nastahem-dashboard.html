@@ -156,10 +156,10 @@
       <div class="table-wrap" id="weeklyTable"></div>
     </div>
 
-    <!-- E-post & Push -->
+    <!-- Push-enheter -->
     <div class="section">
-      <div class="section-title">E-post & Push-notiser</div>
-      <div id="emailPush"></div>
+      <div class="section-title">Push-notiser</div>
+      <div id="pushStats"></div>
     </div>
   </div>
 
@@ -221,7 +221,7 @@
       { key: 'total_bids',         label: 'Bud (totalt)',           icon: '💰' },
       { key: 'total_payments',     label: 'Köp genomförda',         icon: '✅' },
       { key: 'push_tokens_active', label: 'Push-enheter (aktiva)',   icon: '🔔' },
-      { key: 'emails_total',        label: 'E-post loggade',         icon: '📧' }
+      { key: 'push_tokens_active',  label: 'Push-enheter (aktiva)',  icon: '🔔' }
     ];
 
     var chartInstances = [];
@@ -378,18 +378,10 @@
     }
 
     /* ── Render: Email & Push ── */
-    function renderEmailPush(totals) {
-      var el = document.getElementById('emailPush');
+    function renderPushStats(totals) {
+      var el = document.getElementById('pushStats');
       if (!totals) { el.innerHTML = ''; return; }
-      var pending = Number(totals.emails_pending||0);
-      var confirmed = Number(totals.emails_confirmed_ok||0);
-      var failed = Number(totals.emails_confirmed_fail||0);
-      var total = Number(totals.emails_total||0);
       var html = '<div class="totals-grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr));">';
-      html += '<div class="total-card"><div class="val">📧 ' + total + '</div><div class="lbl">E-post loggade (totalt)</div></div>';
-      html += '<div class="total-card"><div class="val" style="color:var(--green);">✅ ' + confirmed + '</div><div class="lbl">Bekräftat OK</div></div>';
-      if (failed > 0) html += '<div class="total-card"><div class="val" style="color:var(--red);">❌ ' + failed + '</div><div class="lbl">Bekräftat fel</div></div>';
-      if (pending > 0) html += '<div class="total-card"><div class="val" style="color:var(--orange);">⏳ ' + pending + '</div><div class="lbl">Ej bekräftade (logg-bugg)</div></div>';
       html += '<div class="total-card"><div class="val">🔔 ' + (totals.push_tokens_active||0) + '</div><div class="lbl">Push-enheter aktiva</div></div>';
       html += '<div class="total-card"><div class="val">🍎 ' + (totals.push_tokens_ios||0) + '</div><div class="lbl">iOS</div></div>';
       html += '<div class="total-card"><div class="val">🤖 ' + (totals.push_tokens_android||0) + '</div><div class="lbl">Android</div></div>';
@@ -404,7 +396,7 @@
       renderCharts(data.weekly);
       renderWeeklyTable(data.weekly);
       renderEventsTable(data.events);
-      renderEmailPush(data.totals);
+      renderPushStats(data.totals);
     }
 
     /* ── CSV export ── */
