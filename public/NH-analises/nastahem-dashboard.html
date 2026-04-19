@@ -123,15 +123,21 @@
   <div id="loadingEl" class="loading"><div class="spinner"></div><p style="margin-top:.5rem;">Hämtar data från Supabase...</p></div>
   <div id="app" style="display:none;">
 
+    <!-- Dagens höjdpunkter -->
+    <div class="section">
+      <div class="section-title">⭐ Dagens höjdpunkter <span id="todayDate" style="font-size:.78rem;font-weight:400;color:var(--muted);margin-left:6px;"></span></div>
+      <div id="todayGrid" class="totals-grid"></div>
+    </div>
+
     <!-- Totals -->
     <div class="section">
       <div class="section-title">Totalt (alla tider)</div>
       <div id="totalsGrid" class="totals-grid"></div>
     </div>
 
-    <!-- KPI senaste veckan -->
+    <!-- KPI pågående vecka -->
     <div class="section">
-      <div class="section-title">Senaste fulla veckan vs veckan innan</div>
+      <div class="section-title">Pågående vecka vs veckan innan</div>
       <div id="kpiGrid" class="kpi-grid"></div>
     </div>
 
@@ -317,8 +323,8 @@
     function renderKpi(weekly) {
       var el = document.getElementById('kpiGrid');
       if (!weekly || weekly.length < 2) { el.innerHTML = '<p style="color:var(--muted);font-size:.85rem;">Behöver minst 2 veckor.</p>'; return; }
-      var curr = weekly[1];
-      var prev = weekly.length > 2 ? weekly[2] : null;
+      var curr = weekly[0]; // pågående vecka
+      var prev = weekly[1]; // förra veckan
       var html = '';
       WEEKLY_FIELDS.forEach(function(f) {
         var val = Number(curr[f.key] || 0);
@@ -449,11 +455,47 @@
       a.click(); URL.revokeObjectURL(a.href);
     };
 
+    /* ── Dagens höjdpunkter ── */
+    function fetchTodayHighlights() {
+      // Dagens datum i Stockholm-tid (YYYY-MM-DD)
+      var todayStr = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Stockholm' });
+      document.getElementById('todayDate').textContent = todayStr;
+      document.getElementById('todayGrid').innerHTML = '<div style="color:var(--muted);font-size:.8rem;">Hämtar...</div>';
+
+      var since = todayStr + 'T00:00:00+02:00';
+      var headers = { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'Prefer': 'count=exact', 'Range': '0-0' };
+
+      function countFrom(table, filter) {
+        return fetch(SUPABASE_URL + '/rest/v1/' + table + '?select=id&created_at=gte.' + encodeURIComponent(since) + (filter||''), { headers: headers })
+          .then(function(r) {
+            var cr = r.headers.get('Content-Range') || '';
+            var m  = cr.match(/\/(\d+)$/);
+            return m ? Number(m[1]) : 0;
+          }).catch(function(){ return '–'; });
+      }
+
+      Promise.all([
+        countFrom('profiles', ''),
+        countFrom('listings', ''),
+        countFrom('viewing_bookings', '')
+      ]).then(function(vals) {
+        var cards = [
+          { icon: '👤', val: vals[0], lbl: 'Nya konton idag' },
+          { icon: '🏠', val: vals[1], lbl: 'Nya annonser idag' },
+          { icon: '📅', val: vals[2], lbl: 'Nya visningar idag' },
+        ];
+        document.getElementById('todayGrid').innerHTML = cards.map(function(c) {
+          return '<div class="total-card"><div class="val">' + c.icon + ' ' + c.val + '</div><div class="lbl">' + c.lbl + '</div></div>';
+        }).join('');
+      });
+    }
+
     /* ── Refresh ── */
-    document.getElementById('refreshBtn').onclick = fetchDashboard;
+    document.getElementById('refreshBtn').onclick = function() { fetchDashboard(); fetchTodayHighlights(); };
 
     /* ── Init ── */
     fetchDashboard();
+    fetchTodayHighlights();
   })();
 
   /* ══════════════════════════════════════
