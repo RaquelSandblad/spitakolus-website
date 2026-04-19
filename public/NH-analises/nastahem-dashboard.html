@@ -457,36 +457,31 @@
 
     /* ── Dagens höjdpunkter ── */
     function fetchTodayHighlights() {
-      // Dagens datum i Stockholm-tid (YYYY-MM-DD)
-      var todayStr = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Stockholm' });
-      document.getElementById('todayDate').textContent = todayStr;
       document.getElementById('todayGrid').innerHTML = '<div style="color:var(--muted);font-size:.8rem;">Hämtar...</div>';
 
-      var since = todayStr + 'T00:00:00+02:00';
-      var headers = { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'Prefer': 'count=exact', 'Range': '0-0' };
-
-      function countFrom(table, filter) {
-        return fetch(SUPABASE_URL + '/rest/v1/' + table + '?select=id&created_at=gte.' + encodeURIComponent(since) + (filter||''), { headers: headers })
-          .then(function(r) {
-            var cr = r.headers.get('Content-Range') || '';
-            var m  = cr.match(/\/(\d+)$/);
-            return m ? Number(m[1]) : 0;
-          }).catch(function(){ return '–'; });
-      }
-
-      Promise.all([
-        countFrom('profiles', ''),
-        countFrom('listings', ''),
-        countFrom('viewing_bookings', '')
-      ]).then(function(vals) {
+      fetch(SUPABASE_URL + '/rest/v1/rpc/get_today_stats', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+        },
+        body: '{}'
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        document.getElementById('todayDate').textContent = d.datum || '';
         var cards = [
-          { icon: '👤', val: vals[0], lbl: 'Nya konton idag' },
-          { icon: '🏠', val: vals[1], lbl: 'Nya annonser idag' },
-          { icon: '📅', val: vals[2], lbl: 'Nya visningar idag' },
+          { icon: '👤', val: d.nya_konton   ?? '–', lbl: 'Nya konton idag' },
+          { icon: '🏠', val: d.nya_annonser  ?? '–', lbl: 'Nya annonser idag' },
+          { icon: '📅', val: d.nya_visningar ?? '–', lbl: 'Nya visningar idag' },
         ];
         document.getElementById('todayGrid').innerHTML = cards.map(function(c) {
           return '<div class="total-card"><div class="val">' + c.icon + ' ' + c.val + '</div><div class="lbl">' + c.lbl + '</div></div>';
         }).join('');
+      })
+      .catch(function() {
+        document.getElementById('todayGrid').innerHTML = '<div style="color:var(--muted);font-size:.8rem;">Kunde inte hämta dagens data.</div>';
       });
     }
 
