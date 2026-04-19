@@ -161,9 +161,45 @@
       <div class="section-title">Push-notiser</div>
       <div id="pushStats"></div>
     </div>
+
+    <!-- Firebase Analytics -->
+    <div class="section" id="fbSection">
+      <div class="section-title">🔥 Firebase Analytics <span id="fbBadge" style="display:none;font-size:.7rem;background:var(--accent);color:#fff;padding:2px 8px;border-radius:99px;margin-left:8px;vertical-align:middle;">Live</span></div>
+      <div id="fbKpi" class="kpi-grid" style="margin-bottom:.75rem;"></div>
+
+      <div class="charts-grid" style="margin-bottom:1rem;">
+        <div class="chart-card">
+          <h3>👥 Aktiva användare per dag (28 dagar)</h3>
+          <div class="chart-wrap"><canvas id="fbDailyChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>📱 Plattform</h3>
+          <div class="chart-wrap"><canvas id="fbPlatformChart"></canvas></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:.75rem;">
+        <div style="font-size:.85rem;font-weight:600;color:var(--accent);margin-bottom:.5rem;">Annons-tratt (senaste 14 dagar)</div>
+        <div id="fbFunnel" class="kpi-grid"></div>
+      </div>
+
+      <div class="table-wrap" style="margin-bottom:.75rem;" id="fbScreensWrap"></div>
+      <div class="table-wrap" style="margin-bottom:.75rem;" id="fbEventsWrap"></div>
+      <div class="table-wrap" style="margin-bottom:.75rem;" id="fbGeoWrap"></div>
+
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-top:.5rem;">
+        <div style="font-size:.85rem;font-weight:600;margin-bottom:.3rem;">Uppdatera Firebase-data</div>
+        <p style="font-size:.78rem;color:var(--muted);margin-bottom:.6rem;">Kör <code style="background:var(--accent-light);padding:1px 5px;border-radius:4px;">node scripts/fetch-firebase-analytics.mjs</code> i Appen-terminalen och klistra in JSON här.</p>
+        <textarea id="fbPaste" style="width:100%;height:90px;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:.5rem;font-size:.75rem;font-family:monospace;resize:vertical;" placeholder='{"fetchedAt":"...","dailyActive":[...],...}'></textarea>
+        <div style="display:flex;gap:.5rem;margin-top:.5rem;flex-wrap:wrap;">
+          <button type="button" onclick="applyFirebase()" class="sm">Visa data</button>
+          <button type="button" onclick="clearFirebase()" class="sm ghost">Rensa</button>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <p class="disclaimer">Alla siffror exkluderar konton med e-post som innehåller "sandblad", "test" eller appstores.review.test@gmail.com. Dashboarden hämtar data direkt från Supabase vid varje besök.</p>
+  <p class="disclaimer">Alla siffror exkluderar konton med e-post som innehåller "sandblad", "test" eller appstores.review.test@gmail.com. Dashboarden hämtar data direkt från Supabase vid varje besök. Firebase-data uppdateras manuellt via skript.</p>
 
   <script>
   (function() {
@@ -418,6 +454,156 @@
 
     /* ── Init ── */
     fetchDashboard();
+  })();
+
+  /* ══════════════════════════════════════
+     FIREBASE ANALYTICS
+  ══════════════════════════════════════ */
+  var fbCharts = {};
+  var FB_KEY = 'nh_firebase_v2';
+
+  function renderFirebase(d) {
+    if (!d) return;
+    document.getElementById('fbBadge').style.display = 'inline-block';
+
+    var daily   = d.dailyActive || [];
+    var events  = d.events      || [];
+    var screens = d.screens     || [];
+    var platform= d.platform    || [];
+    var geo     = d.geo         || [];
+    var funnel  = d.funnelDaily || [];
+
+    var totalAU   = daily.reduce(function(s,r){return s+Number(r.activeUsers||0);},0);
+    var totalNew  = daily.reduce(function(s,r){return s+Number(r.newUsers||0);},0);
+    var totalSess = daily.reduce(function(s,r){return s+Number(r.sessions||0);},0);
+    var last7AU   = daily.slice(-7).reduce(function(s,r){return s+Number(r.activeUsers||0);},0);
+
+    var signUpRow  = events.find(function(e){return e.eventName==='sign_up'||e.eventName==='user_signup';});
+    var listingRow = events.find(function(e){return e.eventName==='listing_created';});
+    var purchRow   = events.find(function(e){return e.eventName==='purchase_completed';});
+    var signUpCnt  = Number(signUpRow  ? signUpRow.totalUsers  : 0);
+    var listingCnt = Number(listingRow ? listingRow.eventCount : 0);
+    var purchCnt   = Number(purchRow   ? purchRow.eventCount   : 0);
+    var convRate   = signUpCnt > 0 ? ((listingCnt/signUpCnt)*100).toFixed(1)+'%' : '–';
+
+    /* KPI-kort */
+    var kpis = [
+      {icon:'👥', val:totalAU,  lbl:'Aktiva totalt (28d)'},
+      {icon:'🆕', val:totalNew, lbl:'Nya användare (28d)'},
+      {icon:'📲', val:totalSess,lbl:'Sessioner (28d)'},
+      {icon:'📅', val:last7AU,  lbl:'Aktiva senaste 7d'},
+      {icon:'✍️', val:signUpCnt||'–', lbl:'Registr. (14d)'},
+      {icon:'🏠', val:listingCnt||'–',lbl:'Annonser skapade (14d)'},
+      {icon:'📈', val:convRate,  lbl:'Konvertering reg→annons'},
+      {icon:'✅', val:purchCnt||'–', lbl:'Köp (14d)'},
+    ];
+    document.getElementById('fbKpi').innerHTML = kpis.map(function(k){
+      return '<div class="kpi-card"><div class="kpi-val">'+k.icon+' '+k.val+'</div><div class="kpi-lbl">'+k.lbl+'</div></div>';
+    }).join('');
+
+    /* Daglig aktiva-graf */
+    if (fbCharts.daily) fbCharts.daily.destroy();
+    var dcCtx = document.getElementById('fbDailyChart').getContext('2d');
+    fbCharts.daily = new Chart(dcCtx, {
+      type: 'bar',
+      data: {
+        labels: daily.map(function(r){return (r.date||'').replace(/(\d{4})(\d{2})(\d{2})/,'$2-$3');}),
+        datasets: [
+          {label:'Aktiva', data:daily.map(function(r){return Number(r.activeUsers);}), backgroundColor:'rgba(45,90,39,.7)', borderRadius:3},
+          {label:'Nya',    data:daily.map(function(r){return Number(r.newUsers);}),    backgroundColor:'rgba(59,130,246,.6)', borderRadius:3}
+        ]
+      },
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10}}}},scales:{x:{ticks:{maxRotation:45,font:{size:9}}},y:{beginAtZero:true,ticks:{precision:0}}}}
+    });
+
+    /* Plattforms-donut */
+    if (fbCharts.platform) fbCharts.platform.destroy();
+    var platCtx = document.getElementById('fbPlatformChart').getContext('2d');
+    fbCharts.platform = new Chart(platCtx, {
+      type: 'doughnut',
+      data: {
+        labels: platform.map(function(r){return r.platform;}),
+        datasets:[{data:platform.map(function(r){return Number(r.activeUsers);}),backgroundColor:['rgba(45,90,39,.8)','rgba(59,130,246,.8)','rgba(245,158,11,.8)'],borderWidth:2}]
+      },
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:11}}}}}
+    });
+
+    /* Tratt */
+    var funnelSignUp = funnel.filter(function(r){return r.eventName==='sign_up'||r.eventName==='user_signup';}).reduce(function(s,r){return s+Number(r.totalUsers||0);},0) || signUpCnt;
+    var funnelCL     = screens.find(function(s){return (s.pageTitle||'').toLowerCase().includes('createlisting');});
+    var funnelListed = funnel.filter(function(r){return r.eventName==='listing_created';}).reduce(function(s,r){return s+Number(r.eventCount||0);},0) || listingCnt;
+    var funnelPurch  = funnel.filter(function(r){return r.eventName==='purchase_completed';}).reduce(function(s,r){return s+Number(r.eventCount||0);},0) || purchCnt;
+    var funnelSteps  = [
+      {icon:'✍️', val:funnelSignUp||'–', lbl:'1. Registrerade sig'},
+      {icon:'🏠', val:funnelCL?Number(funnelCL.activeUsers):'?', lbl:'2. Öppnade Skapa annons'},
+      {icon:'📋', val:funnelListed||'–', lbl:'3. Skapade annons'},
+      {icon:'✅', val:funnelPurch||'–',  lbl:'4. Betalade/publicerade'},
+    ];
+    document.getElementById('fbFunnel').innerHTML = funnelSteps.map(function(s){
+      return '<div class="kpi-card"><div class="kpi-val">'+s.icon+' '+s.val+'</div><div class="kpi-lbl">'+s.lbl+'</div></div>';
+    }).join('');
+
+    /* Skärmtabell */
+    var filtScreens = screens.filter(function(s){return s.pageTitle && s.pageTitle !== '(not set)';});
+    if (filtScreens.length) {
+      var sh = '<table><thead><tr><th>Skärm</th><th class="num">Visningar</th><th class="num">Aktiva</th></tr></thead><tbody>';
+      filtScreens.forEach(function(s){
+        var isCL = (s.pageTitle||'').toLowerCase().includes('createlisting');
+        sh += '<tr><td style="'+(isCL?'color:var(--green);font-weight:600':'')+'">'+s.pageTitle+'</td><td class="num">'+Number(s.screenPageViews).toLocaleString('sv-SE')+'</td><td class="num">'+Number(s.activeUsers).toLocaleString('sv-SE')+'</td></tr>';
+      });
+      sh += '</tbody></table>';
+      document.getElementById('fbScreensWrap').innerHTML = '<div style="font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:.4rem;">Topp skärmar (senaste 14 dagar)</div>'+sh;
+    } else {
+      document.getElementById('fbScreensWrap').innerHTML = '<p style="font-size:.78rem;color:var(--muted);">Skärmnamn saknas ännu — syns efter nästa app-uppdatering.</p>';
+    }
+
+    /* Events-tabell */
+    if (events.length) {
+      var keyEvts = ['sign_up','user_signup','listing_created','purchase_completed','listing_view','search','favorite_added','bid_placed'];
+      var eh = '<table><thead><tr><th>Event</th><th class="num">Antal</th><th class="num">Unika</th></tr></thead><tbody>';
+      events.forEach(function(e){
+        var isKey = keyEvts.indexOf(e.eventName) > -1;
+        eh += '<tr><td style="'+(isKey?'font-weight:600':'color:var(--muted)')+'">'+e.eventName+'</td><td class="num">'+Number(e.eventCount).toLocaleString('sv-SE')+'</td><td class="num">'+Number(e.totalUsers).toLocaleString('sv-SE')+'</td></tr>';
+      });
+      eh += '</tbody></table>';
+      document.getElementById('fbEventsWrap').innerHTML = '<div style="font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:.4rem;">Events (senaste 14 dagar)</div>'+eh;
+    }
+
+    /* Geo-tabell */
+    if (geo.length) {
+      var gh = '<table><thead><tr><th>Stad</th><th class="num">Aktiva</th></tr></thead><tbody>';
+      geo.forEach(function(g){ if(g.city&&g.city!=='(not set)') gh += '<tr><td>'+g.city+'</td><td class="num">'+Number(g.activeUsers).toLocaleString('sv-SE')+'</td></tr>'; });
+      gh += '</tbody></table>';
+      document.getElementById('fbGeoWrap').innerHTML = '<div style="font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:.4rem;">Städer (senaste 28 dagar)</div>'+gh;
+    }
+  }
+
+  function applyFirebase() {
+    var raw = document.getElementById('fbPaste').value.trim();
+    if (!raw) { alert('Klistra in JSON från terminalen.'); return; }
+    var data;
+    try { data = JSON.parse(raw); } catch(e) { alert('Ogiltig JSON.'); return; }
+    try { localStorage.setItem(FB_KEY, JSON.stringify(data)); } catch(e) {}
+    renderFirebase(data);
+  }
+
+  function clearFirebase() {
+    try { localStorage.removeItem(FB_KEY); } catch(e) {}
+    document.getElementById('fbPaste').value = '';
+    document.getElementById('fbKpi').innerHTML = '';
+    document.getElementById('fbFunnel').innerHTML = '';
+    document.getElementById('fbScreensWrap').innerHTML = '';
+    document.getElementById('fbEventsWrap').innerHTML = '';
+    document.getElementById('fbGeoWrap').innerHTML = '';
+    document.getElementById('fbBadge').style.display = 'none';
+  }
+
+  /* Ladda från cache vid sidladdning */
+  (function() {
+    try {
+      var cached = localStorage.getItem(FB_KEY);
+      if (cached) renderFirebase(JSON.parse(cached));
+    } catch(e) {}
   })();
   </script>
 </body>
