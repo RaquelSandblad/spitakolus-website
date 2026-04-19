@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nästa Hem – Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg:      #0d1117;
+      --bg2:     #161b25;
+      --bg3:     #1e2535;
+      --bg4:     #262e42;
+      --border:  #2d3854;
+      --text:    #e2e8f0;
+      --muted:   #8892a4;
+      --accent:  #6366f1;
+      --green:   #10b981;
+      --amber:   #f59e0b;
+      --red:     #ef4444;
+      --blue:    #3b82f6;
+      --purple:  #a855f7;
+      --teal:    #14b8a6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Layout ── */
+    .page { max-width: 1200px; margin: 0 auto; padding: 24px 20px 80px; }
+    header { margin-bottom: 32px; }
+    header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 6px; }
+    header h1 span { color: var(--accent); }
+    header p { color: var(--muted); max-width: 660px; }
+    .badge {
+      display: inline-block; padding: 2px 10px; border-radius: 99px;
+      font-size: 11px; font-weight: 600; letter-spacing: .5px;
+      background: var(--accent); color: #fff; vertical-align: middle; margin-left: 8px;
+    }
+
+    /* ── Sections ── */
+    .section { margin-bottom: 48px; }
+    .section-title {
+      font-size: 1.05rem; font-weight: 700; margin-bottom: 16px;
+      color: var(--text); border-left: 3px solid var(--accent);
+      padding-left: 10px;
+    }
+    .section-desc { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
+
+    /* ── KPI Cards ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 14px;
+    }
+    .kpi-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .kpi-card .label { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .kpi-card .value { font-size: 2rem; font-weight: 700; line-height: 1.1; }
+    .kpi-card .sub   { font-size: 11px; color: var(--muted); margin-top: 4px; }
+    .kpi-card.accent .value { color: var(--accent); }
+    .kpi-card.green  .value { color: var(--green); }
+    .kpi-card.amber  .value { color: var(--amber); }
+    .kpi-card.blue   .value { color: var(--blue); }
+    .kpi-card.purple .value { color: var(--purple); }
+    .kpi-card.teal   .value { color: var(--teal); }
+
+    /* ── Charts ── */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 20px;
+    }
+    .chart-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+    }
+    .chart-box h3 { font-size: 13px; font-weight: 600; margin-bottom: 14px; color: var(--muted); }
+    .chart-box canvas { max-height: 220px; }
+
+    /* ── Tables ── */
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%; border-collapse: collapse; font-size: 13px;
+    }
+    th {
+      background: var(--bg3); color: var(--muted); font-weight: 600;
+      padding: 9px 12px; text-align: right; white-space: nowrap;
+      border-bottom: 2px solid var(--border);
+    }
+    th:first-child { text-align: left; }
+    td {
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+      text-align: right; white-space: nowrap;
+    }
+    td:first-child { text-align: left; font-weight: 500; }
+    tr:hover td { background: var(--bg3); }
+    .zero { color: var(--muted); }
+    .positive { color: var(--green); font-weight: 600; }
+
+    /* ── Data input area ── */
+    .input-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .input-box h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+    .input-box p { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+    textarea {
+      width: 100%; height: 120px; background: var(--bg3); color: var(--text);
+      border: 1px solid var(--border); border-radius: 6px; padding: 10px;
+      font-size: 12px; font-family: 'Cascadia Code', 'Fira Code', monospace;
+      resize: vertical;
+    }
+    textarea:focus { outline: 2px solid var(--accent); }
+
+    /* ── SQL blocks ── */
+    details {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden;
+    }
+    details + details { margin-top: 8px; }
+    summary {
+      padding: 12px 16px; cursor: pointer; font-weight: 600;
+      font-size: 13px; user-select: none; list-style: none;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    summary::after { content: '▾'; color: var(--muted); }
+    details[open] summary::after { content: '▴'; }
+    pre {
+      padding: 14px 16px; overflow-x: auto;
+      font-size: 12px; font-family: 'Cascadia Code', 'Fira Code', monospace;
+      background: var(--bg3); color: #a8c7f9; border-top: 1px solid var(--border);
+      white-space: pre-wrap;
+    }
+
+    /* ── Buttons ── */
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    button {
+      padding: 8px 16px; border-radius: 6px; border: none;
+      font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity .15s;
+    }
+    button:hover { opacity: .85; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-ghost   { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+    .btn-danger  { background: #2d1f1f; color: var(--red); border: 1px solid #5a2222; }
+
+    /* ── Notice ── */
+    .notice {
+      background: #1a1f35; border: 1px solid #3b4680; border-radius: 8px;
+      padding: 14px 16px; font-size: 13px; color: #a0b0e0; margin-bottom: 20px;
+    }
+    .notice strong { color: var(--text); }
+
+    /* ── Footer ── */
+    footer { color: var(--muted); font-size: 12px; margin-top: 48px; text-align: center; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <h1>Nästa Hem <span>– Dashboard</span></h1>
+    <p>Veckovis aktivitet: nya konton, annonser, bud, visningsbokningar, favoriter och app-events.
+       Exkluderar test- och Sandblad-konton.</p>
+  </header>
+
+  <!-- ── Downloads notice ── -->
+  <div class="notice">
+    <strong>Om app-nedladdningar:</strong>
+    Faktiska nedladdningsantal (installationer) finns i
+    <a href="https://appstoreconnect.apple.com" target="_blank">App Store Connect</a> och
+    <a href="https://play.google.com/console" target="_blank">Google Play Console</a> —
+    inte i Supabase. Det som visas här är <strong>registrerade konton</strong>, alltså
+    användare som laddat ner appen <em>och</em> skapat ett konto.
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 1 – Dagens höjdpunkter
+  ════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Totalt (alla tider, exkl. test)</div>
+    <div class="kpi-grid" id="kpi-total"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 2 – KPI senaste fulla veckan
+  ════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">KPI – senaste fulla veckan</div>
+    <div class="section-desc">Jämfört med veckan innan (↑ / ↓).</div>
+    <div class="kpi-grid" id="kpi-week"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 3 – Grafer
+  ════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Grafer per mått (veckovis)</div>
+    <div class="chart-grid" id="chart-grid"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 4 – Veckovis huvudtabell
+  ════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Veckovis översikt</div>
+    <div class="table-wrap" id="main-table-wrap">
+      <p style="color:var(--muted); padding:20px 0">Klistra in data nedan för att visa tabellen.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 5 – App-events pivot
+  ════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">App-events veckovis</div>
+    <div class="section-desc">Antal events per typ och vecka.</div>
+    <div class="table-wrap" id="events-table-wrap">
+      <p style="color:var(--muted); padding:20px 0">Uppdateras automatiskt när du klistrar in huvuddata nedan.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 6 – Data input
+  ════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Uppdatera med ny data från Supabase</div>
+
+    <div class="input-box" style="margin-bottom:16px">
+      <h3>Huvud­fråga (veckovis data)</h3>
+      <p>Kör SQL-frågan nedan i Supabase SQL Editor, välj <strong>Results → JSON</strong>, kopiera och klistra in här.</p>
+      <textarea id="paste-main" placeholder='[{"vecka":"2025-W30","week_start":"2025-07-21",...}]'></textarea>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="applyMain()">Visa uppdaterad data</button>
+        <button class="btn-ghost" onclick="exportCSV()">Exportera CSV</button>
+        <button class="btn-danger" onclick="clearCache()">Rensa cache &amp; ladda om</button>
+      </div>
+    </div>
+
+    <div class="input-box">
+      <h3>App-events per typ (valfritt)</h3>
+      <p>Kör events-frågan nedan och klistra in här för detaljerad händelse­pivot.</p>
+      <textarea id="paste-events" placeholder='[{"vecka":"2025-W30","registreringar":0,...}]'></textarea>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="applyEvents()">Visa uppdaterade events</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 7 – SQL queries
+  ════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">SQL-frågor</div>
+    <p class="section-desc">Kör dessa i <a href="https://supabase.com/dashboard/project/ezvkeowlqizdbfsiyyow/editor" target="_blank">Supabase SQL Editor</a>.</p>
+
+    <details>
+      <summary>Huvud­fråga – veckovis aktivitet (klistra in i rutan ovan)</summary>
+      <pre id="sql-main"></pre>
+    </details>
+
+    <details style="margin-top:8px">
+      <summary>App-events per typ och vecka</summary>
+      <pre id="sql-events"></pre>
+    </details>
+
+    <details style="margin-top:8px">
+      <summary>Användaröversikt – totalt och per status</summary>
+      <pre id="sql-users"></pre>
+    </details>
+
+    <details style="margin-top:8px">
+      <summary>Daglig retention (kohort­analys)</summary>
+      <pre id="sql-retention"></pre>
+    </details>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       SECTION 8 – Firebase Analytics
+  ════════════════════════════════════════════════ -->
+  <div class="section" id="firebase-section">
+    <div class="section-title">🔥 Firebase Analytics <span class="badge" id="firebase-badge" style="display:none">Live</span></div>
+    <div class="section-desc">Skärmanvändning, aktiva användare och annons-tratt direkt från GA4. Kör <code style="background:var(--bg3);padding:2px 6px;border-radius:4px;font-size:11px">node scripts/fetch-firebase-analytics.mjs</code> och klistra in nedan.</div>
+
+    <!-- Firebase KPIs -->
+    <div class="kpi-grid" id="fb-kpi" style="margin-bottom:24px"></div>
+
+    <!-- Plattform + Tratt -->
+    <div class="chart-grid" style="margin-bottom:24px">
+      <div class="chart-box">
+        <h3>Aktiva användare per dag (senaste 28 dagar)</h3>
+        <canvas id="fb-chart-daily" style="max-height:220px"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>Plattform – aktiva användare</h3>
+        <canvas id="fb-chart-platform" style="max-height:220px"></canvas>
+      </div>
+    </div>
+
+    <!-- Annons-tratt -->
+    <div style="margin-bottom:24px">
+      <div class="section-title" style="font-size:.95rem">Annons-tratt (senaste 14 dagar)</div>
+      <div class="kpi-grid" id="fb-funnel"></div>
+    </div>
+
+    <!-- Skärmvyer tabell -->
+    <div class="table-wrap" style="margin-bottom:24px" id="fb-screens-wrap">
+      <p style="color:var(--muted);padding:12px 0">Klistra in Firebase-data nedan för att se skärmstatistik.</p>
+    </div>
+
+    <!-- Events tabell -->
+    <div class="table-wrap" style="margin-bottom:24px" id="fb-events-wrap"></div>
+
+    <!-- Geo tabell -->
+    <div class="table-wrap" style="margin-bottom:24px" id="fb-geo-wrap"></div>
+
+    <!-- Input -->
+    <div class="input-box">
+      <h3>Firebase Analytics-data</h3>
+      <p>Kör <strong>node scripts/fetch-firebase-analytics.mjs</strong> i terminalen, kopiera JSON-utdatat och klistra in här.</p>
+      <textarea id="paste-firebase" placeholder='{"fetchedAt":"...","dailyActive":[...],"screens":[...],...}'></textarea>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="applyFirebase()">Visa Firebase-data</button>
+        <button class="btn-ghost" onclick="clearFirebase()">Rensa</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Nästa Hem Dashboard · Data från Supabase &amp; Firebase Analytics ·
+    <span id="last-updated">Laddar…</span>
+  </footer>
+</div>
+
+<script>
+'use strict';
+
+// ══════════════════════════════════════════════════════════
+// SQL QUERIES
+// ══════════════════════════════════════════════════════════
+const SQL_MAIN = `-- NÄSTA HEM – Huvud­fråga (veckovis aktivitet)
+-- Kör i Supabase SQL Editor › välj Results → JSON › kopiera
+-- Exkluderar test- och Sandblad-konton automatiskt
+
+WITH excl AS (
+  SELECT id FROM auth.users
+  WHERE email ILIKE '%sandblad%'
+     OR email ILIKE '%test%'
+     OR email = 'appstores.review.test@gmail.com'
+),
+week_series AS (
+  SELECT generate_series(
+    '2026-03-16'::timestamptz,
+    date_trunc('week', now() AT TIME ZONE 'Europe/Stockholm'),
+    '1 week'::interval
+  ) AS w
+)
+SELECT
+  to_char(w, 'IYYY-"W"IW')                                         AS vecka,
+  w::date                                                           AS week_start,
+  (SELECT COUNT(*) FROM auth.users u
+   WHERE date_trunc('week', u.created_at AT TIME ZONE 'Europe/Stockholm') = w
+     AND u.id NOT IN (SELECT id FROM excl))                        AS nya_anvandare,
+  (SELECT COUNT(*) FROM auth.users u
+   JOIN profiles p ON p.id = u.id
+   WHERE date_trunc('week', u.created_at AT TIME ZONE 'Europe/Stockholm') = w
+     AND u.id NOT IN (SELECT id FROM excl)
+     AND p.bankid_verified = true)                                  AS bankid_nya,
+  (SELECT COUNT(*) FROM listings l
+   WHERE date_trunc('week', l.created_at AT TIME ZONE 'Europe/Stockholm') = w) AS nya_annonser,
+  (SELECT COUNT(*) FROM bids b
+   WHERE date_trunc('week', b.created_at AT TIME ZONE 'Europe/Stockholm') = w) AS nya_bud,
+  (SELECT COUNT(*) FROM viewing_bookings vb
+   WHERE date_trunc('week', vb.created_at AT TIME ZONE 'Europe/Stockholm') = w) AS nya_visningsbokningar,
+  (SELECT COUNT(*) FROM listing_favorites lf
+   WHERE date_trunc('week', lf.created_at AT TIME ZONE 'Europe/Stockholm') = w
+     AND lf.removed_at IS NULL)                                     AS nya_favoriter,
+  (SELECT COUNT(*) FROM app_events ae
+   WHERE date_trunc('week', ae.created_at AT TIME ZONE 'Europe/Stockholm') = w) AS app_events_totalt,
+  (SELECT COUNT(*) FROM payments pay
+   WHERE date_trunc('week', pay.created_at AT TIME ZONE 'Europe/Stockholm') = w
+     AND pay.status = 'succeeded')                                  AS kop_genomforda
+FROM week_series
+ORDER BY w DESC;`;
+
+const SQL_EVENTS = `-- App-events per typ och vecka
+SELECT
+  to_char(
+    date_trunc('week', created_at AT TIME ZONE 'Europe/Stockholm'),
+    'IYYY-"W"IW'
+  )                                                                 AS vecka,
+  COUNT(*) FILTER (WHERE event_type = 'user_signup')               AS registreringar,
+  COUNT(*) FILTER (WHERE event_type = 'listing_created')           AS annonser_skapade,
+  COUNT(*) FILTER (WHERE event_type = 'bid_placed')                AS bud_placerade,
+  COUNT(*) FILTER (WHERE event_type = 'viewing_booked')            AS visningsbokningar,
+  COUNT(*) FILTER (WHERE event_type = 'purchase_completed')        AS kop_genomforda,
+  COUNT(*) FILTER (WHERE event_type = 'favorite_added')            AS favoriter_lagda,
+  COUNT(*) FILTER (WHERE event_type = 'favorite_removed')          AS favoriter_borttagna,
+  COUNT(*) FILTER (WHERE event_type = 'bankid_upgrade')            AS bankid_uppgraderingar,
+  COUNT(*)                                                          AS totalt
+FROM app_events
+GROUP BY 1
+ORDER BY 1 DESC;`;
+
+const SQL_USERS = `-- Användaröversikt (exkl. test-konton)
+WITH excl AS (
+  SELECT id FROM auth.users
+  WHERE email ILIKE '%sandblad%'
+     OR email ILIKE '%test%'
+     OR email = 'appstores.review.test@gmail.com'
+)
+SELECT
+  COUNT(*)                                        AS totalt_konton,
+  COUNT(*) FILTER (WHERE p.bankid_verified = true) AS bankid_verifierade,
+  COUNT(*) FILTER (WHERE p.bankid_verified IS DISTINCT FROM true) AS ej_bankid_verifierade,
+  COUNT(*) FILTER (WHERE u.email_confirmed_at IS NOT NULL)        AS bekraftad_epost,
+  COUNT(*) FILTER (WHERE p.registration_completed = true)         AS registrering_klar
+FROM auth.users u
+LEFT JOIN profiles p ON p.id = u.id
+WHERE u.id NOT IN (SELECT id FROM excl);`;
+
+const SQL_RETENTION = `-- Daglig retention – per registreringsvecka (exkl. test)
+-- Visar hur många i varje veckas kohort som loggat ett app_event
+-- senare samma vecka (dag 0–6) eller veckan efter (dag 7–13), osv.
+WITH excl AS (
+  SELECT id FROM auth.users
+  WHERE email ILIKE '%sandblad%'
+     OR email ILIKE '%test%'
+     OR email = 'appstores.review.test@gmail.com'
+),
+cohorts AS (
+  SELECT
+    u.id,
+    date_trunc('week', u.created_at AT TIME ZONE 'Europe/Stockholm')::date AS cohort_week
+  FROM auth.users u
+  WHERE u.id NOT IN (SELECT id FROM excl)
+),
+events AS (
+  SELECT user_id, created_at FROM app_events
+)
+SELECT
+  c.cohort_week,
+  COUNT(DISTINCT c.id)                                                    AS kohort_storlek,
+  COUNT(DISTINCT e0.user_id)                                              AS aktiva_v0,
+  COUNT(DISTINCT e1.user_id)                                              AS aktiva_v1,
+  COUNT(DISTINCT e2.user_id)                                              AS aktiva_v2,
+  COUNT(DISTINCT e4.user_id)                                              AS aktiva_v4
+FROM cohorts c
+LEFT JOIN events e0 ON e0.user_id = c.id
+  AND e0.created_at AT TIME ZONE 'Europe/Stockholm' >= c.cohort_week::timestamptz
+  AND e0.created_at AT TIME ZONE 'Europe/Stockholm' <  (c.cohort_week + 7)::timestamptz
+LEFT JOIN events e1 ON e1.user_id = c.id
+  AND e1.created_at AT TIME ZONE 'Europe/Stockholm' >= (c.cohort_week + 7)::timestamptz
+  AND e1.created_at AT TIME ZONE 'Europe/Stockholm' <  (c.cohort_week + 14)::timestamptz
+LEFT JOIN events e2 ON e2.user_id = c.id
+  AND e2.created_at AT TIME ZONE 'Europe/Stockholm' >= (c.cohort_week + 14)::timestamptz
+  AND e2.created_at AT TIME ZONE 'Europe/Stockholm' <  (c.cohort_week + 21)::timestamptz
+LEFT JOIN events e4 ON e4.user_id = c.id
+  AND e4.created_at AT TIME ZONE 'Europe/Stockholm' >= (c.cohort_week + 28)::timestamptz
+  AND e4.created_at AT TIME ZONE 'Europe/Stockholm' <  (c.cohort_week + 35)::timestamptz
+GROUP BY c.cohort_week
+ORDER BY c.cohort_week DESC;`;
+
+// ══════════════════════════════════════════════════════════
+// STORAGE
+// ══════════════════════════════════════════════════════════
+const KEYS = { main: 'nh_main_v1', events: 'nh_events_v1', ts: 'nh_ts_v1' };
+
+function save(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {}
+}
+function load(key) {
+  try { return JSON.parse(localStorage.getItem(key)); } catch(e) { return null; }
+}
+
+// ══════════════════════════════════════════════════════════
+// CHARTS
+// ══════════════════════════════════════════════════════════
+const CHART_COLORS = {
+  nya_anvandare:        '#6366f1',
+  bankid_nya:           '#a855f7',
+  nya_annonser:         '#10b981',
+  nya_bud:              '#f59e0b',
+  nya_visningsbokningar:'#3b82f6',
+  nya_favoriter:        '#14b8a6',
+  app_events_totalt:    '#8892a4',
+  kop_genomforda:       '#ef4444',
+};
+
+const CHART_LABELS = {
+  nya_anvandare:        'Nya konton',
+  bankid_nya:           'BankID-verif. (nya)',
+  nya_annonser:         'Annonser skapade',
+  nya_bud:              'Bud placerade',
+  nya_visningsbokningar:'Visningsbokningar',
+  nya_favoriter:        'Favoriter tillagda',
+  app_events_totalt:    'App-events (totalt)',
+  kop_genomforda:       'Köp genomförda',
+};
+
+let chartInstances = {};
+
+function buildCharts(rows) {
+  const grid = document.getElementById('chart-grid');
+  grid.innerHTML = '';
+
+  const fields = Object.keys(CHART_LABELS);
+  const labels = [...rows].reverse().map(r => r.vecka);
+
+  fields.forEach(field => {
+    const values = [...rows].reverse().map(r => Number(r[field] ?? 0));
+    const total  = values.reduce((a,b)=>a+b,0);
+    if (total === 0) return; // skip all-zero charts
+
+    const box = document.createElement('div');
+    box.className = 'chart-box';
+    box.innerHTML = `<h3>${CHART_LABELS[field]}</h3><canvas id="chart-${field}"></canvas>`;
+    grid.appendChild(box);
+
+    const ctx = box.querySelector('canvas').getContext('2d');
+    if (chartInstances[field]) chartInstances[field].destroy();
+    chartInstances[field] = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: CHART_LABELS[field],
+          data: values,
+          backgroundColor: CHART_COLORS[field] + 'cc',
+          borderColor:     CHART_COLORS[field],
+          borderWidth: 1,
+          borderRadius: 4,
+        }],
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: '#8892a4', font: { size: 10 } }, grid: { color: '#1e2535' } },
+          y: { ticks: { color: '#8892a4', font: { size: 10 } }, grid: { color: '#1e2535' }, beginAtZero: true },
+        },
+      },
+    });
+  });
+
+  if (!grid.children.length) {
+    grid.innerHTML = '<p style="color:var(--muted); padding:12px 0">Inga icke-noll-värden att visa. Klistra in data nedan.</p>';
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// RENDER – TOTAL KPIs
+// ══════════════════════════════════════════════════════════
+function renderTotalKPIs(rows) {
+  const totals = {
+    nya_anvandare:        0, bankid_nya: 0, nya_annonser: 0,
+    nya_bud:              0, nya_visningsbokningar: 0, nya_favoriter: 0,
+    app_events_totalt:    0, kop_genomforda: 0,
+  };
+  rows.forEach(r => Object.keys(totals).forEach(k => { totals[k] += Number(r[k] ?? 0); }));
+
+  const defs = [
+    { key: 'nya_anvandare',         label: 'Konton (totalt)',    cls: 'accent', sub: 'sedan lansering' },
+    { key: 'bankid_nya',            label: 'BankID-verif.',      cls: 'purple', sub: 'av nya konton' },
+    { key: 'nya_annonser',          label: 'Annonser',           cls: 'green',  sub: 'skapade' },
+    { key: 'nya_bud',               label: 'Bud',                cls: 'amber',  sub: 'placerade' },
+    { key: 'nya_visningsbokningar', label: 'Visningsbokn.',      cls: 'blue',   sub: 'bokningar' },
+    { key: 'nya_favoriter',         label: 'Favoriter',          cls: 'teal',   sub: 'tillagda' },
+    { key: 'app_events_totalt',     label: 'App-events',         cls: '',       sub: 'totalt' },
+    { key: 'kop_genomforda',        label: 'Köp',                cls: 'green',  sub: 'genomförda' },
+  ];
+
+  document.getElementById('kpi-total').innerHTML = defs.map(d =>
+    `<div class="kpi-card ${d.cls}">
+      <div class="label">${d.label}</div>
+      <div class="value">${totals[d.key].toLocaleString('sv-SE')}</div>
+      <div class="sub">${d.sub}</div>
+    </div>`
+  ).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+// RENDER – LAST FULL WEEK KPIs
+// ══════════════════════════════════════════════════════════
+function renderWeekKPIs(rows) {
+  const today = new Date();
+  const dow   = today.getDay(); // 0=Sun
+  // Find last full week = the most recent week that has ended
+  // ISO week starts Monday; current week may be incomplete
+  const lastFull  = rows.length > 1 ? rows[1] : rows[0];
+  const prevFull  = rows.length > 2 ? rows[2] : null;
+
+  const fields = [
+    { key: 'nya_anvandare',         label: 'Nya konton',         cls: 'accent' },
+    { key: 'bankid_nya',            label: 'BankID-verif.',      cls: 'purple' },
+    { key: 'nya_annonser',          label: 'Annonser',           cls: 'green'  },
+    { key: 'nya_bud',               label: 'Bud',                cls: 'amber'  },
+    { key: 'nya_visningsbokningar', label: 'Visningsbokn.',      cls: 'blue'   },
+    { key: 'nya_favoriter',         label: 'Favoriter',          cls: 'teal'   },
+    { key: 'app_events_totalt',     label: 'App-events',         cls: ''       },
+    { key: 'kop_genomforda',        label: 'Köp',                cls: 'green'  },
+  ];
+
+  document.getElementById('kpi-week').innerHTML = fields.map(f => {
+    const val  = Number(lastFull?.[f.key] ?? 0);
+    const prev = Number(prevFull?.[f.key] ?? 0);
+    let delta = '';
+    if (prevFull !== null) {
+      const diff = val - prev;
+      if (diff > 0) delta = `<span style="color:var(--green)">↑${diff}</span>`;
+      else if (diff < 0) delta = `<span style="color:var(--red)">↓${Math.abs(diff)}</span>`;
+      else delta = `<span style="color:var(--muted)">→ 0</span>`;
+    }
+    return `<div class="kpi-card ${f.cls}">
+      <div class="label">${f.label}</div>
+      <div class="value">${val.toLocaleString('sv-SE')}</div>
+      <div class="sub">${lastFull?.vecka ?? '–'} ${delta}</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════
+// RENDER – MAIN TABLE
+// ══════════════════════════════════════════════════════════
+function renderMainTable(rows) {
+  const wrap = document.getElementById('main-table-wrap');
+  if (!rows || !rows.length) {
+    wrap.innerHTML = '<p style="color:var(--muted);padding:20px 0">Ingen data. Klistra in nedan.</p>';
+    return;
+  }
+
+  const cols = [
+    { key: 'vecka',                 label: 'Vecka'           },
+    { key: 'nya_anvandare',         label: 'Nya konton'      },
+    { key: 'bankid_nya',            label: 'BankID-verif.'   },
+    { key: 'nya_annonser',          label: 'Annonser'        },
+    { key: 'nya_bud',               label: 'Bud'             },
+    { key: 'nya_visningsbokningar', label: 'Visningsbokn.'   },
+    { key: 'nya_favoriter',         label: 'Favoriter'       },
+    { key: 'app_events_totalt',     label: 'App-events'      },
+    { key: 'kop_genomforda',        label: 'Köp'             },
+  ];
+
+  const header = `<tr>${cols.map(c => `<th>${c.label}</th>`).join('')}</tr>`;
+  const body   = rows.map(r => `<tr>${
+    cols.map(c => {
+      if (c.key === 'vecka') return `<td>${r[c.key]}</td>`;
+      const v = Number(r[c.key] ?? 0);
+      return `<td class="${v === 0 ? 'zero' : v > 0 ? 'positive' : ''}">${v > 0 ? v : '–'}</td>`;
+    }).join('')
+  }</tr>`).join('');
+
+  wrap.innerHTML = `<table><thead>${header}</thead><tbody>${body}</tbody></table>`;
+}
+
+// ══════════════════════════════════════════════════════════
+// RENDER – EVENTS PIVOT TABLE
+// ══════════════════════════════════════════════════════════
+function renderEventsTable(rows) {
+  const wrap = document.getElementById('events-table-wrap');
+  if (!rows || !rows.length) {
+    wrap.innerHTML = '<p style="color:var(--muted);padding:20px 0">Ingen events-data. Klistra in nedan eller kör events-frågan.</p>';
+    return;
+  }
+
+  const cols = [
+    { key: 'vecka',                  label: 'Vecka'             },
+    { key: 'registreringar',         label: 'Registreringar'    },
+    { key: 'annonser_skapade',       label: 'Annonser skapade'  },
+    { key: 'bud_placerade',          label: 'Bud'               },
+    { key: 'visningsbokningar',      label: 'Visningsbok.'      },
+    { key: 'kop_genomforda',         label: 'Köp'               },
+    { key: 'favoriter_lagda',        label: 'Fav. tillagda'     },
+    { key: 'favoriter_borttagna',    label: 'Fav. borttagna'    },
+    { key: 'bankid_uppgraderingar',  label: 'BankID-uppgr.'     },
+    { key: 'totalt',                 label: 'Totalt'            },
+  ];
+
+  const header = `<tr>${cols.map(c => `<th>${c.label}</th>`).join('')}</tr>`;
+  const body   = rows.map(r => `<tr>${
+    cols.map(c => {
+      if (c.key === 'vecka') return `<td>${r[c.key]}</td>`;
+      const v = Number(r[c.key] ?? 0);
+      return `<td class="${v === 0 ? 'zero' : 'positive'}">${v > 0 ? v : '–'}</td>`;
+    }).join('')
+  }</tr>`).join('');
+
+  wrap.innerHTML = `<table><thead>${header}</thead><tbody>${body}</tbody></table>`;
+}
+
+// ══════════════════════════════════════════════════════════
+// APPLY / PARSE
+// ══════════════════════════════════════════════════════════
+function applyMain() {
+  const raw = document.getElementById('paste-main').value.trim();
+  if (!raw) { alert('Klistra in JSON-data från Supabase SQL Editor.'); return; }
+  let data;
+  try { data = JSON.parse(raw); }
+  catch(e) { alert('Ogiltig JSON. Kopiera resultatet som JSON från SQL Editor.'); return; }
+  save(KEYS.main, data);
+  save(KEYS.ts, new Date().toISOString());
+  renderAll(data, load(KEYS.events));
+}
+
+function applyEvents() {
+  const raw = document.getElementById('paste-events').value.trim();
+  if (!raw) { alert('Klistra in JSON-data från events-frågan.'); return; }
+  let data;
+  try { data = JSON.parse(raw); }
+  catch(e) { alert('Ogiltig JSON.'); return; }
+  save(KEYS.events, data);
+  renderEventsTable(data);
+}
+
+function clearCache() {
+  if (!confirm('Rensa all cachad data?')) return;
+  [KEYS.main, KEYS.events, KEYS.ts].forEach(k => localStorage.removeItem(k));
+  location.reload();
+}
+
+function exportCSV() {
+  const rows = load(KEYS.main);
+  if (!rows || !rows.length) { alert('Ingen data att exportera.'); return; }
+  const keys = Object.keys(rows[0]);
+  const csv  = [keys.join(','), ...rows.map(r => keys.map(k => r[k]).join(','))].join('\n');
+  const a    = document.createElement('a');
+  a.href     = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'nastahem-veckodata.csv';
+  a.click();
+}
+
+// ══════════════════════════════════════════════════════════
+// RENDER ALL
+// ══════════════════════════════════════════════════════════
+function renderAll(mainData, eventsData) {
+  if (mainData && mainData.length) {
+    renderTotalKPIs(mainData);
+    renderWeekKPIs(mainData);
+    buildCharts(mainData);
+    renderMainTable(mainData);
+  }
+  if (eventsData && eventsData.length) {
+    renderEventsTable(eventsData);
+  }
+  const ts = load(KEYS.ts);
+  document.getElementById('last-updated').textContent = ts
+    ? 'Senast uppdaterad: ' + new Date(ts).toLocaleString('sv-SE')
+    : 'Ingen data inläst ännu';
+}
+
+// ══════════════════════════════════════════════════════════
+// FIREBASE ANALYTICS RENDERING
+// ══════════════════════════════════════════════════════════
+const FB_KEY = 'nh_firebase_v1';
+let fbChartInstances = {};
+
+function renderFirebase(d) {
+  if (!d) return;
+  document.getElementById('firebase-badge').style.display = 'inline-block';
+
+  // ── KPI-kort ──
+  const dailyRows  = d.dailyActive ?? [];
+  const totalAU    = dailyRows.reduce((s, r) => s + Number(r.activeUsers ?? 0), 0);
+  const totalNew   = dailyRows.reduce((s, r) => s + Number(r.newUsers    ?? 0), 0);
+  const totalSess  = dailyRows.reduce((s, r) => s + Number(r.sessions    ?? 0), 0);
+  const last7AU    = dailyRows.slice(-7).reduce((s, r) => s + Number(r.activeUsers ?? 0), 0);
+
+  const events     = d.events ?? [];
+  const signUpRow  = events.find(e => e.eventName === 'sign_up' || e.eventName === 'user_signup');
+  const listingRow = events.find(e => e.eventName === 'listing_created');
+  const purchRow   = events.find(e => e.eventName === 'purchase_completed');
+  const signUpCnt  = Number(signUpRow?.totalUsers ?? 0);
+  const listingCnt = Number(listingRow?.eventCount ?? 0);
+  const purchCnt   = Number(purchRow?.eventCount   ?? 0);
+  const convRate   = signUpCnt > 0 ? ((listingCnt / signUpCnt) * 100).toFixed(1) : '–';
+
+  const fbKpis = [
+    { label: 'Aktiva totalt (28d)',  value: totalAU.toLocaleString('sv-SE'),   cls: 'accent', sub: d.dateRange?.from + ' – ' + d.dateRange?.to },
+    { label: 'Nya användare (28d)',  value: totalNew.toLocaleString('sv-SE'),  cls: 'purple', sub: 'unika' },
+    { label: 'Sessioner (28d)',      value: totalSess.toLocaleString('sv-SE'), cls: 'blue',   sub: 'totalt' },
+    { label: 'Aktiva senaste 7 d',   value: last7AU.toLocaleString('sv-SE'),   cls: 'green',  sub: 'unika aktiva' },
+    { label: 'Registrerade (14d)',   value: signUpCnt || '–',                  cls: 'teal',   sub: 'via sign_up-event' },
+    { label: 'Annonser (14d)',       value: listingCnt || '–',                 cls: 'amber',  sub: 'listing_created' },
+    { label: 'Konvertering',         value: convRate === '–' ? '–' : convRate + '%', cls: convRate !== '–' && Number(convRate) >= 20 ? 'green' : 'amber', sub: 'registr → annons' },
+    { label: 'Köp (14d)',            value: purchCnt || '–',                   cls: 'green',  sub: 'purchase_completed' },
+  ];
+  document.getElementById('fb-kpi').innerHTML = fbKpis.map(k =>
+    `<div class="kpi-card ${k.cls}"><div class="label">${k.label}</div><div class="value">${k.value}</div><div class="sub">${k.sub}</div></div>`
+  ).join('');
+
+  // ── Daglig aktiva-graf ──
+  if (fbChartInstances['fb-daily']) fbChartInstances['fb-daily'].destroy();
+  const dcCtx = document.getElementById('fb-chart-daily').getContext('2d');
+  fbChartInstances['fb-daily'] = new Chart(dcCtx, {
+    type: 'bar',
+    data: {
+      labels: dailyRows.map(r => r.date?.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3') ?? r.date),
+      datasets: [
+        { label: 'Aktiva', data: dailyRows.map(r => Number(r.activeUsers)), backgroundColor: '#6366f1cc', borderColor: '#6366f1', borderWidth: 1, borderRadius: 3 },
+        { label: 'Nya',    data: dailyRows.map(r => Number(r.newUsers)),    backgroundColor: '#a855f7cc', borderColor: '#a855f7', borderWidth: 1, borderRadius: 3 },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { labels: { color: '#8892a4', font: { size: 10 } } } },
+      scales: {
+        x: { ticks: { color: '#8892a4', font: { size: 9 }, maxRotation: 45 }, grid: { color: '#1e2535' } },
+        y: { ticks: { color: '#8892a4', font: { size: 10 } }, grid: { color: '#1e2535' }, beginAtZero: true },
+      },
+    },
+  });
+
+  // ── Plattforms-donut ──
+  if (fbChartInstances['fb-platform']) fbChartInstances['fb-platform'].destroy();
+  const platRows = d.platform ?? [];
+  const platCtx  = document.getElementById('fb-chart-platform').getContext('2d');
+  fbChartInstances['fb-platform'] = new Chart(platCtx, {
+    type: 'doughnut',
+    data: {
+      labels: platRows.map(r => r.platform),
+      datasets: [{
+        data: platRows.map(r => Number(r.activeUsers)),
+        backgroundColor: ['#6366f1cc', '#10b981cc', '#f59e0bcc', '#3b82f6cc'],
+        borderColor:     ['#6366f1',   '#10b981',   '#f59e0b',   '#3b82f6'],
+        borderWidth: 2,
+      }],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: '#e2e8f0', font: { size: 11 } } },
+      },
+    },
+  });
+
+  // ── Annons-tratt ──
+  const funnelRows = d.funnelDaily ?? [];
+  const aggEvent = name => funnelRows
+    .filter(r => r.eventName === name)
+    .reduce((s, r) => s + Number(r.totalUsers ?? r.eventCount ?? 0), 0);
+  const funnelSignUp = aggEvent('sign_up') + aggEvent('user_signup');
+  const funnelCL     = (d.screens ?? []).find(s => s.pageTitle?.toLowerCase().includes('createlisting') || s.pageTitle?.toLowerCase().includes('skapa'));
+  const funnelCLVal  = funnelCL ? Number(funnelCL.activeUsers ?? 0) : '?';
+  const funnelListed = aggEvent('listing_created');
+  const funnelPurch  = aggEvent('purchase_completed');
+
+  const funnelSteps = [
+    { label: '1. Registrerade sig',          value: funnelSignUp || signUpCnt, cls: 'accent', sub: '(sign_up)' },
+    { label: '2. Besökte Skapa annons',       value: funnelCLVal,               cls: 'blue',   sub: '(CreateListing-skärm)' },
+    { label: '3. Skapade annons',             value: funnelListed || listingCnt, cls: 'green',  sub: '(listing_created)' },
+    { label: '4. Betalade / publicerade',     value: funnelPurch  || purchCnt,  cls: 'amber',  sub: '(purchase_completed)' },
+  ];
+  document.getElementById('fb-funnel').innerHTML = funnelSteps.map(s =>
+    `<div class="kpi-card ${s.cls}"><div class="label">${s.label}</div><div class="value">${Number(s.value) > 0 ? Number(s.value).toLocaleString('sv-SE') : (s.value || '–')}</div><div class="sub">${s.sub}</div></div>`
+  ).join('');
+
+  // ── Skärmtabell ──
+  const screens = d.screens ?? [];
+  if (screens.length) {
+    document.getElementById('fb-screens-wrap').innerHTML = `
+      <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:10px">Topp skärmar (senaste 14 dagar)</div>
+      <table><thead><tr><th>Skärm</th><th>Sidvisningar</th><th>Aktiva</th></tr></thead><tbody>
+      ${screens.map(s => `<tr>
+        <td style="color:${s.pageTitle?.toLowerCase().includes('createlisting') ? 'var(--green)' : 'inherit'}">${s.pageTitle ?? '(okänd)'}</td>
+        <td class="${Number(s.screenPageViews) > 0 ? 'positive' : 'zero'}">${Number(s.screenPageViews).toLocaleString('sv-SE')}</td>
+        <td class="${Number(s.activeUsers) > 0 ? 'positive' : 'zero'}">${Number(s.activeUsers).toLocaleString('sv-SE')}</td>
+      </tr>`).join('')}
+      </tbody></table>`;
+  }
+
+  // ── Events-tabell ──
+  const evts = d.events ?? [];
+  if (evts.length) {
+    const importantEvents = ['sign_up','user_signup','listing_created','purchase_completed','screen_view','bid_placed','viewing_booked','favorite_added','bankid_upgrade','contact_request','listing_view'];
+    const sorted = [...evts].sort((a,b) => Number(b.eventCount) - Number(a.eventCount));
+    document.getElementById('fb-events-wrap').innerHTML = `
+      <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:10px">Events (senaste 14 dagar)</div>
+      <table><thead><tr><th>Event</th><th>Antal</th><th>Unika användare</th></tr></thead><tbody>
+      ${sorted.map(e => `<tr>
+        <td style="color:${importantEvents.includes(e.eventName) ? 'var(--text)' : 'var(--muted)'};font-weight:${importantEvents.includes(e.eventName) ? '600' : '400'}">${e.eventName}</td>
+        <td class="positive">${Number(e.eventCount).toLocaleString('sv-SE')}</td>
+        <td class="${Number(e.totalUsers) > 0 ? 'positive' : 'zero'}">${Number(e.totalUsers).toLocaleString('sv-SE')}</td>
+      </tr>`).join('')}
+      </tbody></table>`;
+  }
+
+  // ── Geo-tabell ──
+  const geo = d.geo ?? [];
+  if (geo.length) {
+    document.getElementById('fb-geo-wrap').innerHTML = `
+      <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:10px">Geografisk fördelning – städer (senaste 28 dagar)</div>
+      <table><thead><tr><th>Stad</th><th>Aktiva</th></tr></thead><tbody>
+      ${geo.map(g => `<tr><td>${g.city ?? '(okänd)'}</td><td class="positive">${Number(g.activeUsers).toLocaleString('sv-SE')}</td></tr>`).join('')}
+      </tbody></table>`;
+  }
+}
+
+function applyFirebase() {
+  const raw = document.getElementById('paste-firebase').value.trim();
+  if (!raw) { alert('Klistra in JSON-output från node scripts/fetch-firebase-analytics.mjs'); return; }
+  let data;
+  try { data = JSON.parse(raw); }
+  catch(e) { alert('Ogiltig JSON. Kopiera hela utdatan från terminalen.'); return; }
+  try { localStorage.setItem(FB_KEY, JSON.stringify(data)); } catch(e) {}
+  renderFirebase(data);
+}
+
+function clearFirebase() {
+  try { localStorage.removeItem(FB_KEY); } catch(e) {}
+  document.getElementById('paste-firebase').value = '';
+  document.getElementById('fb-kpi').innerHTML = '';
+  document.getElementById('fb-funnel').innerHTML = '';
+  document.getElementById('fb-screens-wrap').innerHTML = '<p style="color:var(--muted);padding:12px 0">Rensad.</p>';
+  document.getElementById('fb-events-wrap').innerHTML = '';
+  document.getElementById('fb-geo-wrap').innerHTML = '';
+  document.getElementById('firebase-badge').style.display = 'none';
+}
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+function init() {
+  // Inject SQL texts
+  document.getElementById('sql-main').textContent      = SQL_MAIN;
+  document.getElementById('sql-events').textContent    = SQL_EVENTS;
+  document.getElementById('sql-users').textContent     = SQL_USERS;
+  document.getElementById('sql-retention').textContent = SQL_RETENTION;
+
+  // Load from cache
+  const mainData   = load(KEYS.main);
+  const eventsData = load(KEYS.events);
+
+  // Load Firebase cache
+  try {
+    const fbData = JSON.parse(localStorage.getItem(FB_KEY));
+    if (fbData) renderFirebase(fbData);
+  } catch(e) {}
+
+  if (mainData) {
+    document.getElementById('paste-main').value = JSON.stringify(mainData);
+  }
+  if (eventsData) {
+    document.getElementById('paste-events').value = JSON.stringify(eventsData);
+  }
+
+  renderAll(mainData, eventsData);
+}
+
+init();
+</script>
+</body>
+</html>
