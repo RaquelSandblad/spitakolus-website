@@ -121,6 +121,10 @@
     .chart-card { margin-bottom: 2rem; }
     .chart-card h3 { font-size: 1rem; margin: 0 0 0.75rem 0; color: var(--accent); }
     .chart-wrap { position: relative; height: 220px; max-width: 100%; }
+    .dau-card { display: flex; align-items: center; flex-wrap: wrap; gap: 0.75rem 1.25rem; }
+    .dau-card .dau-value { font-size: 2rem; font-weight: 700; color: var(--accent); line-height: 1.1; font-variant-numeric: tabular-nums; }
+    .dau-card .dau-title { font-size: 1rem; font-weight: 600; color: var(--text); margin: 0; }
+    .dau-card .dau-hint { font-size: 0.85rem; color: var(--muted); margin: 0; flex: 1 1 100%; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -154,6 +158,9 @@
   </script>
   <h1>Flocken – Veckovis aktivitet</h1>
   <div id="textSummary" class="sr-only" role="region" aria-label="Textsammanfattning för skärmläsare och AI"></div>
+  <div class="card dau-card" id="dauCard" aria-live="polite">
+    <div id="outDau"></div>
+  </div>
   <p class="help"><strong>Här nedan ser du:</strong> antal nya konton, hundar, hundvaktprofiler, konversationer, meddelanden, promenader och hundvänliga platser vecka för vecka – plus app-events (inloggningar, annonser skapade, kontakt med hundvakt). Alla siffror exkluderar Raquel, Torbjörn och tb.sandblad.</p>
   <p class="help" style="margin-bottom:0;"><strong>Live-data</strong> <span id="fetchStatus" style="font-weight:600;"></span></p>
 
@@ -323,6 +330,24 @@
           konv_per_100: konton ? (konv / konton) * 100 : 0,
           medd_per_konv: konv ? (medd / konv) : 0
         };
+      }
+
+      function renderDau(todayData) {
+        var el = document.getElementById('outDau');
+        if (!el) return;
+        if (!todayData || !todayData.date) {
+          el.innerHTML = '<p class="dau-hint" style="margin:0;">DAU (dagliga aktiva användare) laddas när dagens data finns från Supabase.</p>';
+          return;
+        }
+        var n = todayData.dau;
+        if (n == null || n === undefined) n = null;
+        var valueHtml = n != null ? String(n) : '—';
+        el.innerHTML =
+          '<div style="display:flex;align-items:baseline;flex-wrap:wrap;gap:0.5rem 1rem;">' +
+          '<span class="dau-value">' + valueHtml + '</span>' +
+          '<span class="dau-title">DAU – dagliga aktiva användare</span>' +
+          '</div>' +
+          '<p class="dau-hint">Unika som öppnat appen idag (händelse <code>app_opened</code>, kalenderdag enligt databasen). Samma exkludering som övrig dashboard.</p>';
       }
 
       function renderHighlights(mainData, todayData) {
@@ -1134,6 +1159,9 @@
         
         if (lastTodayData && lastTodayData.date) {
           text += 'DAGENS HÖJDPUNKTER (' + lastTodayData.date + '):\n';
+          if (lastTodayData.dau != null && lastTodayData.dau !== undefined) {
+            text += '- DAU (unika app_opened idag): ' + lastTodayData.dau + '\n';
+          }
           var totalToday = 0;
           (lastTodayData.accounts || []).forEach(function(a) { totalToday += a.new_accounts || 0; });
           text += '- Nya konton idag: ' + totalToday + '\n';
@@ -1165,6 +1193,7 @@
         if (outEvents) outEvents.innerHTML = renderEventsTable(eventsData);
         var outEventsDaily = document.getElementById('outEventsDaily');
         if (outEventsDaily) outEventsDaily.innerHTML = renderEventsDailyTable(lastEventsDailyData);
+        renderDau(lastTodayData);
         renderHighlights(mainData, lastTodayData);
         renderSubscriptionBars(lastSubscriptionData);
         renderRetention(lastRetentionData);
