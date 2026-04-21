@@ -474,7 +474,7 @@
         var cards = [
           { icon: '👤', val: d.nya_konton   ?? '–', lbl: 'Nya konton idag' },
           { icon: '🏠', val: d.nya_annonser  ?? '–', lbl: 'Nya annonser idag' },
-          { icon: '📅', val: d.nya_visningar ?? '–', lbl: 'Nya visningar idag' },
+          { icon: '👀', val: d.nya_visningar ?? '–', lbl: 'Objektvisningar idag' },
         ];
         document.getElementById('todayGrid').innerHTML = cards.map(function(c) {
           return '<div class="total-card"><div class="val">' + c.icon + ' ' + c.val + '</div><div class="lbl">' + c.lbl + '</div></div>';
