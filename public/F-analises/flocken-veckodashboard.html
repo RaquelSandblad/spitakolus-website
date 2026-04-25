@@ -336,18 +336,52 @@
         var el = document.getElementById('outDau');
         if (!el) return;
         if (!todayData || !todayData.date) {
-          el.innerHTML = '<p class="dau-hint" style="margin:0;">DAU (dagliga aktiva användare) laddas när dagens data finns från Supabase.</p>';
+          el.innerHTML = '<p class="dau-hint" style="margin:0;">DAU laddas när dagens data finns från Supabase.</p>';
           return;
         }
-        var n = todayData.dau;
-        if (n == null || n === undefined) n = null;
-        var valueHtml = n != null ? String(n) : '—';
-        el.innerHTML =
-          '<div style="display:flex;align-items:baseline;flex-wrap:wrap;gap:0.5rem 1rem;">' +
-          '<span class="dau-value">' + valueHtml + '</span>' +
-          '<span class="dau-title">DAU – dagliga aktiva användare</span>' +
-          '</div>' +
-          '<p class="dau-hint">Unika som öppnat appen idag (händelse <code>app_opened</code>, kalenderdag enligt databasen). Samma exkludering som övrig dashboard.</p>';
+
+        var dau = todayData.dau != null ? todayData.dau : null;
+        var deviceDau = todayData.device_dau != null ? todayData.device_dau : null;
+        var convPct = (dau != null && deviceDau != null && deviceDau > 0)
+          ? (dau / deviceDau * 100).toFixed(1).replace('.', ',')
+          : null;
+
+        var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.75rem 1.5rem;align-items:start;">';
+
+        // Kolumn 1 – Alla enheter (device_dau)
+        html += '<div>';
+        html += '<div style="display:flex;align-items:baseline;gap:0.5rem;">';
+        html += '<span class="dau-value" style="color:var(--muted);">' + (deviceDau != null ? deviceDau : '—') + '</span>';
+        html += '</div>';
+        html += '<p class="dau-title" style="margin:0.15rem 0 0;">Öppningar idag</p>';
+        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Alla enheter inkl. anonyma</p>';
+        html += '</div>';
+
+        // Kolumn 2 – Inloggade (dau)
+        html += '<div>';
+        html += '<div style="display:flex;align-items:baseline;gap:0.5rem;">';
+        html += '<span class="dau-value">' + (dau != null ? dau : '—') + '</span>';
+        html += '</div>';
+        html += '<p class="dau-title" style="margin:0.15rem 0 0;">DAU – inloggade</p>';
+        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Unika inloggade användare</p>';
+        html += '</div>';
+
+        // Kolumn 3 – Konversion
+        html += '<div>';
+        html += '<div style="display:flex;align-items:baseline;gap:0.5rem;">';
+        var convColor = convPct != null
+          ? (parseFloat(convPct.replace(',', '.')) >= 30 ? '#0d6832' : parseFloat(convPct.replace(',', '.')) >= 15 ? '#856404' : '#b02a37')
+          : 'var(--muted)';
+        html += '<span class="dau-value" style="color:' + convColor + ';">' + (convPct != null ? convPct + '%' : '—') + '</span>';
+        html += '</div>';
+        html += '<p class="dau-title" style="margin:0.15rem 0 0;">Konversion</p>';
+        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Inloggade / alla enheter</p>';
+        html += '</div>';
+
+        html += '</div>';
+        html += '<p class="dau-hint" style="margin-top:0.6rem;">Händelse <code>app_opened</code> idag. Konversion = andel som har ett konto av alla som öppnat appen. Exkluderar testkonton.</p>';
+
+        el.innerHTML = html;
       }
 
       function renderHighlights(mainData, todayData) {
@@ -1159,8 +1193,12 @@
         
         if (lastTodayData && lastTodayData.date) {
           text += 'DAGENS HÖJDPUNKTER (' + lastTodayData.date + '):\n';
-          if (lastTodayData.dau != null && lastTodayData.dau !== undefined) {
-            text += '- DAU (unika app_opened idag): ' + lastTodayData.dau + '\n';
+          var deviceDauToday = lastTodayData.device_dau;
+          var dauToday = lastTodayData.dau;
+          if (deviceDauToday != null) text += '- Öppningar idag (alla enheter inkl. anonyma): ' + deviceDauToday + '\n';
+          if (dauToday != null) text += '- DAU inloggade (unika app_opened idag): ' + dauToday + '\n';
+          if (dauToday != null && deviceDauToday != null && deviceDauToday > 0) {
+            text += '- Konversion (inloggade/alla enheter): ' + (dauToday / deviceDauToday * 100).toFixed(1) + '%\n';
           }
           var totalToday = 0;
           (lastTodayData.accounts || []).forEach(function(a) { totalToday += a.new_accounts || 0; });
