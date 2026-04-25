@@ -348,22 +348,22 @@
 
         var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.75rem 1.5rem;align-items:start;">';
 
-        // Kolumn 1 – Alla enheter (device_dau)
-        html += '<div>';
-        html += '<div style="display:flex;align-items:baseline;gap:0.5rem;">';
-        html += '<span class="dau-value" style="color:var(--muted);">' + (deviceDau != null ? deviceDau : '—') + '</span>';
-        html += '</div>';
-        html += '<p class="dau-title" style="margin:0.15rem 0 0;">Öppningar idag</p>';
-        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Alla enheter inkl. anonyma</p>';
-        html += '</div>';
-
-        // Kolumn 2 – Inloggade (dau)
+        // Kolumn 1 – Inloggade (dau)
         html += '<div>';
         html += '<div style="display:flex;align-items:baseline;gap:0.5rem;">';
         html += '<span class="dau-value">' + (dau != null ? dau : '—') + '</span>';
         html += '</div>';
         html += '<p class="dau-title" style="margin:0.15rem 0 0;">DAU – inloggade</p>';
         html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Unika inloggade användare</p>';
+        html += '</div>';
+
+        // Kolumn 2 – Alla enheter (device_dau)
+        html += '<div>';
+        html += '<div style="display:flex;align-items:baseline;gap:0.5rem;">';
+        html += '<span class="dau-value" style="color:var(--muted);">' + (deviceDau != null ? deviceDau : '—') + '</span>';
+        html += '</div>';
+        html += '<p class="dau-title" style="margin:0.15rem 0 0;">Öppningar idag</p>';
+        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Alla enheter inkl. anonyma</p>';
         html += '</div>';
 
         // Kolumn 3 – Konversion
