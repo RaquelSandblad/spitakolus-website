@@ -3,7 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Flocken – Veckovis aktivitet</title>
+  <!-- Version: 2026-04-28 12:53 - Uppdaterad med "Nedladdningar" istället för "Öppningar idag" -->
   <style>
     :root {
       --bg: #f8f9fa;
@@ -341,14 +345,15 @@
         }
 
         var dau = todayData.dau != null ? todayData.dau : null;
-        var deviceDau = todayData.device_dau != null ? todayData.device_dau : null;
-        var convPct = (dau != null && deviceDau != null && deviceDau > 0)
-          ? (dau / deviceDau * 100).toFixed(1).replace('.', ',')
+        var anonymousOpens = todayData.anonymous_opens != null ? todayData.anonymous_opens : null;
+        var newAccountsTotal = todayData.new_accounts_total != null ? todayData.new_accounts_total : null;
+        var convPct = (newAccountsTotal != null && anonymousOpens != null && anonymousOpens > 0)
+          ? (newAccountsTotal / anonymousOpens * 100).toFixed(1).replace('.', ',')
           : null;
 
         var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.75rem 1.5rem;align-items:start;">';
 
-        // Kolumn 1 – Inloggade (dau)
+        // Kolumn 1 – DAU (inloggade som redan HAR konto)
         html += '<div>';
         html += '<div style="display:flex;align-items:baseline;gap:0.5rem;">';
         html += '<span class="dau-value">' + (dau != null ? dau : '—') + '</span>';
@@ -357,16 +362,25 @@
         html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Unika inloggade användare</p>';
         html += '</div>';
 
-        // Kolumn 2 – Alla enheter (device_dau)
+        // Kolumn 2 – Nedladdningar (anonyma enheter)
         html += '<div>';
         html += '<div style="display:flex;align-items:baseline;gap:0.5rem;">';
-        html += '<span class="dau-value" style="color:var(--muted);">' + (deviceDau != null ? deviceDau : '—') + '</span>';
+        html += '<span class="dau-value" style="color:var(--muted);">' + (anonymousOpens != null ? anonymousOpens : '—') + '</span>';
         html += '</div>';
-        html += '<p class="dau-title" style="margin:0.15rem 0 0;">Öppningar idag</p>';
-        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Alla enheter inkl. anonyma</p>';
+        html += '<p class="dau-title" style="margin:0.15rem 0 0;">Nedladdningar</p>';
+        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Endast anonyma enheter</p>';
         html += '</div>';
 
-        // Kolumn 3 – Konversion
+        // Kolumn 3 – Nya konton
+        html += '<div>';
+        html += '<div style="display:flex;align-items:baseline;gap:0.5rem;">';
+        html += '<span class="dau-value" style="color:var(--accent);">' + (newAccountsTotal != null ? newAccountsTotal : '—') + '</span>';
+        html += '</div>';
+        html += '<p class="dau-title" style="margin:0.15rem 0 0;">Nya konton</p>';
+        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Registreringar idag</p>';
+        html += '</div>';
+
+        // Kolumn 4 – Konversion
         html += '<div>';
         html += '<div style="display:flex;align-items:baseline;gap:0.5rem;">';
         var convColor = convPct != null
@@ -375,11 +389,11 @@
         html += '<span class="dau-value" style="color:' + convColor + ';">' + (convPct != null ? convPct + '%' : '—') + '</span>';
         html += '</div>';
         html += '<p class="dau-title" style="margin:0.15rem 0 0;">Konversion</p>';
-        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Inloggade / alla enheter</p>';
+        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Nya konton / nedladdningar</p>';
         html += '</div>';
 
         html += '</div>';
-        html += '<p class="dau-hint" style="margin-top:0.6rem;">Händelse <code>app_opened</code> idag. Konversion = andel som har ett konto av alla som öppnat appen. Exkluderar testkonton.</p>';
+        html += '<p class="dau-hint" style="margin-top:0.6rem;">Händelse <code>app_opened</code> idag. Konversion = andel nedladdningar som registrerade sig. Exkluderar testkonton.</p>';
 
         el.innerHTML = html;
       }
@@ -396,12 +410,7 @@
         var html = '<div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; margin-bottom:1rem;">';
         html += '<div><div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr);">';
         
-        var totalNewAccounts = 0;
-        if (todayData.accounts && todayData.accounts.length > 0) {
-          todayData.accounts.forEach(function(a) {
-            totalNewAccounts += a.new_accounts || 0;
-          });
-        }
+        var totalNewAccounts = todayData.new_accounts_total != null ? todayData.new_accounts_total : 0;
         
         html += '<div class="kpi-card"><div class="kpi-value">' + totalNewAccounts + '</div><div class="kpi-label">Nya konton</div></div>';
         html += '<div class="kpi-card"><div class="kpi-value">' + (todayData.new_dogs || 0) + '</div><div class="kpi-label">Nya hundar</div></div>';
@@ -1193,16 +1202,15 @@
         
         if (lastTodayData && lastTodayData.date) {
           text += 'DAGENS HÖJDPUNKTER (' + lastTodayData.date + '):\n';
-          var deviceDauToday = lastTodayData.device_dau;
+          var anonymousOpens = lastTodayData.anonymous_opens;
           var dauToday = lastTodayData.dau;
-          if (deviceDauToday != null) text += '- Öppningar idag (alla enheter inkl. anonyma): ' + deviceDauToday + '\n';
-          if (dauToday != null) text += '- DAU inloggade (unika app_opened idag): ' + dauToday + '\n';
-          if (dauToday != null && deviceDauToday != null && deviceDauToday > 0) {
-            text += '- Konversion (inloggade/alla enheter): ' + (dauToday / deviceDauToday * 100).toFixed(1) + '%\n';
+          var newAccountsTotal = lastTodayData.new_accounts_total;
+          if (anonymousOpens != null) text += '- Nedladdningar (endast anonyma enheter): ' + anonymousOpens + '\n';
+          if (newAccountsTotal != null) text += '- Nya konton idag (registreringar): ' + newAccountsTotal + '\n';
+          if (newAccountsTotal != null && anonymousOpens != null && anonymousOpens > 0) {
+            text += '- Konversion (nya konton / nedladdningar): ' + (newAccountsTotal / anonymousOpens * 100).toFixed(1) + '%\n';
           }
-          var totalToday = 0;
-          (lastTodayData.accounts || []).forEach(function(a) { totalToday += a.new_accounts || 0; });
-          text += '- Nya konton idag: ' + totalToday + '\n';
+          if (dauToday != null) text += '- DAU inloggade (folk som redan har konto): ' + dauToday + '\n';
           text += '- Nya hundar idag: ' + (lastTodayData.new_dogs || 0) + '\n';
           text += '- Nya hundvaktprofiler idag: ' + (lastTodayData.new_sitters || 0) + '\n\n';
         }
