@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Flocken – Veckovis aktivitet</title>
-  <!-- Version: 2026-04-28 12:53 - Uppdaterad med "Nedladdningar" istället för "Öppningar idag" -->
+  <!-- Version: 2026-05-08 – Linjediagram (vecko/månad), events-trender, KPI-tabellstäd, retention nedladdningar -->
   <style>
     :root {
       --bg: #f8f9fa;
@@ -125,6 +125,9 @@
     .chart-card { margin-bottom: 2rem; }
     .chart-card h3 { font-size: 1rem; margin: 0 0 0.75rem 0; color: var(--accent); }
     .chart-wrap { position: relative; height: 220px; max-width: 100%; }
+    .chart-toolbar { display: flex; flex-wrap: wrap; gap: 0.75rem 1.25rem; align-items: center; margin: 0.75rem 0 1rem 0; font-size: 0.9rem; }
+    .chart-toolbar label { display: inline-flex; align-items: center; gap: 0.4rem; }
+    .chart-toolbar select { padding: 0.35rem 0.5rem; border-radius: 6px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text); }
     .dau-card { display: flex; align-items: center; flex-wrap: wrap; gap: 0.75rem 1.25rem; }
     .dau-card .dau-value { font-size: 2rem; font-weight: 700; color: var(--accent); line-height: 1.1; font-variant-numeric: tabular-nums; }
     .dau-card .dau-title { font-size: 1rem; font-weight: 600; color: var(--text); margin: 0; }
@@ -156,6 +159,7 @@
         document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
         localStorage.setItem('dashboard_theme', isDark ? 'light' : 'dark');
         updateBtn();
+        document.dispatchEvent(new Event('flocken-theme-change'));
       };
       updateBtn();
     })();
@@ -186,12 +190,6 @@
   </div>
 
   <div class="card">
-    <h2>Grafer per parameter</h2>
-    <p class="help">Samma data som tabellen ovan, ett stapeldiagram per mått. Fullständiga namn – inga förkortningar.</p>
-    <div id="outCharts"></div>
-  </div>
-
-  <div class="card">
     <h2>Kontotyper – fördelning och e-postbekräftelse</h2>
     <p class="help">Totalt antal konton per typ, hur många som bekräftat sin e-post, och nya konton per vecka uppdelat på typ.</p>
     <div id="outAccountTypes"></div>
@@ -202,6 +200,10 @@
     <h2>App-events veckovis (pivoterat – en rad per vecka)</h2>
     <p class="help">Unika användare per event och vecka. Visar senaste tre fulla veckor.</p>
     <div class="table-wrap"><div id="outEvents"></div></div>
+    <h3 style="margin-top:1.25rem; font-size:1rem;">App-events över tid (linjediagram)</h3>
+    <p class="help">Vecko-vy är exakt pivotens unika/anrop. Vid <strong>månader</strong> summeras händelsantal per månad; för <strong>unika</strong> per månad används högsta veckotal i månaden (konservativt grovuppskattning – sant månadsvärde kräver egen SQL).</p>
+    <div class="chart-toolbar" id="eventsTrendToolbar"></div>
+    <div id="outEventsCharts"></div>
     <h3 style="margin-top:1.5rem; font-size:1rem;">Pågående vecka (dag för dag)</h3>
     <div class="table-wrap"><div id="outEventsDaily"></div></div>
     <details style="margin-top:1rem;">
@@ -222,6 +224,10 @@
     <h2>Veckovis översikt (råtal + andelar)</h2>
     <div class="table-wrap"><div id="outMain"></div></div>
     <div id="outPartial" style="margin-top:1rem;"></div>
+    <h3 style="margin-top:1.25rem;">Trendlinjer (samma mått som tabellen)</h3>
+    <p class="help">Linjediagram för längre uppföljning. Vid <strong>månad</strong> summeras rörelsetal (konton, hundar, meddelanden, …); procenttal (reply rate) vägs med antal konversationer; för notis-<em>unika</em> används max av veckorna i månaden.</p>
+    <div class="chart-toolbar" id="mainTrendToolbar"></div>
+    <div id="outCharts"></div>
     <p style="margin-top:0.75rem;">
       <button type="button" id="btnExportCsv">Exportera huvudtabell som CSV</button>
       <button type="button" id="btnClearCache" style="margin-left:0.5rem; background:#dc3545;">Rensa cache & ladda om</button>
@@ -507,7 +513,6 @@
         var curr = full[full.length - 1];
         var prev = full[full.length - 2];
         var dCurr = computeDerived(curr);
-        var dPrev = computeDerived(prev);
         var pivot = pivotEvents(eventsData || []);
         var currPivot = pivot.find(function(p) { return p.label === curr.label; }) || {};
         var listingUnika = currPivot.listing_created_unika != null ? currPivot.listing_created_unika : 0;
@@ -516,22 +521,9 @@
           if (previous == null || previous === 0) return null;
           return ((current - previous) / previous) * 100;
         }
-        function ppChange(currentPct, previousPct) {
-          if (previousPct == null) return null;
-          return (currentPct - previousPct);
-        }
-        function fmtPpChange(currPct, prevPct) {
-          var pp = currPct - prevPct;
-          return 'från ' + prevPct.toFixed(1).replace('.', ',') + '% → ' + currPct.toFixed(1).replace('.', ',') + '% (' + (pp >= 0 ? '+' : '') + pp.toFixed(1).replace('.', ',') + ' procentenheter)';
-        }
         var kontonChange = pctChange(curr.nya_konton, prev.nya_konton);
-        var hundPp = ppChange(dCurr.hund_aktivering_pct, dPrev.hund_aktivering_pct);
-        var vaktPp = ppChange(dCurr.vakt_aktivering_pct, dPrev.vakt_aktivering_pct);
         var html = '<div class="kpi-grid">';
         html += '<div class="kpi-card"><div class="kpi-value">' + (curr.nya_konton || 0) + '</div><div class="kpi-label">Nya konton</div>' + (kontonChange != null ? '<div class="wow ' + (kontonChange >= 0 ? 'wow-up' : 'wow-down') + '">' + (kontonChange >= 0 ? '+' : '') + kontonChange.toFixed(1) + '% vs föregående vecka</div>' : '') + '</div>';
-        html += '<div class="kpi-card"><div class="kpi-value">' + dCurr.hund_aktivering_pct.toFixed(1).replace('.', ',') + '%</div><div class="kpi-label">Hund-aktivering (' + (curr.nya_hundar || 0) + ' av ' + (curr.nya_konton || 0) + ')</div>' + (hundPp != null ? '<div class="wow ' + (hundPp >= 0 ? 'wow-up' : 'wow-down') + '">Jämfört med förra veckan: ' + fmtPpChange(dCurr.hund_aktivering_pct, dPrev.hund_aktivering_pct) + '</div>' : '') + '</div>';
-        html += '<div class="kpi-card"><div class="kpi-value">' + dCurr.vakt_aktivering_pct.toFixed(1).replace('.', ',') + '%</div><div class="kpi-label">Vakt-aktivering</div>' + (vaktPp != null ? '<div class="wow ' + (vaktPp >= 0 ? 'wow-up' : 'wow-down') + '">Jämfört med förra veckan: ' + fmtPpChange(dCurr.vakt_aktivering_pct, dPrev.vakt_aktivering_pct) + '</div>' : '') + '</div>';
-        html += '<div class="kpi-card"><div class="kpi-value">' + dCurr.konv_per_100.toFixed(2) + '</div><div class="kpi-label">Konv per 100 konton</div></div>';
         html += '<div class="kpi-card"><div class="kpi-value">' + (dCurr.medd_per_konv ? dCurr.medd_per_konv.toFixed(1) : '–') + '</div><div class="kpi-label">Medd per konv</div></div>';
         html += '<div class="kpi-card"><div class="kpi-value">' + listingRate.toFixed(1) + '%</div><div class="kpi-label">Listing-rate (annons/konton)</div></div>';
         var aktiva = (currPivot.app_opened_unika != null) ? currPivot.app_opened_unika : (currPivot.login_unika != null ? currPivot.login_unika : null);
@@ -563,19 +555,16 @@
         if (!Array.isArray(data) || data.length === 0) return '<p>Inga rader att visa.</p>';
         var full = getFullWeeks(data);
         var keys = ['nya_konton','nya_hundar','nya_hundvakt_profiler','sitter_konversationer','tindog_konversationer','sitter_meddelanden','tindog_meddelanden','promenader','hundvanliga_platser','bokningar'];
-        var keyLabels = { nya_konton: 'Nya konton', nya_hundar: 'Nya hundar', nya_hundvakt_profiler: 'Nya vaktprofiler', sitter_konversationer: 'Sitter-konv', tindog_konversationer: 'Tindog-konv', sitter_meddelanden: 'Sitter-medd', tindog_meddelanden: 'Tindog-medd', promenader: 'Promenader', hundvanliga_platser: 'Platser', bokningar: 'Bokningar', hund_aktivering_pct: 'Hund-akt %', vakt_aktivering_pct: 'Vakt-akt %', konv_per_100: 'Konv/100', medd_per_konv: 'Medd/konv' };
+        var keyLabels = { nya_konton: 'Nya konton', nya_hundar: 'Nya hundar', nya_hundvakt_profiler: 'Nya vaktprofiler', sitter_konversationer: 'Sitter-konv', tindog_konversationer: 'Tindog-konv', sitter_meddelanden: 'Sitter-medd', tindog_meddelanden: 'Tindog-medd', promenader: 'Promenader', hundvanliga_platser: 'Platser', bokningar: 'Bokningar', medd_per_konv: 'Medd/konv' };
         if (full.length === 0) return '<p>Inga fulla veckor.</p>';
         full.sort(function(a,b) { return (a.week_num != null && b.week_num != null) ? a.week_num - b.week_num : 0; });
         var html = '<table><thead><tr><th>Vecka</th>';
         keys.forEach(function(k) { html += '<th class="num">' + (mainLabels[k] || k) + '</th>'; });
-        html += '<th class="num">Hund-akt %</th><th class="num">Vakt-akt %</th><th class="num">Konv/100</th><th class="num">Medd/konv</th><th class="num">Push-notiser</th><th class="num">Unika mottagare</th></tr></thead><tbody>';
+        html += '<th class="num">Medd/konv</th><th class="num">Push-notiser</th><th class="num">Unika mottagare</th></tr></thead><tbody>';
         full.forEach(function(row) {
           var d = computeDerived(row);
           html += '<tr><td>' + (row.label || '') + '</td>';
           keys.forEach(function(k) { html += '<td class="num">' + (row[k] != null ? row[k] : '–') + '</td>'; });
-          html += '<td class="num">' + (d.hund_aktivering_pct ? d.hund_aktivering_pct.toFixed(1) + '%' : '–') + '</td>';
-          html += '<td class="num">' + (d.vakt_aktivering_pct ? d.vakt_aktivering_pct.toFixed(1) + '%' : '–') + '</td>';
-          html += '<td class="num">' + (d.konv_per_100 != null ? d.konv_per_100.toFixed(2) : '–') + '</td>';
           html += '<td class="num">' + (d.medd_per_konv != null ? d.medd_per_konv.toFixed(1) : '–') + '</td>';
           html += '<td class="num">' + (row.notiser_skickade != null ? row.notiser_skickade : '–') + '</td>';
           html += '<td class="num">' + (row.unika_mottagare != null ? row.unika_mottagare : '–') + '</td></tr>';
@@ -586,11 +575,9 @@
 
       function renderPartialSection(row) {
         if (!row) return '';
-        var d = computeDerived(row);
-        var dayCount = row.days_in_week || 1;
         var html = '<p class="help"><strong>Pågående vecka</strong> <span class="badge">' + dayCount + ' dag' + (dayCount > 1 ? 'ar' : '') + '</span> – jämför inte rakt av med 7-dagarsveckor.</p>';
-        html += '<table><thead><tr><th>Vecka</th><th class="num">Nya konton</th><th class="num">Nya hundar</th><th class="num">Hund-akt %</th><th class="num">Sitter-konv</th><th class="num">Tindog-konv</th><th class="num">Medd</th></tr></thead><tbody>';
-        html += '<tr><td>' + (row.label || '') + '</td><td class="num">' + (row.nya_konton ?? '–') + '</td><td class="num">' + (row.nya_hundar ?? '–') + '</td><td class="num">' + (d.hund_aktivering_pct ? d.hund_aktivering_pct.toFixed(1) + '%' : '–') + '</td><td class="num">' + (row.sitter_konversationer ?? '–') + '</td><td class="num">' + (row.tindog_konversationer ?? '–') + '</td><td class="num">' + ((row.sitter_meddelanden || 0) + (row.tindog_meddelanden || 0)) + '</td></tr>';
+        html += '<table><thead><tr><th>Vecka</th><th class="num">Nya konton</th><th class="num">Nya hundar</th><th class="num">Sitter-konv</th><th class="num">Tindog-konv</th><th class="num">Medd</th></tr></thead><tbody>';
+        html += '<tr><td>' + (row.label || '') + '</td><td class="num">' + (row.nya_konton ?? '–') + '</td><td class="num">' + (row.nya_hundar ?? '–') + '</td><td class="num">' + (row.sitter_konversationer ?? '–') + '</td><td class="num">' + (row.tindog_konversationer ?? '–') + '</td><td class="num">' + ((row.sitter_meddelanden || 0) + (row.tindog_meddelanden || 0)) + '</td></tr>';
         html += '</tbody></table>';
         return html;
       }
@@ -728,6 +715,154 @@
       }
 
       var chartInstances = [];
+      var chartInstancesEvents = [];
+
+      function pad2(n) {
+        return n < 10 ? '0' + n : '' + n;
+      }
+
+      var MONTH_ABBR_SV = { jan: 0, feb: 1, mar: 2, apr: 3, maj: 4, jun: 5, jul: 6, aug: 7, sep: 8, okt: 9, nov: 10, dec: 11 };
+      var MONTH_NAMES_SV = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+        if (row.week_start) {
+          var ds = String(row.week_start).slice(0, 10);
+          var d = new Date(ds + 'T12:00:00');
+          if (!isNaN(d.getTime())) {
+            var y = d.getFullYear();
+            var m = d.getMonth() + 1;
+            return { key: y + '-' + pad2(m), label: d.toLocaleString('sv-SE', { month: 'short', year: 'numeric' }) };
+          }
+        }
+        var lab = row.label || '';
+        var yMatch = lab.match(/\b(20[2-3]\d)\b/);
+        var y = yMatch ? parseInt(yMatch[1], 10) : 2026;
+        var mi = null;
+        Object.keys(MONTH_ABBR_SV).forEach(function(ab) {
+          if (mi != null) return;
+          if (new RegExp('\\b' + ab + '\\b', 'i').test(lab)) mi = MONTH_ABBR_SV[ab];
+        });
+        if (mi == null) return null;
+        return { key: y + '-' + pad2(mi + 1), label: (MONTH_NAMES_SV[mi] || 'm') + ' ' + y };
+      }
+
+      function sortMainFullWeeksChronological(mainData) {
+        var full = getFullWeeks(mainData || []);
+        return full.slice().sort(function(a, b) {
+          if (a.week_num != null && b.week_num != null && a.week_num !== b.week_num) return a.week_num - b.week_num;
+          var da = a.week_start ? new Date(String(a.week_start).slice(0, 10) + 'T12:00:00') : null;
+          var db = b.week_start ? new Date(String(b.week_start).slice(0, 10) + 'T12:00:00') : null;
+          if (da && db && !isNaN(da.getTime()) && !isNaN(db.getTime())) return da - db;
+          return 0;
+        });
+      }
+
+      function aggregateMainRowsByMonth(sortedWeekRows) {
+        var groups = {};
+        sortedWeekRows.forEach(function(row) {
+          var b = monthBucketFromWeekRow(row);
+          if (!b) return;
+          if (!groups[b.key]) groups[b.key] = { label: b.label, rows: [] };
+          groups[b.key].rows.push(row);
+        });
+        var keys = Object.keys(groups).sort();
+        return keys.map(function(k) {
+          var g = groups[k];
+          var R = g.rows;
+          var sum = function(key) { return R.reduce(function(s, r) { return s + (r[key] != null ? Number(r[key]) : 0); }, 0); };
+          var sitterK = sum('sitter_konversationer');
+          var tindogK = sum('tindog_konversationer');
+          var sitterM = sum('sitter_meddelanden');
+          var tindogM = sum('tindog_meddelanden');
+          var tw = 0, tt = 0;
+          R.forEach(function(r) {
+            tw += r.reply_with != null ? Number(r.reply_with) : 0;
+            tt += r.reply_total != null ? Number(r.reply_total) : 0;
+          });
+          var maxUnikaNotis = R.reduce(function(m, r) { var u = r.unika_mottagare; return u != null ? Math.max(m, Number(u)) : m; }, 0);
+          return {
+            label: g.label,
+            week_num: null,
+            week_start: k + '-01',
+            nya_konton: sum('nya_konton'),
+            nya_hundar: sum('nya_hundar'),
+            nya_hundvakt_profiler: sum('nya_hundvakt_profiler'),
+            sitter_konversationer: sitterK,
+            tindog_konversationer: tindogK,
+            sitter_meddelanden: sitterM,
+            tindog_meddelanden: tindogM,
+            promenader: sum('promenader'),
+            hundvanliga_platser: sum('hundvanliga_platser'),
+            bokningar: sum('bokningar'),
+            notiser_skickade: sum('notiser_skickade'),
+            unika_mottagare: maxUnikaNotis || null,
+            reply_with: tw,
+            reply_total: tt,
+            reply_rate_pct: tt > 0 ? (tw / tt) * 100 : null
+          };
+        });
+      }
+
+      function eventMonthBucket(label) {
+        var fakeRow = { label: label };
+        return monthBucketFromWeekRow(fakeRow);
+      }
+
+        var pivot = pivotEvents(eventsData || []);
+        var full = pivot.filter(function(r) { return !isPartialEventWeek(r.label); });
+        var orderMap = {};
+        (lastMainData || []).forEach(function(r, idx) { orderMap[r.label] = idx; });
+        full.sort(function(a, b) {
+          var oa = orderMap[a.label];
+          var ob = orderMap[b.label];
+          if (oa != null && ob != null) return oa - ob;
+          return 0;
+        });
+        return full;
+      }
+
+      function setupMainTrendToolbar() {
+        var el = document.getElementById('mainTrendToolbar');
+        if (!el || el.dataset.ready === '1') return;
+        el.dataset.ready = '1';
+        el.innerHTML =
+          '<label>Intervall <select id="mainChartGranularity"><option value="week">Veckor</option><option value="month">Månader</option></select></label>' +
+          '<span id="mainWeeksControl"><label>Antal veckor <select id="mainChartWeeksLimit">' +
+          '<option value="8">8</option><option value="12" selected>12</option><option value="24">24</option>' +
+          '<option value="52">52</option><option value="999">Alla</option></select></label></span>' +
+          '<span id="mainMonthsControl" style="display:none;"><label>Antal månader <select id="mainChartMonthsLimit">' +
+          '<option value="3">3</option><option value="6" selected>6</option><option value="12">12</option>' +
+          '<option value="24">24</option><option value="999">Alla</option></select></label></span>';
+        document.getElementById('mainChartGranularity').addEventListener('change', function(ev) {
+          var m = ev.target.value === 'month';
+          document.getElementById('mainWeeksControl').style.display = m ? 'none' : '';
+          document.getElementById('mainMonthsControl').style.display = m ? '' : 'none';
+          renderCharts(lastMainData);
+        });
+        document.getElementById('mainChartWeeksLimit').addEventListener('change', function() { renderCharts(lastMainData); });
+        document.getElementById('mainChartMonthsLimit').addEventListener('change', function() { renderCharts(lastMainData); });
+      }
+
+      function setupEventsTrendToolbar() {
+        var el = document.getElementById('eventsTrendToolbar');
+        if (!el || el.dataset.ready === '1') return;
+        el.dataset.ready = '1';
+        el.innerHTML =
+          '<label>Intervall <select id="evtChartGranularity"><option value="week">Veckor</option><option value="month">Månader</option></select></label>' +
+          '<span id="evtWeeksControl"><label>Antal veckor <select id="evtChartWeeksLimit">' +
+          '<option value="8">8</option><option value="12" selected>12</option><option value="24">24</option>' +
+          '<option value="52">52</option><option value="999">Alla</option></select></label></span>' +
+          '<span id="evtMonthsControl" style="display:none;"><label>Antal månader <select id="evtChartMonthsLimit">' +
+          '<option value="3">3</option><option value="6" selected>6</option><option value="12">12</option>' +
+          '<option value="24">24</option><option value="999">Alla</option></select></label></span>';
+        document.getElementById('evtChartGranularity').addEventListener('change', function(ev) {
+          var m = ev.target.value === 'month';
+          document.getElementById('evtWeeksControl').style.display = m ? 'none' : '';
+          document.getElementById('evtMonthsControl').style.display = m ? '' : 'none';
+          renderEventsLineCharts(lastEventsData);
+        });
+        document.getElementById('evtChartWeeksLimit').addEventListener('change', function() { renderEventsLineCharts(lastEventsData); });
+        document.getElementById('evtChartMonthsLimit').addEventListener('change', function() { renderEventsLineCharts(lastEventsData); });
+      }
+
       var CHART_METRICS = [
         { key: 'nya_konton', label: 'Nya konton', derived: false, förklaring: 'Antal nya användarkonton registrerade per vecka: ' },
         { key: 'nya_hundar', label: 'Nya hundar', derived: false, förklaring: 'Antal nya hundar tillagda i appen per vecka: ' },
@@ -739,9 +874,6 @@
         { key: 'promenader', label: 'Promenader', derived: false, förklaring: 'Antal promenader loggade i appen per vecka: ' },
         { key: 'hundvanliga_platser', label: 'Hundvänliga platser', derived: false, förklaring: 'Antal hundvänliga platser tillagda eller besökta per vecka: ' },
         { key: 'bokningar', label: 'Bokningar', derived: false, förklaring: 'Antal bokningar av hundvakt genom appen per vecka: ' },
-        { key: 'hund_aktivering_pct', label: 'Hund-aktivering (procent)', derived: true, förklaring: 'Andel nya konton som lade till minst en hund (procent): ' },
-        { key: 'vakt_aktivering_pct', label: 'Vakt-aktivering (procent)', derived: true, förklaring: 'Andel nya konton som skapade hundvaktprofil (procent): ' },
-        { key: 'konv_per_100', label: 'Konversationer per 100 konton', derived: true, förklaring: 'Konversationer (Sitter + Tindog) per 100 nya konton: ' },
         { key: 'medd_per_konv', label: 'Meddelanden per konversation', derived: true, förklaring: 'Genomsnitt antal meddelanden per konversation per vecka: ' },
         { key: 'reply_rate_pct', label: 'Reply rate (procent)', derived: false, förklaring: 'Andel konversationer som fick svar inom 24 timmar: ' },
         { key: 'notiser_skickade', label: 'Push-notiser skickade', derived: false, förklaring: 'Antal push-notiser skickade till användare per vecka: ' },
@@ -754,43 +886,78 @@
           var v = d[metric.key];
           return v != null ? (typeof v === 'number' ? v : parseFloat(v)) : null;
         }
-        var v = row[metric.key];
-        return v != null ? (typeof v === 'number' ? v : parseInt(v, 10)) : null;
+        var vx = row[metric.key];
+        if (vx == null) return null;
+        return typeof vx === 'number' ? vx : parseFloat(vx);
       }
 
+      function getLineColorPartial() {
+        return document.documentElement.getAttribute('data-theme') === 'dark' ? '#ffb74d' : '#ff9800';
+      }
+
+      function getLineColorMain() {
+        return document.documentElement.getAttribute('data-theme') === 'dark' ? '#8fd38f' : '#2d5a27';
+      }
+
+      /** Linjediagram för veckoöversikten (+ valbar månad aggregering). */
       function renderCharts(mainData) {
+        setupMainTrendToolbar();
         var container = document.getElementById('outCharts');
         if (!container) return;
         chartInstances.forEach(function(ch) { if (ch && ch.destroy) ch.destroy(); });
         chartInstances = [];
         container.innerHTML = '';
 
-        var full = getFullWeeks(mainData || []);
-        var partial = getPartialWeek(mainData || []);
-        
-        if (full.length === 0 && !partial) {
-          container.innerHTML = '<p class="help">Inga veckor – grafer visas när det finns data.</p>';
+        mainData = mainData || [];
+        var sortedFull = sortMainFullWeeksChronological(mainData);
+        var partial = getPartialWeek(mainData);
+
+        var granEl = document.getElementById('mainChartGranularity');
+        var granularity = granEl ? granEl.value : 'week';
+        var lineColor = getLineColorMain();
+        var partialColor = getLineColorPartial();
+
+        var seriesRows;
+        if (granularity === 'month') {
+          seriesRows = aggregateMainRowsByMonth(sortedFull);
+          var nM = parseInt(document.getElementById('mainChartMonthsLimit') && document.getElementById('mainChartMonthsLimit').value, 10) || 6;
+          if (nM < 999) seriesRows = seriesRows.slice(-nM);
+        } else {
+          var nW = parseInt(document.getElementById('mainChartWeeksLimit') && document.getElementById('mainChartWeeksLimit').value, 10) || 12;
+          seriesRows = nW >= 999 ? sortedFull.slice() : sortedFull.slice(-nW);
+          if (partial && seriesRows.length > 0) {
+            var lastLab = seriesRows[seriesRows.length - 1].label;
+            if (partial.label !== lastLab) seriesRows = seriesRows.concat([partial]);
+          } else if (partial && sortedFull.length === 0) {
+            seriesRows = [partial];
+          }
+        }
+
+        if (granularity === 'month' && seriesRows.length === 0 && sortedFull.length > 0) {
+          container.innerHTML = '<p class="help">Månadsvy kräver att veckorna går att placera i kalender (lägg till <code>week_start</code> i data eller månad i veckoetikett).</p>';
           return;
         }
 
-        // Alltid 7 staplar: de 6 föregående veckorna (gröna) + sista veckan (orange = pågående)
-        var allData = full.slice();
-        if (partial) allData.push(partial);
-        allData.sort(function(a,b) { return (a.week_num||0) - (b.week_num||0); });
-        var allWeeks = allData.slice(-7);
-        var lastIdx = allWeeks.length - 1;
-        var labels = allWeeks.map(function(r) { return r.label || ''; });
+        if (seriesRows.length === 0) {
+          container.innerHTML = '<p class="help">Inga datapunkter – grafer visas när det finns helveckor.</p>';
+          return;
+        }
+
+        var labels = seriesRows.map(function(r) { return r.label || ''; });
+        var partialFlags = granularity === 'week' ? seriesRows.map(isPartialWeek) : seriesRows.map(function() { return false; });
 
         CHART_METRICS.forEach(function(metric) {
-          var values = allWeeks.map(function(row) { return getChartValue(row, metric); });
+          var values = seriesRows.map(function(row) { return getChartValue(row, metric); });
           var hasAny = values.some(function(v) { return v != null && !isNaN(v); });
           if (!hasAny) return;
 
-          var backgroundColors = allWeeks.map(function(row, idx) {
-            return idx === lastIdx ? 'rgba(255, 152, 0, 0.6)' : 'rgba(45, 90, 39, 0.6)';
+          var pointColors = values.map(function(_, idx) {
+            return partialFlags[idx] ? partialColor : lineColor;
           });
-          var borderColors = allWeeks.map(function(row, idx) {
-            return idx === lastIdx ? 'rgb(255, 152, 0)' : 'rgb(45, 90, 39)';
+          var pointRadii = partialFlags.map(function(isP, idx) {
+            var v = values[idx];
+            var vis = v != null && !isNaN(v);
+            return vis ? (isP ? 7 : 4) : 0;
           });
 
           var wrap = document.createElement('div');
@@ -808,22 +975,47 @@
 
           var ctx = canvas.getContext('2d');
           var chart = new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
               labels: labels,
               datasets: [{
                 label: metric.label,
                 data: values,
-                backgroundColor: backgroundColors,
-                borderColor: borderColors,
-                borderWidth: 1
+                borderColor: lineColor,
+                backgroundColor: 'transparent',
+                borderWidth: 2,
+                stepped: false,
+                tension: 0,
+                pointBackgroundColor: pointColors,
+                pointBorderColor: pointColors,
+                pointRadius: pointRadii,
+                pointHoverRadius: 6,
+                spanGaps: false
               }]
             },
             options: {
               responsive: true,
               maintainAspectRatio: false,
+              interaction: { mode: 'index', intersect: false },
               plugins: {
-                legend: { display: false }
+                legend: { display: false },
+                tooltip: {
+                  callbacks: {
+                    label: function(ct) {
+                      var v = ct.parsed.y;
+                      var i = ct.dataIndex;
+                      var suff = partialFlags[i] ? ' (pågående/ofull vecka)' : '';
+                      if (v == null || isNaN(v)) return '';
+                      var dec =
+                        metric.key === 'reply_rate_pct' || String(metric.key).indexOf('_pct') >= 0
+                          ? 2
+                          : Math.abs(v - Math.round(v)) < 1e-9
+                            ? 0
+                            : 2;
+                      return ct.dataset.label + ': ' + Number(v.toFixed(dec)) + suff;
+                    }
+                  }
+                }
               },
               scales: {
                 y: { beginAtZero: true },
@@ -832,6 +1024,117 @@
             }
           });
           chartInstances.push(chart);
+        });
+      }
+
+      var EVENT_LINE_METRICS = [
+        { pivotKey: 'app_opened_unika', label: 'App öppnad (unika)' },
+        { pivotKey: 'login_unika', label: 'Login (unika)' },
+        { pivotKey: 'listing_created_unika', label: 'Listing skapad (unika)' },
+        { pivotKey: 'sitter_contacted_unika', label: 'Sitter kontaktad (unika)' }
+      ];
+
+      function aggregatePivotByMonthKeys(sortedPivotRows, keys) {
+        var groups = {};
+        sortedPivotRows.forEach(function(row) {
+          var b = eventMonthBucket(row.label);
+          if (!b) return;
+          if (!groups[b.key]) groups[b.key] = { label: b.label, rows: [] };
+          groups[b.key].rows.push(row);
+        });
+        var ks = Object.keys(groups).sort();
+        return ks.map(function(key) {
+          var R = groups[key].rows;
+          var o = { label: groups[key].label };
+          keys.forEach(function(pk) {
+            var vals = R.map(function(r) { return r[pk] != null ? Number(r[pk]) : 0; });
+            o[pk] = vals.length ? Math.max.apply(null, vals) : null;
+          });
+          return o;
+        });
+      }
+
+      /** Linjediagram för app-events (unika som i pivottabellen). */
+      function renderEventsLineCharts(eventsData) {
+        setupEventsTrendToolbar();
+        var container = document.getElementById('outEventsCharts');
+        if (!container) return;
+        chartInstancesEvents.forEach(function(ch) { if (ch && ch.destroy) ch.destroy(); });
+        chartInstancesEvents = [];
+        container.innerHTML = '';
+
+        var pivotFull = getEventPivotFullWeeksSorted(eventsData);
+        var granEl = document.getElementById('evtChartGranularity');
+        var granularity = granEl ? granEl.value : 'week';
+
+        var lineColor = getLineColorMain();
+        var keys = EVENT_LINE_METRICS.map(function(m) { return m.pivotKey; });
+
+        var seriesRows;
+        if (granularity === 'month') {
+          seriesRows = aggregatePivotByMonthKeys(pivotFull, keys);
+          var nM = parseInt(document.getElementById('evtChartMonthsLimit') && document.getElementById('evtChartMonthsLimit').value, 10) || 6;
+          if (nM < 999) seriesRows = seriesRows.slice(-nM);
+        } else {
+          var nW = parseInt(document.getElementById('evtChartWeeksLimit') && document.getElementById('evtChartWeeksLimit').value, 10) || 12;
+          seriesRows = nW >= 999 ? pivotFull.slice() : pivotFull.slice(-nW);
+        }
+
+        if (!seriesRows || seriesRows.length === 0) {
+          container.innerHTML = '<p class="help">Ingen historik för events än (eller inga helveckor).</p>';
+          return;
+        }
+
+        var labels = seriesRows.map(function(r) { return r.label || ''; });
+
+        EVENT_LINE_METRICS.forEach(function(em) {
+          var values = seriesRows.map(function(r) {
+            var v = r[em.pivotKey];
+            return v != null ? Number(v) : null;
+          });
+          var hasAny = values.some(function(v) { return v != null && !isNaN(v); });
+          if (!hasAny) return;
+
+          var wrap = document.createElement('div');
+          wrap.className = 'chart-card';
+          var title = document.createElement('h3');
+          title.textContent = em.label;
+          wrap.appendChild(title);
+          var canvasWrap = document.createElement('div');
+          canvasWrap.className = 'chart-wrap';
+          var canvas = document.createElement('canvas');
+          canvasWrap.appendChild(canvas);
+          wrap.appendChild(canvasWrap);
+          container.appendChild(wrap);
+
+          var ctx = canvas.getContext('2d');
+          var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: em.label,
+                data: values,
+                borderColor: lineColor,
+                tension: 0,
+                borderWidth: 2,
+                pointRadius: 4,
+                pointBackgroundColor: lineColor,
+                spanGaps: false
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              interaction: { mode: 'index', intersect: false },
+              plugins: { legend: { display: false } },
+              scales: {
+                y: { beginAtZero: true },
+                x: { ticks: { maxRotation: 45, minRotation: 0 } }
+              }
+            }
+          });
+          chartInstancesEvents.push(chart);
         });
       }
 
@@ -912,7 +1215,7 @@
           days.push({ key: 'day_' + i, label: 'Dag ' + i, offset: i });
         }
         var html = '<div class="table-wrap"><table><thead><tr>';
-        html += '<th>Datum</th><th class="num">Nya konton</th><th class="num" title="Genomsnittligt antal enheter per användare i kohortet (första veckan)">Devices</th>';
+        html += '<th>Datum</th><th class="num">Nya konton</th><th class="num" title="Unika anonyma app_opened (device_id), samma kalenderdag som registrering — samma sätt som Nedladdningar i sidhuvudet. Kräver uppdaterad RPC (nedladdningar_dag).">Nedladdningar</th>';
         days.forEach(function(d) { html += '<th class="num">' + d.label + '</th>'; });
         html += '</tr></thead><tbody>';
 
@@ -923,8 +1226,24 @@
         }
         var todayStr = new Date().toLocaleDateString('sv-SE');
 
-        // Genomsnittsrad FÖRST (överst)
-        var avgRow = '<tr style="font-weight:600; background:var(--accent-light);"><td>Genomsnitt</td><td class="num">–</td><td class="num">–</td>';
+        function nedladdningarValue(row) {
+          if (row.nedladdningar_dag != null) return row.nedladdningar_dag;
+          if (row.downloads_same_day != null) return row.downloads_same_day;
+          return null;
+        }
+
+        var nedlAvgSum = 0;
+        var nedlAvgN = 0;
+        data.forEach(function(row) {
+          var nv = nedladdningarValue(row);
+          if (nv != null && nv !== '' && !isNaN(Number(nv))) {
+            nedlAvgSum += Number(nv);
+            nedlAvgN++;
+          }
+        });
+        var nedlAvgStr = nedlAvgN ? (nedlAvgSum / nedlAvgN).toFixed(1).replace('.', ',') : '–';
+
+        var avgRow = '<tr style="font-weight:600; background:var(--accent-light);"><td>Genomsnitt</td><td class="num">–</td><td class="num">' + nedlAvgStr + '</td>';
         days.forEach(function(d) {
           var totalPct = 0;
           var validCount = 0;
@@ -951,8 +1270,9 @@
         data.forEach(function(row) {
           var cohortDate = row.cohort_date;
           var size = row.cohort_size;
-          var devices = row.avg_devices != null ? row.avg_devices : '–';
-          html += '<tr><td>' + cohortDate + '</td><td class="num">' + size + '</td><td class="num">' + devices + '</td>';
+          var nedlRaw = nedladdningarValue(row);
+          var nedlShown = nedlRaw != null && nedlRaw !== '' ? nedlRaw : '–';
+          html += '<tr><td>' + cohortDate + '</td><td class="num">' + size + '</td><td class="num">' + nedlShown + '</td>';
           days.forEach(function(d) {
             var count = row[d.key] || 0;
             var pct = size > 0 ? (count / size * 100) : 0;
@@ -1244,9 +1564,15 @@
         renderSubscriptionBars(lastSubscriptionData);
         renderRetention(lastRetentionData);
         renderCharts(mainData);
+        renderEventsLineCharts(eventsData);
         renderAccountTypes(lastAccountData);
         renderTextSummary(mainData, eventsData);
       }
+
+      document.addEventListener('flocken-theme-change', function() {
+        renderCharts(lastMainData);
+        renderEventsLineCharts(lastEventsData);
+      });
 
       document.addEventListener('DOMContentLoaded', function() {
         var statusEl = document.getElementById('fetchStatus');
@@ -1381,7 +1707,7 @@
         var data = lastMainData || DEFAULT_MAIN_DATA;
         var full = getFullWeeks(data);
         if (full.length === 0) return;
-        var headers = ['Vecka','Nya konton','Nya hundar','Nya vaktprofiler','Sitter-konv','Tindog-konv','Sitter-medd','Tindog-medd','Promenader','Platser','Bokningar','Hund-akt %','Vakt-akt %','Konv/100','Medd/konv','Push-notiser','Unika mottagare'];
+        var headers = ['Vecka','Nya konton','Nya hundar','Nya vaktprofiler','Sitter-konv','Tindog-konv','Sitter-medd','Tindog-medd','Promenader','Platser','Bokningar','Medd/konv','Push-notiser','Unika mottagare'];
         var rows = [headers.join(';')];
         full.forEach(function(row) {
           var d = computeDerived(row);
@@ -1397,9 +1723,6 @@
             row.promenader ?? '',
             row.hundvanliga_platser ?? '',
             row.bokningar ?? '',
-            d.hund_aktivering_pct ? d.hund_aktivering_pct.toFixed(1) : '',
-            d.vakt_aktivering_pct ? d.vakt_aktivering_pct.toFixed(1) : '',
-            d.konv_per_100 != null ? d.konv_per_100.toFixed(2) : '',
             d.medd_per_konv != null ? d.medd_per_konv.toFixed(1) : '',
             row.notiser_skickade ?? '',
             row.unika_mottagare ?? ''
