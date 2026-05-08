@@ -190,12 +190,6 @@
   </div>
 
   <div class="card">
-    <h2>Grafer per parameter (stapel – senaste 7 perioderna)</h2>
-    <p class="help">Samma mått som veckoöversikten. Grönt = helveckor, orange = senaste ofull veckan.</p>
-    <div id="outBarCharts"></div>
-  </div>
-
-  <div class="card">
     <h2>Kontotyper – fördelning och e-postbekräftelse</h2>
     <p class="help">Totalt antal konton per typ, hur många som bekräftat sin e-post, och nya konton per vecka uppdelat på typ.</p>
     <div id="outAccountTypes"></div>
@@ -740,7 +734,6 @@
       }
 
       var chartInstances = [];
-      var chartInstancesBar = [];
       var chartInstancesEvents = [];
 
       function safeMainForRender(mainData) {
@@ -1063,81 +1056,6 @@
             }
           });
           chartInstances.push(chart);
-        });
-      }
-
-      /** Stapeldiagram – samma mått som linjetrenderna, senaste 7 perioderna. */
-      function renderBarCharts(mainData) {
-        var container = document.getElementById('outBarCharts');
-        if (!container) return;
-        chartInstancesBar.forEach(function(ch) { if (ch && ch.destroy) ch.destroy(); });
-        chartInstancesBar = [];
-        container.innerHTML = '';
-
-        var full = getFullWeeks(mainData || []);
-        var partial = getPartialWeek(mainData || []);
-
-        if (full.length === 0 && !partial) {
-          container.innerHTML = '<p class="help">Inga veckor – staplar visas när det finns data.</p>';
-          return;
-        }
-
-        var allData = full.slice();
-        if (partial) allData.push(partial);
-        allData.sort(function(a, b) { return (a.week_num || 0) - (b.week_num || 0); });
-        var allWeeks = allData.slice(-7);
-        var lastIdx = allWeeks.length - 1;
-        var labels = allWeeks.map(function(r) { return r.label || ''; });
-
-        CHART_METRICS.forEach(function(metric) {
-          var values = allWeeks.map(function(row) { return getChartValue(row, metric); });
-          var hasAny = values.some(function(v) { return v != null && !isNaN(v); });
-          if (!hasAny) return;
-
-          var backgroundColors = allWeeks.map(function(row, idx) {
-            return idx === lastIdx ? 'rgba(255, 152, 0, 0.6)' : 'rgba(45, 90, 39, 0.6)';
-          });
-          var borderColors = allWeeks.map(function(row, idx) {
-            return idx === lastIdx ? 'rgb(255, 152, 0)' : 'rgb(45, 90, 39)';
-          });
-
-          var wrap = document.createElement('div');
-          wrap.className = 'chart-card';
-          var title = document.createElement('h3');
-          var förklaring = (metric.förklaring || '').replace(/:?\s*$/, '').trim();
-          title.textContent = metric.label + (förklaring ? ': ' + förklaring : '');
-          wrap.appendChild(title);
-          var canvasWrap = document.createElement('div');
-          canvasWrap.className = 'chart-wrap';
-          var canvas = document.createElement('canvas');
-          canvasWrap.appendChild(canvas);
-          wrap.appendChild(canvasWrap);
-          container.appendChild(wrap);
-
-          var ctx = canvas.getContext('2d');
-          var chart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-              labels: labels,
-              datasets: [{
-                label: metric.label,
-                data: values,
-                backgroundColor: backgroundColors,
-                borderColor: borderColors,
-                borderWidth: 1
-              }]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: { legend: { display: false } },
-              scales: {
-                y: { beginAtZero: true },
-                x: { ticks: { maxRotation: 45, minRotation: 0 } }
-              }
-            }
-          });
-          chartInstancesBar.push(chart);
         });
       }
 
@@ -1678,7 +1596,6 @@
         renderSubscriptionBars(lastSubscriptionData);
         renderRetention(lastRetentionData);
         try { renderCharts(md); } catch (eR) { console.error('renderCharts', eR); }
-        try { renderBarCharts(md); } catch (eB) { console.error('renderBarCharts', eB); }
         try { renderEventsLineCharts(ev); } catch (eE) { console.error('renderEventsLineCharts', eE); }
         renderAccountTypes(lastAccountData);
         renderTextSummary(md, ev);
@@ -1688,7 +1605,6 @@
         var dm = safeMainForRender(lastMainData);
         var ev = safeEventsForRender(lastEventsData);
         try { renderCharts(dm); } catch (e1) { console.warn('renderCharts:', e1); }
-        try { renderBarCharts(dm); } catch (e2) { console.warn('renderBarCharts:', e2); }
         try { renderEventsLineCharts(ev); } catch (e3) { console.warn('renderEventsLineCharts:', e3); }
       });
 
