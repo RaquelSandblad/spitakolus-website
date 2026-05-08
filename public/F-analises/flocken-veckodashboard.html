@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Flocken – Veckovis aktivitet</title>
-  <!-- Version: 2026-05-08 – Linjediagram (vecko/månad), events-trender, KPI-tabellstäd, retention nedladdningar -->
+  <!-- Version: 2026-05-08b – Fix: renderPartialSection dayCount (kunde krascha hela sidan). Stapeldiagram tillbaka. Tom cache [] → demo-data. -->
   <style>
     :root {
       --bg: #f8f9fa;
@@ -187,6 +187,12 @@
   <div class="card">
     <h2>KPI – senaste fulla veckan</h2>
     <div id="outKpi"></div>
+  </div>
+
+  <div class="card">
+    <h2>Grafer per parameter (stapel – senaste 7 perioderna)</h2>
+    <p class="help">Samma mått som veckoöversikten. Grönt = helveckor, orange = senaste ofull veckan.</p>
+    <div id="outBarCharts"></div>
   </div>
 
   <div class="card">
@@ -513,6 +519,7 @@
         var curr = full[full.length - 1];
         var prev = full[full.length - 2];
         var dCurr = computeDerived(curr);
+        var dPrev = computeDerived(prev);
         var pivot = pivotEvents(eventsData || []);
         var currPivot = pivot.find(function(p) { return p.label === curr.label; }) || {};
         var listingUnika = currPivot.listing_created_unika != null ? currPivot.listing_created_unika : 0;
@@ -521,9 +528,22 @@
           if (previous == null || previous === 0) return null;
           return ((current - previous) / previous) * 100;
         }
+        function ppChange(currentPct, previousPct) {
+          if (previousPct == null) return null;
+          return currentPct - previousPct;
+        }
+        function fmtPpChange(currPct, prevPct) {
+          var pp = currPct - prevPct;
+          return 'från ' + prevPct.toFixed(1).replace('.', ',') + '% → ' + currPct.toFixed(1).replace('.', ',') + '% (' + (pp >= 0 ? '+' : '') + pp.toFixed(1).replace('.', ',') + ' procentenheter)';
+        }
         var kontonChange = pctChange(curr.nya_konton, prev.nya_konton);
+        var hundPp = ppChange(dCurr.hund_aktivering_pct, dPrev.hund_aktivering_pct);
+        var vaktPp = ppChange(dCurr.vakt_aktivering_pct, dPrev.vakt_aktivering_pct);
         var html = '<div class="kpi-grid">';
         html += '<div class="kpi-card"><div class="kpi-value">' + (curr.nya_konton || 0) + '</div><div class="kpi-label">Nya konton</div>' + (kontonChange != null ? '<div class="wow ' + (kontonChange >= 0 ? 'wow-up' : 'wow-down') + '">' + (kontonChange >= 0 ? '+' : '') + kontonChange.toFixed(1) + '% vs föregående vecka</div>' : '') + '</div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + dCurr.hund_aktivering_pct.toFixed(1).replace('.', ',') + '%</div><div class="kpi-label">Hund-aktivering (' + (curr.nya_hundar || 0) + ' av ' + (curr.nya_konton || 0) + ')</div>' + (hundPp != null ? '<div class="wow ' + (hundPp >= 0 ? 'wow-up' : 'wow-down') + '">Jämfört med förra veckan: ' + fmtPpChange(dCurr.hund_aktivering_pct, dPrev.hund_aktivering_pct) + '</div>' : '') + '</div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + dCurr.vakt_aktivering_pct.toFixed(1).replace('.', ',') + '%</div><div class="kpi-label">Vakt-aktivering</div>' + (vaktPp != null ? '<div class="wow ' + (vaktPp >= 0 ? 'wow-up' : 'wow-down') + '">Jämfört med förra veckan: ' + fmtPpChange(dCurr.vakt_aktivering_pct, dPrev.vakt_aktivering_pct) + '</div>' : '') + '</div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + dCurr.konv_per_100.toFixed(2) + '</div><div class="kpi-label">Konv per 100 konton</div></div>';
         html += '<div class="kpi-card"><div class="kpi-value">' + (dCurr.medd_per_konv ? dCurr.medd_per_konv.toFixed(1) : '–') + '</div><div class="kpi-label">Medd per konv</div></div>';
         html += '<div class="kpi-card"><div class="kpi-value">' + listingRate.toFixed(1) + '%</div><div class="kpi-label">Listing-rate (annons/konton)</div></div>';
         var aktiva = (currPivot.app_opened_unika != null) ? currPivot.app_opened_unika : (currPivot.login_unika != null ? currPivot.login_unika : null);
@@ -560,11 +580,14 @@
         full.sort(function(a,b) { return (a.week_num != null && b.week_num != null) ? a.week_num - b.week_num : 0; });
         var html = '<table><thead><tr><th>Vecka</th>';
         keys.forEach(function(k) { html += '<th class="num">' + (mainLabels[k] || k) + '</th>'; });
-        html += '<th class="num">Medd/konv</th><th class="num">Push-notiser</th><th class="num">Unika mottagare</th></tr></thead><tbody>';
+        html += '<th class="num">Hund-akt %</th><th class="num">Vakt-akt %</th><th class="num">Konv/100</th><th class="num">Medd/konv</th><th class="num">Push-notiser</th><th class="num">Unika mottagare</th></tr></thead><tbody>';
         full.forEach(function(row) {
           var d = computeDerived(row);
           html += '<tr><td>' + (row.label || '') + '</td>';
           keys.forEach(function(k) { html += '<td class="num">' + (row[k] != null ? row[k] : '–') + '</td>'; });
+          html += '<td class="num">' + (d.hund_aktivering_pct ? d.hund_aktivering_pct.toFixed(1) + '%' : '–') + '</td>';
+          html += '<td class="num">' + (d.vakt_aktivering_pct ? d.vakt_aktivering_pct.toFixed(1) + '%' : '–') + '</td>';
+          html += '<td class="num">' + (d.konv_per_100 != null ? d.konv_per_100.toFixed(2) : '–') + '</td>';
           html += '<td class="num">' + (d.medd_per_konv != null ? d.medd_per_konv.toFixed(1) : '–') + '</td>';
           html += '<td class="num">' + (row.notiser_skickade != null ? row.notiser_skickade : '–') + '</td>';
           html += '<td class="num">' + (row.unika_mottagare != null ? row.unika_mottagare : '–') + '</td></tr>';
@@ -575,9 +598,11 @@
 
       function renderPartialSection(row) {
         if (!row) return '';
+        var d = computeDerived(row);
+        var dayCount = row.days_in_week || 1;
         var html = '<p class="help"><strong>Pågående vecka</strong> <span class="badge">' + dayCount + ' dag' + (dayCount > 1 ? 'ar' : '') + '</span> – jämför inte rakt av med 7-dagarsveckor.</p>';
-        html += '<table><thead><tr><th>Vecka</th><th class="num">Nya konton</th><th class="num">Nya hundar</th><th class="num">Sitter-konv</th><th class="num">Tindog-konv</th><th class="num">Medd</th></tr></thead><tbody>';
-        html += '<tr><td>' + (row.label || '') + '</td><td class="num">' + (row.nya_konton ?? '–') + '</td><td class="num">' + (row.nya_hundar ?? '–') + '</td><td class="num">' + (row.sitter_konversationer ?? '–') + '</td><td class="num">' + (row.tindog_konversationer ?? '–') + '</td><td class="num">' + ((row.sitter_meddelanden || 0) + (row.tindog_meddelanden || 0)) + '</td></tr>';
+        html += '<table><thead><tr><th>Vecka</th><th class="num">Nya konton</th><th class="num">Nya hundar</th><th class="num">Hund-akt %</th><th class="num">Sitter-konv</th><th class="num">Tindog-konv</th><th class="num">Medd</th></tr></thead><tbody>';
+        html += '<tr><td>' + (row.label || '') + '</td><td class="num">' + (row.nya_konton ?? '–') + '</td><td class="num">' + (row.nya_hundar ?? '–') + '</td><td class="num">' + (d.hund_aktivering_pct ? d.hund_aktivering_pct.toFixed(1) + '%' : '–') + '</td><td class="num">' + (row.sitter_konversationer ?? '–') + '</td><td class="num">' + (row.tindog_konversationer ?? '–') + '</td><td class="num">' + ((row.sitter_meddelanden || 0) + (row.tindog_meddelanden || 0)) + '</td></tr>';
         html += '</tbody></table>';
         return html;
       }
@@ -715,7 +740,16 @@
       }
 
       var chartInstances = [];
+      var chartInstancesBar = [];
       var chartInstancesEvents = [];
+
+      function safeMainForRender(mainData) {
+        return Array.isArray(mainData) && mainData.length > 0 ? mainData : JSON.parse(JSON.stringify(DEFAULT_MAIN_DATA));
+      }
+
+      function safeEventsForRender(eventsData) {
+        return Array.isArray(eventsData) && eventsData.length > 0 ? eventsData : JSON.parse(JSON.stringify(DEFAULT_EVENTS_DATA));
+      }
 
       function pad2(n) {
         return n < 10 ? '0' + n : '' + n;
@@ -835,10 +869,10 @@
           var m = ev.target.value === 'month';
           document.getElementById('mainWeeksControl').style.display = m ? 'none' : '';
           document.getElementById('mainMonthsControl').style.display = m ? '' : 'none';
-          renderCharts(lastMainData);
+          renderCharts(safeMainForRender(lastMainData));
         });
-        document.getElementById('mainChartWeeksLimit').addEventListener('change', function() { renderCharts(lastMainData); });
-        document.getElementById('mainChartMonthsLimit').addEventListener('change', function() { renderCharts(lastMainData); });
+        document.getElementById('mainChartWeeksLimit').addEventListener('change', function() { renderCharts(safeMainForRender(lastMainData)); });
+        document.getElementById('mainChartMonthsLimit').addEventListener('change', function() { renderCharts(safeMainForRender(lastMainData)); });
       }
 
       function setupEventsTrendToolbar() {
@@ -857,10 +891,10 @@
           var m = ev.target.value === 'month';
           document.getElementById('evtWeeksControl').style.display = m ? 'none' : '';
           document.getElementById('evtMonthsControl').style.display = m ? '' : 'none';
-          renderEventsLineCharts(lastEventsData);
+          renderEventsLineCharts(safeEventsForRender(lastEventsData));
         });
-        document.getElementById('evtChartWeeksLimit').addEventListener('change', function() { renderEventsLineCharts(lastEventsData); });
-        document.getElementById('evtChartMonthsLimit').addEventListener('change', function() { renderEventsLineCharts(lastEventsData); });
+        document.getElementById('evtChartWeeksLimit').addEventListener('change', function() { renderEventsLineCharts(safeEventsForRender(lastEventsData)); });
+        document.getElementById('evtChartMonthsLimit').addEventListener('change', function() { renderEventsLineCharts(safeEventsForRender(lastEventsData)); });
       }
 
       var CHART_METRICS = [
@@ -874,6 +908,9 @@
         { key: 'promenader', label: 'Promenader', derived: false, förklaring: 'Antal promenader loggade i appen per vecka: ' },
         { key: 'hundvanliga_platser', label: 'Hundvänliga platser', derived: false, förklaring: 'Antal hundvänliga platser tillagda eller besökta per vecka: ' },
         { key: 'bokningar', label: 'Bokningar', derived: false, förklaring: 'Antal bokningar av hundvakt genom appen per vecka: ' },
+        { key: 'hund_aktivering_pct', label: 'Hund-aktivering (procent)', derived: true, förklaring: 'Andel nya konton som lade till minst en hund (procent): ' },
+        { key: 'vakt_aktivering_pct', label: 'Vakt-aktivering (procent)', derived: true, förklaring: 'Andel nya konton som skapade hundvaktprofil (procent): ' },
+        { key: 'konv_per_100', label: 'Konversationer per 100 konton', derived: true, förklaring: 'Konversationer (Sitter + Tindog) per 100 nya konton: ' },
         { key: 'medd_per_konv', label: 'Meddelanden per konversation', derived: true, förklaring: 'Genomsnitt antal meddelanden per konversation per vecka: ' },
         { key: 'reply_rate_pct', label: 'Reply rate (procent)', derived: false, förklaring: 'Andel konversationer som fick svar inom 24 timmar: ' },
         { key: 'notiser_skickade', label: 'Push-notiser skickade', derived: false, förklaring: 'Antal push-notiser skickade till användare per vecka: ' },
@@ -1024,6 +1061,81 @@
             }
           });
           chartInstances.push(chart);
+        });
+      }
+
+      /** Stapeldiagram – samma mått som linjetrenderna, senaste 7 perioderna. */
+      function renderBarCharts(mainData) {
+        var container = document.getElementById('outBarCharts');
+        if (!container) return;
+        chartInstancesBar.forEach(function(ch) { if (ch && ch.destroy) ch.destroy(); });
+        chartInstancesBar = [];
+        container.innerHTML = '';
+
+        var full = getFullWeeks(mainData || []);
+        var partial = getPartialWeek(mainData || []);
+
+        if (full.length === 0 && !partial) {
+          container.innerHTML = '<p class="help">Inga veckor – staplar visas när det finns data.</p>';
+          return;
+        }
+
+        var allData = full.slice();
+        if (partial) allData.push(partial);
+        allData.sort(function(a, b) { return (a.week_num || 0) - (b.week_num || 0); });
+        var allWeeks = allData.slice(-7);
+        var lastIdx = allWeeks.length - 1;
+        var labels = allWeeks.map(function(r) { return r.label || ''; });
+
+        CHART_METRICS.forEach(function(metric) {
+          var values = allWeeks.map(function(row) { return getChartValue(row, metric); });
+          var hasAny = values.some(function(v) { return v != null && !isNaN(v); });
+          if (!hasAny) return;
+
+          var backgroundColors = allWeeks.map(function(row, idx) {
+            return idx === lastIdx ? 'rgba(255, 152, 0, 0.6)' : 'rgba(45, 90, 39, 0.6)';
+          });
+          var borderColors = allWeeks.map(function(row, idx) {
+            return idx === lastIdx ? 'rgb(255, 152, 0)' : 'rgb(45, 90, 39)';
+          });
+
+          var wrap = document.createElement('div');
+          wrap.className = 'chart-card';
+          var title = document.createElement('h3');
+          var förklaring = (metric.förklaring || '').replace(/:?\s*$/, '').trim();
+          title.textContent = metric.label + (förklaring ? ': ' + förklaring : '');
+          wrap.appendChild(title);
+          var canvasWrap = document.createElement('div');
+          canvasWrap.className = 'chart-wrap';
+          var canvas = document.createElement('canvas');
+          canvasWrap.appendChild(canvas);
+          wrap.appendChild(canvasWrap);
+          container.appendChild(wrap);
+
+          var ctx = canvas.getContext('2d');
+          var chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: metric.label,
+                data: values,
+                backgroundColor: backgroundColors,
+                borderColor: borderColors,
+                borderWidth: 1
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                y: { beginAtZero: true },
+                x: { ticks: { maxRotation: 45, minRotation: 0 } }
+              }
+            }
+          });
+          chartInstancesBar.push(chart);
         });
       }
 
@@ -1429,8 +1541,8 @@
       }
 
       function buildChatGPTPrompt(mainData, eventsData) {
-        mainData = mainData || DEFAULT_MAIN_DATA;
-        eventsData = eventsData || DEFAULT_EVENTS_DATA;
+        mainData = safeMainForRender(mainData);
+        eventsData = safeEventsForRender(eventsData);
         var t = 'Jag har veckovis statistik från en hund-app (Flocken). Analysera siffrorna och ge mig:\n';
         t += '1) Bra indikatorer (vad som ser starkt ut)\n2) Vad jag ska vara uppmärksam på\n3) Dåliga indikatorer / risker\n4) Korta, konkreta råd.\n\n';
         t += '--- Veckovis översikt (vecka, nya konton, nya hundar, nya hundvaktprofiler, sitter-konv, tindog-konv, sitter-medd, tindog-medd, promenader, hundvänliga platser, bokningar) ---\n';
@@ -1545,33 +1657,37 @@
       }
 
       function renderAll(mainData, eventsData) {
-        mainData = mainData || DEFAULT_MAIN_DATA;
-        eventsData = eventsData || DEFAULT_EVENTS_DATA;
-        if (lastReplyData) mergeReplyRate(mainData, lastReplyData);
-        if (lastNotifData) mergeNotifData(mainData, lastNotifData);
+        var md = safeMainForRender(mainData);
+        var ev = safeEventsForRender(eventsData);
+        if (lastReplyData) mergeReplyRate(md, lastReplyData);
+        if (lastNotifData) mergeNotifData(md, lastNotifData);
         var outKpi = document.getElementById('outKpi');
         var outMain = document.getElementById('outMain');
         var outPartial = document.getElementById('outPartial');
         var outEvents = document.getElementById('outEvents');
-        if (outKpi) outKpi.innerHTML = renderKpiCards(mainData, eventsData);
-        if (outMain) outMain.innerHTML = renderMainTable(mainData);
-        if (outPartial) outPartial.innerHTML = renderPartialSection(getPartialWeek(mainData));
-        if (outEvents) outEvents.innerHTML = renderEventsTable(eventsData);
+        if (outKpi) outKpi.innerHTML = renderKpiCards(md, ev);
+        if (outMain) outMain.innerHTML = renderMainTable(md);
+        if (outPartial) outPartial.innerHTML = renderPartialSection(getPartialWeek(md));
+        if (outEvents) outEvents.innerHTML = renderEventsTable(ev);
         var outEventsDaily = document.getElementById('outEventsDaily');
         if (outEventsDaily) outEventsDaily.innerHTML = renderEventsDailyTable(lastEventsDailyData);
         renderDau(lastTodayData);
-        renderHighlights(mainData, lastTodayData);
+        renderHighlights(md, lastTodayData);
         renderSubscriptionBars(lastSubscriptionData);
         renderRetention(lastRetentionData);
-        renderCharts(mainData);
-        renderEventsLineCharts(eventsData);
+        try { renderCharts(md); } catch (eR) { console.error('renderCharts', eR); }
+        try { renderBarCharts(md); } catch (eB) { console.error('renderBarCharts', eB); }
+        try { renderEventsLineCharts(ev); } catch (eE) { console.error('renderEventsLineCharts', eE); }
         renderAccountTypes(lastAccountData);
-        renderTextSummary(mainData, eventsData);
+        renderTextSummary(md, ev);
       }
 
       document.addEventListener('flocken-theme-change', function() {
-        renderCharts(lastMainData);
-        renderEventsLineCharts(lastEventsData);
+        var dm = safeMainForRender(lastMainData);
+        var ev = safeEventsForRender(lastEventsData);
+        try { renderCharts(dm); } catch (e1) { console.warn('renderCharts:', e1); }
+        try { renderBarCharts(dm); } catch (e2) { console.warn('renderBarCharts:', e2); }
+        try { renderEventsLineCharts(ev); } catch (e3) { console.warn('renderEventsLineCharts:', e3); }
       });
 
       document.addEventListener('DOMContentLoaded', function() {
@@ -1584,8 +1700,24 @@
           var savedMain = localStorage.getItem('flocken_dashboard_main');
           var savedEvents = localStorage.getItem('flocken_dashboard_events');
           var savedReply = localStorage.getItem('flocken_dashboard_reply');
-          if (savedMain) { main = JSON.parse(savedMain); lastMainData = main; }
-          if (savedEvents) { events = JSON.parse(savedEvents); lastEventsData = events; }
+          if (savedMain) {
+            var pm = JSON.parse(savedMain);
+            if (Array.isArray(pm) && pm.length > 0) {
+              main = pm;
+              lastMainData = pm;
+            } else {
+              try { localStorage.removeItem('flocken_dashboard_main'); } catch (eRm) {}
+            }
+          }
+          if (savedEvents) {
+            var pe = JSON.parse(savedEvents);
+            if (Array.isArray(pe) && pe.length > 0) {
+              events = pe;
+              lastEventsData = pe;
+            } else {
+              try { localStorage.removeItem('flocken_dashboard_events'); } catch (eRe) {}
+            }
+          }
           if (savedReply) { lastReplyData = JSON.parse(savedReply); }
           var savedNotif = localStorage.getItem('flocken_dashboard_notif');
           if (savedNotif) { lastNotifData = JSON.parse(savedNotif); }
@@ -1704,10 +1836,10 @@
       });
 
       document.getElementById('btnExportCsv').onclick = function() {
-        var data = lastMainData || DEFAULT_MAIN_DATA;
+        var data = safeMainForRender(lastMainData);
         var full = getFullWeeks(data);
         if (full.length === 0) return;
-        var headers = ['Vecka','Nya konton','Nya hundar','Nya vaktprofiler','Sitter-konv','Tindog-konv','Sitter-medd','Tindog-medd','Promenader','Platser','Bokningar','Medd/konv','Push-notiser','Unika mottagare'];
+        var headers = ['Vecka','Nya konton','Nya hundar','Nya vaktprofiler','Sitter-konv','Tindog-konv','Sitter-medd','Tindog-medd','Promenader','Platser','Bokningar','Hund-akt %','Vakt-akt %','Konv/100','Medd/konv','Push-notiser','Unika mottagare'];
         var rows = [headers.join(';')];
         full.forEach(function(row) {
           var d = computeDerived(row);
@@ -1723,6 +1855,9 @@
             row.promenader ?? '',
             row.hundvanliga_platser ?? '',
             row.bokningar ?? '',
+            d.hund_aktivering_pct ? d.hund_aktivering_pct.toFixed(1) : '',
+            d.vakt_aktivering_pct ? d.vakt_aktivering_pct.toFixed(1) : '',
+            d.konv_per_100 != null ? d.konv_per_100.toFixed(2) : '',
             d.medd_per_konv != null ? d.medd_per_konv.toFixed(1) : '',
             row.notiser_skickade ?? '',
             row.unika_mottagare ?? ''
