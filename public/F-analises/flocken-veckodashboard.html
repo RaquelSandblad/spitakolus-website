@@ -757,6 +757,7 @@
 
       var MONTH_ABBR_SV = { jan: 0, feb: 1, mar: 2, apr: 3, maj: 4, jun: 5, jul: 6, aug: 7, sep: 8, okt: 9, nov: 10, dec: 11 };
       var MONTH_NAMES_SV = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+      function monthBucketFromWeekRow(row) {
         if (row.week_start) {
           var ds = String(row.week_start).slice(0, 10);
           var d = new Date(ds + 'T12:00:00');
@@ -840,6 +841,7 @@
         return monthBucketFromWeekRow(fakeRow);
       }
 
+      function getEventPivotFullWeeksSorted(eventsData) {
         var pivot = pivotEvents(eventsData || []);
         var full = pivot.filter(function(r) { return !isPartialEventWeek(r.label); });
         var orderMap = {};
