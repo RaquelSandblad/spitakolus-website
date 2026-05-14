@@ -6,8 +6,8 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>Flocken – Veckovis aktivitet</title>
-  <!-- Version: 2026-05-08b – Fix: renderPartialSection dayCount (kunde krascha hela sidan). Stapeldiagram tillbaka. Tom cache [] → demo-data. -->
+  <title>Flocken – Veckovis aktivitet (Brasilien)</title>
+  <!-- Version: 2026-05-14 – Kopia av EU-dashboard (2026-05-08b); data från Supabase Brasilien (vdpdehoreqjlenvqumho). localStorage-prefix: flocken_dashboard_br_* -->
   <style>
     :root {
       --bg: #f8f9fa;
@@ -164,7 +164,7 @@
       updateBtn();
     })();
   </script>
-  <h1>Flocken – Veckovis aktivitet</h1>
+  <h1>Flocken – Veckovis aktivitet <span style="font-size:0.75rem;font-weight:600;color:var(--muted);vertical-align:middle;">(Brasilien)</span></h1>
   <div id="textSummary" class="sr-only" role="region" aria-label="Textsammanfattning för skärmläsare och AI"></div>
   <div class="card dau-card" id="dauCard" aria-live="polite">
     <div id="outDau"></div>
@@ -245,8 +245,8 @@
 
   <script>
     (function() {
-      var SUPABASE_URL = 'https://jzbdxcsocwdxwzjjlnrw.supabase.co';
-      var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6YmR4Y3NvY3dkeHd6ampsbnJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyMjY4NTEsImV4cCI6MjA3NjgwMjg1MX0.eWpRvtv_2dClpwRYnLsD8yvNWz75jd1J42KLstVGpd4';
+      var SUPABASE_URL = 'https://vdpdehoreqjlenvqumho.supabase.co';
+      var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkcGRlaG9yZXFqbGVudnF1bWhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0OTY0NDQsImV4cCI6MjA5NDA3MjQ0NH0.kVj5K22XGa5caJtSvzQwWYSB57C4nEY3-gapI-v_PSU';
 
       function rpc(fnName) {
         return fetch(SUPABASE_URL + '/rest/v1/rpc/' + fnName, {
@@ -1615,16 +1615,16 @@
         var main = lastMainData;
         var events = lastEventsData;
         try {
-          var savedMain = localStorage.getItem('flocken_dashboard_main');
-          var savedEvents = localStorage.getItem('flocken_dashboard_events');
-          var savedReply = localStorage.getItem('flocken_dashboard_reply');
+          var savedMain = localStorage.getItem('flocken_dashboard_br_main');
+          var savedEvents = localStorage.getItem('flocken_dashboard_br_events');
+          var savedReply = localStorage.getItem('flocken_dashboard_br_reply');
           if (savedMain) {
             var pm = JSON.parse(savedMain);
             if (Array.isArray(pm) && pm.length > 0) {
               main = pm;
               lastMainData = pm;
             } else {
-              try { localStorage.removeItem('flocken_dashboard_main'); } catch (eRm) {}
+              try { localStorage.removeItem('flocken_dashboard_br_main'); } catch (eRm) {}
             }
           }
           if (savedEvents) {
@@ -1633,19 +1633,19 @@
               events = pe;
               lastEventsData = pe;
             } else {
-              try { localStorage.removeItem('flocken_dashboard_events'); } catch (eRe) {}
+              try { localStorage.removeItem('flocken_dashboard_br_events'); } catch (eRe) {}
             }
           }
           if (savedReply) { lastReplyData = JSON.parse(savedReply); }
-          var savedNotif = localStorage.getItem('flocken_dashboard_notif');
+          var savedNotif = localStorage.getItem('flocken_dashboard_br_notif');
           if (savedNotif) { lastNotifData = JSON.parse(savedNotif); }
-          var savedAcct = localStorage.getItem('flocken_dashboard_accounts');
+          var savedAcct = localStorage.getItem('flocken_dashboard_br_accounts');
           if (savedAcct) { lastAccountData = JSON.parse(savedAcct); }
-          var savedToday = localStorage.getItem('flocken_dashboard_today');
+          var savedToday = localStorage.getItem('flocken_dashboard_br_today');
           if (savedToday) { lastTodayData = JSON.parse(savedToday); }
-          var savedRetention = localStorage.getItem('flocken_dashboard_retention');
+          var savedRetention = localStorage.getItem('flocken_dashboard_br_retention');
           if (savedRetention) { lastRetentionData = JSON.parse(savedRetention); }
-          var savedSubscription = localStorage.getItem('flocken_dashboard_subscription');
+          var savedSubscription = localStorage.getItem('flocken_dashboard_br_subscription');
           if (savedSubscription) { lastSubscriptionData = JSON.parse(savedSubscription); }
         } catch (e) {}
         renderAll(main, events);
@@ -1659,11 +1659,11 @@
             var replyResult = results[2];
             if (Array.isArray(mainResult) && mainResult.length > 0) {
               lastMainData = mainResult;
-              try { localStorage.setItem('flocken_dashboard_main', JSON.stringify(mainResult)); } catch (e) {}
+              try { localStorage.setItem('flocken_dashboard_br_main', JSON.stringify(mainResult)); } catch (e) {}
             }
             if (Array.isArray(eventsResult) && eventsResult.length > 0) {
               lastEventsData = eventsResult;
-              try { localStorage.setItem('flocken_dashboard_events', JSON.stringify(eventsResult)); } catch (e) {}
+              try { localStorage.setItem('flocken_dashboard_br_events', JSON.stringify(eventsResult)); } catch (e) {}
             }
             var replyArr = replyResult;
             if (Array.isArray(replyResult) && replyResult.length === 1 && replyResult[0] && replyResult[0].dashboard_reply_rate) {
@@ -1671,7 +1671,7 @@
             }
             if (Array.isArray(replyArr) && replyArr.length > 0) {
               lastReplyData = replyArr;
-              try { localStorage.setItem('flocken_dashboard_reply', JSON.stringify(replyArr)); } catch (e) {}
+              try { localStorage.setItem('flocken_dashboard_br_reply', JSON.stringify(replyArr)); } catch (e) {}
             }
             var notifResult = results[3];
             var notifArr = null;
@@ -1694,7 +1694,7 @@
             console.log('notifArr after unwrap:', JSON.stringify(notifArr ? notifArr.slice(0,2) : null));
             if (Array.isArray(notifArr) && notifArr.length > 0) {
               lastNotifData = notifArr;
-              try { localStorage.setItem('flocken_dashboard_notif', JSON.stringify(notifArr)); } catch (e) {}
+              try { localStorage.setItem('flocken_dashboard_br_notif', JSON.stringify(notifArr)); } catch (e) {}
             }
             var acctResult = results[4];
             var acctObj = acctResult;
@@ -1703,21 +1703,21 @@
             }
             if (acctObj && acctObj.by_type) {
               lastAccountData = acctObj;
-              try { localStorage.setItem('flocken_dashboard_accounts', JSON.stringify(acctObj)); } catch (e) {}
+              try { localStorage.setItem('flocken_dashboard_br_accounts', JSON.stringify(acctObj)); } catch (e) {}
             }
             var todayResult = results[5];
             var todayObj = todayResult;
             // Om det är ett direkt objekt från REST API
             if (todayObj && todayObj.date) {
               lastTodayData = todayObj;
-              try { localStorage.setItem('flocken_dashboard_today', JSON.stringify(todayObj)); } catch (e) {}
+              try { localStorage.setItem('flocken_dashboard_br_today', JSON.stringify(todayObj)); } catch (e) {}
             }
             // Om det är wrappat i array med function name
             else if (Array.isArray(todayResult) && todayResult.length === 1 && todayResult[0] && todayResult[0].dashboard_today_highlights) {
               todayObj = todayResult[0].dashboard_today_highlights;
               if (todayObj && todayObj.date) {
                 lastTodayData = todayObj;
-                try { localStorage.setItem('flocken_dashboard_today', JSON.stringify(todayObj)); } catch (e) {}
+                try { localStorage.setItem('flocken_dashboard_br_today', JSON.stringify(todayObj)); } catch (e) {}
               }
             }
             var retentionResult = results[6];
@@ -1727,7 +1727,7 @@
             }
             if (Array.isArray(retentionArr) && retentionArr.length > 0) {
               lastRetentionData = retentionArr;
-              try { localStorage.setItem('flocken_dashboard_retention', JSON.stringify(retentionArr)); } catch (e) {}
+              try { localStorage.setItem('flocken_dashboard_br_retention', JSON.stringify(retentionArr)); } catch (e) {}
             }
             var subResult = results[7];
             var subObj = subResult;
@@ -1736,7 +1736,7 @@
             }
             if (subObj && (subObj.gratis_konto != null || subObj.betalande != null)) {
               lastSubscriptionData = subObj;
-              try { localStorage.setItem('flocken_dashboard_subscription', JSON.stringify(subObj)); } catch (e) {}
+              try { localStorage.setItem('flocken_dashboard_br_subscription', JSON.stringify(subObj)); } catch (e) {}
             }
             lastEventsDailyData = Array.isArray(results[8]) ? results[8] : [];
             if (Array.isArray(results[8]) && results[8].length === 1 && results[8][0] && results[8][0].dashboard_events_daily_current_week) {
@@ -1785,7 +1785,7 @@
         var blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
         var a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = 'flocken-veckodata.csv';
+        a.download = 'flocken-veckodata-brasilien.csv';
         a.click();
         URL.revokeObjectURL(a.href);
       };
@@ -1793,14 +1793,14 @@
       document.getElementById('btnClearCache').onclick = function() {
         if (!confirm('Detta raderar all cachad dashboard-data och laddar om från Supabase. Fortsätt?')) return;
         console.log('🗑️ Clearing localStorage cache...');
-        localStorage.removeItem('flocken_dashboard_main');
-        localStorage.removeItem('flocken_dashboard_events');
-        localStorage.removeItem('flocken_dashboard_reply');
-        localStorage.removeItem('flocken_dashboard_notif');
-        localStorage.removeItem('flocken_dashboard_accounts');
-        localStorage.removeItem('flocken_dashboard_today');
-        localStorage.removeItem('flocken_dashboard_retention');
-        localStorage.removeItem('flocken_dashboard_subscription');
+        localStorage.removeItem('flocken_dashboard_br_main');
+        localStorage.removeItem('flocken_dashboard_br_events');
+        localStorage.removeItem('flocken_dashboard_br_reply');
+        localStorage.removeItem('flocken_dashboard_br_notif');
+        localStorage.removeItem('flocken_dashboard_br_accounts');
+        localStorage.removeItem('flocken_dashboard_br_today');
+        localStorage.removeItem('flocken_dashboard_br_retention');
+        localStorage.removeItem('flocken_dashboard_br_subscription');
         console.log('✅ Cache cleared. Reloading page...');
         location.reload();
       };
@@ -1814,7 +1814,7 @@
           var data = Array.isArray(parsed) ? parsed : (parsed.data || parsed.result || [parsed]);
           if (!Array.isArray(data)) data = [data];
           lastMainData = data;
-          try { localStorage.setItem('flocken_dashboard_main', JSON.stringify(data)); } catch (e) {}
+          try { localStorage.setItem('flocken_dashboard_br_main', JSON.stringify(data)); } catch (e) {}
           renderAll(lastMainData, lastEventsData);
         } catch (e) {
           showErr('errMain', 'Ogiltig JSON: ' + e.message);
@@ -1830,7 +1830,7 @@
           var data = Array.isArray(parsed) ? parsed : (parsed.data || parsed.result || [parsed]);
           if (!Array.isArray(data)) data = [data];
           lastEventsData = data;
-          try { localStorage.setItem('flocken_dashboard_events', JSON.stringify(data)); } catch (e) {}
+          try { localStorage.setItem('flocken_dashboard_br_events', JSON.stringify(data)); } catch (e) {}
           renderAll(lastMainData, lastEventsData);
         } catch (e) {
           showErr('errEvents', 'Ogiltig JSON: ' + e.message);

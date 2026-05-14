@@ -51,11 +51,12 @@
 <body>
   <div class="box">
     <h1>Flocken dashboard</h1>
-    <p style="color:#6c757d; font-size:0.9rem; margin:0 0 1rem 0;">Ange lösenord för att öppna veckodashboarden.</p>
+    <p style="color:#6c757d; font-size:0.9rem; margin:0 0 1rem 0;">Ange lösenord för att öppna veckodashboarden (Europa eller Brasilien).</p>
     <form id="form" method="get" action="flocken-veckodashboard.html">
       <label for="pw">Lösenord</label>
       <input type="password" id="pw" name="pw" autocomplete="current-password" placeholder="Lösenord">
-      <button type="submit">Öppna dashboard</button>
+      <button type="submit" formaction="flocken-veckodashboard.html">Öppna dashboard (Europa)</button>
+      <button type="submit" formaction="flocken-veckodashboard-brasilien.html">Öppna dashboard (Brasilien)</button>
     </form>
     <p id="err" class="error" style="display:none;" aria-live="polite">Fel lösenord. Försök igen.</p>
   </div>
@@ -73,7 +74,8 @@
         err.style.display = 'none';
         if (pw.value === RATT_LOSENORD) {
           sessionStorage.setItem('dashboard_ok', '1');
-          window.location.href = 'flocken-veckodashboard.html';
+          var target = (e.submitter && e.submitter.getAttribute('formaction')) || 'flocken-veckodashboard.html';
+          window.location.href = target;
         } else {
           err.style.display = 'block';
           pw.focus();
