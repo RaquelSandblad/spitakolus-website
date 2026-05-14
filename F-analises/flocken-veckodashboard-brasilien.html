@@ -165,6 +165,10 @@
     })();
   </script>
   <h1>Flocken – Veckovis aktivitet <span style="font-size:0.75rem;font-weight:600;color:var(--muted);vertical-align:middle;">(Brasilien)</span></h1>
+  <div class="card" style="background:#fff3cd;border-left:4px solid #ffc107;margin-bottom:1rem;">
+    <p style="margin:0;font-weight:600;color:#856404;">⚠️ Brasilien-databasen saknar ännu dashboard-funktioner</p>
+    <p style="margin:0.5rem 0 0;font-size:0.9rem;color:#856404;">Denna dashboard ansluter korrekt till Brasilien (vdpdehoreqjlenvqumho), men de tre kritiska RPC-funktionerna (<code>dashboard_weekly_main</code>, <code>dashboard_weekly_events</code>, <code>dashboard_subscription_bars</code>) måste först migreras från Europa-databasen. Tills dess visas "Inga rader" eller tom data.</p>
+  </div>
   <div id="textSummary" class="sr-only" role="region" aria-label="Textsammanfattning för skärmläsare och AI"></div>
   <div class="card dau-card" id="dauCard" aria-live="polite">
     <div id="outDau"></div>
@@ -274,37 +278,9 @@
         bokningar: 'Bokningar'
       };
 
-      var DEFAULT_MAIN_DATA = [
-        {"label":"22–28 jan","nya_konton":69,"nya_hundar":14,"nya_hundvakt_profiler":22,"sitter_konversationer":0,"tindog_konversationer":0,"sitter_meddelanden":0,"tindog_meddelanden":0,"promenader":0,"hundvanliga_platser":0,"bokningar":0},
-        {"label":"29 jan–4 feb","nya_konton":74,"nya_hundar":19,"nya_hundvakt_profiler":11,"sitter_konversationer":0,"tindog_konversationer":0,"sitter_meddelanden":0,"tindog_meddelanden":3,"promenader":0,"hundvanliga_platser":2,"bokningar":0},
-        {"label":"5–11 feb","nya_konton":108,"nya_hundar":18,"nya_hundvakt_profiler":23,"sitter_konversationer":1,"tindog_konversationer":1,"sitter_meddelanden":1,"tindog_meddelanden":1,"promenader":2,"hundvanliga_platser":2,"bokningar":0},
-        {"label":"12–18 feb","nya_konton":131,"nya_hundar":16,"nya_hundvakt_profiler":20,"sitter_konversationer":0,"tindog_konversationer":2,"sitter_meddelanden":0,"tindog_meddelanden":1,"promenader":1,"hundvanliga_platser":2,"bokningar":0},
-        {"label":"19–25 feb","nya_konton":112,"nya_hundar":12,"nya_hundvakt_profiler":27,"sitter_konversationer":2,"tindog_konversationer":4,"sitter_meddelanden":2,"tindog_meddelanden":2,"promenader":0,"hundvanliga_platser":0,"bokningar":0},
-        {"label":"26 feb–4 mar","nya_konton":145,"nya_hundar":37,"nya_hundvakt_profiler":41,"sitter_konversationer":2,"tindog_konversationer":11,"sitter_meddelanden":1,"tindog_meddelanden":9,"promenader":1,"hundvanliga_platser":0,"bokningar":0},
-        {"label":"5 mar (1 dag)","nya_konton":13,"nya_hundar":2,"nya_hundvakt_profiler":2,"sitter_konversationer":5,"tindog_konversationer":0,"sitter_meddelanden":4,"tindog_meddelanden":0,"promenader":0,"hundvanliga_platser":0,"bokningar":0}
-      ];
+      var DEFAULT_MAIN_DATA = [];
 
-      var DEFAULT_EVENTS_DATA = [
-        {"label":"12–18 feb","event_name":"app_opened","antal_events":66,"unika_anvandare":46},
-        {"label":"12–18 feb","event_name":"listing_created","antal_events":9,"unika_anvandare":9},
-        {"label":"12–18 feb","event_name":"login","antal_events":140,"unika_anvandare":65},
-        {"label":"12–18 feb","event_name":"user_signed_in","antal_events":70,"unika_anvandare":65},
-        {"label":"19–25 feb","event_name":"app_opened","antal_events":202,"unika_anvandare":81},
-        {"label":"19–25 feb","event_name":"listing_created","antal_events":12,"unika_anvandare":12},
-        {"label":"19–25 feb","event_name":"login","antal_events":220,"unika_anvandare":95},
-        {"label":"19–25 feb","event_name":"sitter_contacted","antal_events":2,"unika_anvandare":1},
-        {"label":"19–25 feb","event_name":"user_signed_in","antal_events":110,"unika_anvandare":95},
-        {"label":"26 feb–4 mar","event_name":"app_opened","antal_events":265,"unika_anvandare":98},
-        {"label":"26 feb–4 mar","event_name":"listing_created","antal_events":40,"unika_anvandare":30},
-        {"label":"26 feb–4 mar","event_name":"login","antal_events":288,"unika_anvandare":129},
-        {"label":"26 feb–4 mar","event_name":"sitter_contacted","antal_events":3,"unika_anvandare":1},
-        {"label":"26 feb–4 mar","event_name":"user_signed_in","antal_events":145,"unika_anvandare":129},
-        {"label":"5 mar","event_name":"app_opened","antal_events":16,"unika_anvandare":14},
-        {"label":"5 mar","event_name":"listing_created","antal_events":2,"unika_anvandare":2},
-        {"label":"5 mar","event_name":"login","antal_events":22,"unika_anvandare":11},
-        {"label":"5 mar","event_name":"sitter_contacted","antal_events":7,"unika_anvandare":2},
-        {"label":"5 mar","event_name":"user_signed_in","antal_events":11,"unika_anvandare":11}
-      ];
+      var DEFAULT_EVENTS_DATA = [];
 
       function showErr(id, msg) {
         var el = document.getElementById(id);
