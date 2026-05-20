@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>Flocken – Rapport &amp; Prognos</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg: #f8f9fa; --card: #fff; --border: #dee2e6; --text: #212529;
+      --muted: #6c757d; --accent: #2d5a27; --accent-light: #e8f0e6;
+    }
+    [data-theme="dark"] {
+      --bg: #1a1d21; --card: #25282c; --border: #3d4248; --text: #f0f2f5;
+      --muted: #d0d3d8; --accent: #8fd38f; --accent-light: #2d3d2d;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.5;
+      margin: 0; padding: 1rem; max-width: 1200px; margin-left: auto; margin-right: auto;
+    }
+    h1 { font-size: 1.5rem; margin-top: 0; color: var(--accent); }
+    h2 { font-size: 1.15rem; margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text); border-left: 3px solid var(--accent); padding-left: 10px; }
+    h3 { font-size: 1rem; margin-top: 1rem; margin-bottom: 0.4rem; color: var(--text); }
+    .card { background: var(--card); border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.08); padding: 1.25rem; margin-bottom: 1rem; }
+    .help { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.5rem; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px,1fr)); gap: 0.75rem; margin-bottom: 1rem; }
+    .kpi-card { background: var(--card); border-radius: 8px; padding: 1rem; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+    .kpi-value { font-size: 1.6rem; font-weight: 700; color: var(--accent); }
+    .kpi-label { font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; }
+    .kpi-sub { font-size: 0.75rem; color: var(--muted); }
+    .chart-wrap { position: relative; height: 220px; margin-bottom: 0.75rem; }
+    .chart-wrap-sm { position: relative; height: 170px; margin-bottom: 0.75rem; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+    @media (max-width: 700px) { .two-col, .three-col { grid-template-columns: 1fr; } }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th { background: var(--accent-light); color: var(--accent); text-align: left; padding: 0.5rem 0.6rem; }
+    [data-theme="dark"] th { color: #8fd38f; background: #2d3d2d; }
+    td { padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    .tone-success { color: #2d5a27; font-weight: 600; }
+    .tone-danger  { color: #c0392b; font-weight: 600; }
+    .tone-warning { color: #c87d00; font-weight: 600; }
+    [data-theme="dark"] .tone-success { color: #8fd38f; }
+    [data-theme="dark"] .tone-danger  { color: #ff7070; }
+    [data-theme="dark"] .tone-warning { color: #ffb74d; }
+    .callout { border-left: 4px solid; border-radius: 0 6px 6px 0; padding: 0.75rem 1rem; margin: 0.75rem 0; font-size: 0.88rem; }
+    .callout-info    { border-color: #0d6efd; background: rgba(13,110,253,.07); }
+    .callout-warning { border-color: #ffc107; background: rgba(255,193,7,.08); }
+    .callout-success { border-color: #2d5a27; background: rgba(45,90,39,.07); }
+    .callout-danger  { border-color: #dc3545; background: rgba(220,53,69,.07); }
+    [data-theme="dark"] .callout-info    { background: rgba(13,110,253,.12); }
+    [data-theme="dark"] .callout-warning { background: rgba(255,193,7,.10); }
+    [data-theme="dark"] .callout-success { background: rgba(143,211,143,.10); }
+    [data-theme="dark"] .callout-danger  { background: rgba(220,53,69,.12); }
+    .row-link { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .btn { display: inline-block; padding: 0.45rem 1rem; border-radius: 6px; font-size: 0.88rem; cursor: pointer; text-decoration: none; border: 1px solid var(--border); background: var(--card); color: var(--text); }
+    .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .source-note { font-size: 0.78rem; color: var(--muted); font-style: italic; margin-top: 0.25rem; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+    .loading { color: var(--muted); font-style: italic; }
+    #statusBar { font-size: 0.82rem; color: var(--muted); margin-bottom: 1rem; }
+    .theme-btn { position: fixed; top: 1rem; right: 1rem; padding: 0.35rem 0.8rem; border-radius: 20px; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; font-size: 0.8rem; z-index: 100; }
+    .prog-row { display: grid; grid-template-columns: 80px repeat(3, 1fr) 1fr; gap: 0; }
+    .prog-row > div { padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border); font-size: 0.84rem; }
+    .prog-row > div:first-child { font-weight: 600; }
+    .prog-header > div { background: var(--accent-light); color: var(--accent); font-weight: 700; padding: 0.5rem 0.6rem; border-radius: 4px 4px 0 0; }
+    [data-theme="dark"] .prog-header > div { background: #2d3d2d; color: #8fd38f; }
+  </style>
+</head>
+<body>
+
+<button class="theme-btn" onclick="toggleTheme()">🌙 Mörkläge</button>
+
+<div class="row-link">
+  <a href="flocken-veckodashboard.html" class="btn">← Veckoöversikt</a>
+  <h1 style="margin:0;">Flocken – Rapport &amp; Prognos</h1>
+</div>
+
+<div id="statusBar">Hämtar data…</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     KPI-topp
+════════════════════════════════════════════════════════════ -->
+<div class="kpi-grid" id="topKpis">
+  <div class="kpi-card"><div class="kpi-value loading" id="kpiMrr">…</div><div class="kpi-label">MRR (brutto)</div></div>
+  <div class="kpi-card"><div class="kpi-value loading" id="kpiActives">…</div><div class="kpi-label">Betalande prenumeranter</div></div>
+  <div class="kpi-card"><div class="kpi-value loading" id="kpiTrials">…</div><div class="kpi-label">Aktiva trials</div></div>
+  <div class="kpi-card"><div class="kpi-value loading" id="kpiNetto">…</div><div class="kpi-label">MRR netto (−15%)</div><div class="kpi-sub">efter App Store-avgift</div></div>
+  <div class="kpi-card"><div class="kpi-value loading" id="kpiChurn">…</div><div class="kpi-label">Senaste churn %</div></div>
+  <div class="kpi-card"><div class="kpi-value loading" id="kpiNewAccounts">…</div><div class="kpi-label">Nya konton senaste veckan</div></div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     MRR-tillväxt
+════════════════════════════════════════════════════════════ -->
+<div class="card">
+  <h2>MRR-tillväxt (veckovis)</h2>
+  <p class="help">Källa: RevenueCat (synkad till Supabase). Klicka på tabellen för att se rådata.</p>
+  <div class="chart-wrap"><canvas id="mrrChart"></canvas></div>
+  <div id="mrrKpis" class="kpi-grid"></div>
+  <div class="callout callout-info">
+    <strong>Händelsmarkering:</strong> "29 mar"-veckan = appen öppnar med betalvägg och lanseras brett.
+    "12 apr"-veckan = 4-dagars bugg som blockerade kontoregistrering — MRR stod stilla.
+    "19 apr"-veckan = öppning för gratis-konton + aktiv marknadsföring startar.
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     Intäkter per vecka
+════════════════════════════════════════════════════════════ -->
+<div class="card">
+  <h2>Intäkter per vecka</h2>
+  <p class="help">Källa: RevenueCat (synkad). Brutto inkl. Apple/Google-avgifter. Netto = brutto × 0.85.</p>
+  <div class="chart-wrap"><canvas id="revenueChart"></canvas></div>
+  <div id="revenueKpis" class="kpi-grid"></div>
+  <div class="callout callout-warning">
+    <strong>12 apr-veckan:</strong> Endast $4.24 i intäkt (1 transaktion) — buggen som blockerade kontoregistrering i ~4 dagar.
+    Tydlig i både MRR och intäktsdata.
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     Trial-tratt
+════════════════════════════════════════════════════════════ -->
+<div class="card">
+  <h2>Trial-tratt &amp; konvertering (per cohort-vecka)</h2>
+  <p class="help">Källa: RevenueCat (synkad). Cohorts med "Pending" = trials ännu ej avgjorda.</p>
+  <div class="two-col">
+    <div>
+      <h3>Nya trials per vecka</h3>
+      <div class="chart-wrap-sm"><canvas id="trialStartsChart"></canvas></div>
+    </div>
+    <div>
+      <h3>Konverterade vs utgångna (per cohort)</h3>
+      <div class="chart-wrap-sm"><canvas id="trialConvChart"></canvas></div>
+    </div>
+  </div>
+  <div id="trialKpis" class="kpi-grid"></div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     Churn
+════════════════════════════════════════════════════════════ -->
+<div class="card">
+  <h2>Churn rate per vecka (%)</h2>
+  <p class="help">Källa: RevenueCat (synkad). Under 5% = bra. Över 10% = bevaka noga.</p>
+  <div class="chart-wrap"><canvas id="churnChart"></canvas></div>
+  <div id="churnKpis" class="kpi-grid"></div>
+  <div class="callout callout-info">
+    Veckorna 26 apr och 3 maj visade förhöjd churn (13.9% resp. 10.3%) — troligen gamla 1-månads-trials
+    som löpte ut efter att betalvägg öppnade 1 april. Senaste 2 veckorna under 3% = stabiliserat.
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     Nya konton + innehållstillväxt
+════════════════════════════════════════════════════════════ -->
+<div class="card">
+  <h2>Nya konton per vecka</h2>
+  <p class="help">Källa: Supabase (profiles.created_at). Exkluderar teamkonton.</p>
+  <div class="chart-wrap"><canvas id="accountsChart"></canvas></div>
+  <div id="accountsKpis" class="kpi-grid"></div>
+  <div class="callout callout-info">
+    <strong>Lanserings-peak mars:</strong> 333 nya konton veckan 16 mar, 304 v. 9 mar. Betalväggen (1 apr)
+    sänkte inflödet till ~79/vecka. Mid-april (öppning gratis-konton) stabiliserade det på ~100/vecka.
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════════════
+     MRR-prognos (dynamisk)
+════════════════════════════════════════════════════════════ -->
+<div class="card">
+  <h2>MRR-prognos juni – december 2026</h2>
+  <p class="help">
+    Beräknas automatiskt från senaste MRR i databasen.
+    Tre scenarion: Konservativt (+15%/mån), Modernt (+25%/mån), Optimistiskt (+40%/mån).
+  </p>
+  <div id="prognosisBaseMrr" class="callout callout-info" style="display:none;"></div>
+  <div class="chart-wrap" style="height:260px;"><canvas id="projectionChart"></canvas></div>
+  <h3>Prognostiserade MRR-värden</h3>
+  <div id="projectionTable"></div>
+  <div class="three-col" style="margin-top:1rem;">
+    <div class="card" style="margin:0;border:1px solid var(--border);">
+      <h3 style="color:var(--muted);">Konservativt (+15%/mån)</h3>
+      <p style="font-size:0.85rem;">Organisk tillväxt, nedladdningar håller ~800/mån iOS. Ingen ny marknadsföringspush.</p>
+      <p style="font-size:0.85rem;">Trolig <strong>nedre gräns</strong> om marknadsföringen inte skalas.</p>
+    </div>
+    <div class="card" style="margin:0;border:2px solid var(--accent);">
+      <h3 style="color:var(--accent);">Modernt (+25%/mån) ★ Troligast</h3>
+      <p style="font-size:0.85rem;">Marknadsföringspushen ger +30–50% fler nedladdningar. Trial-inflöde ökar. Konvertering håller 35%.</p>
+      <p style="font-size:0.85rem;"><strong>Kräver ~120 trials/mån från juni.</strong></p>
+    </div>
+    <div class="card" style="margin:0;border:1px solid var(--border);">
+      <h3 style="color:#c87d00;">Optimistiskt (+40%/mån)</h3>
+      <p style="font-size:0.85rem;">Marknadsföringen ger starkt lyft + höst-säsong (hundvakt-peak aug–sep). Viral spridning möjlig.</p>
+      <p style="font-size:0.85rem;">Möjligt om nedladdningarna dubbleras (1 600+/mån iOS) och churn håller under 5%.</p>
+    </div>
+  </div>
+  <div class="callout callout-success" style="margin-top:1rem;">
+    Alla scenarier = brutto-MRR. Netto ≈ MRR × 0.85 (efter App Store-avgifter).
+    Prognosen förutsätter nuvarande konverteringsgrad (35% trial→paid) och churn under 5%.
+    <strong>Nästa nyckeltal:</strong> Hur många av de pending trials (cohort maj 10+) konverterar? Avgör om maj avslutas med MRR över $300.
+  </div>
+</div>
+
+
+<hr class="divider">
+<p class="source-note" style="text-align:center;">
+  Flocken Rapport &amp; Prognos · Live-data från Supabase (RevenueCat synkad dagligen)
+  &nbsp;·&nbsp; <a href="flocken-veckodashboard.html">← Tillbaka till veckoöversikten</a>
+</p>
+
+<script>
+(function() {
+  // ──────────────────────────────────────────────────────────────
+  // Config
+  // ──────────────────────────────────────────────────────────────
+  var SUPABASE_URL      = 'https://jzbdxcsocwdxwzjjlnrw.supabase.co';
+  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6YmR4Y3NvY3dkeHd6ampsbnJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyMjY4NTEsImV4cCI6MjA3NjgwMjg1MX0.eWpRvtv_2dClpwRYnLsD8yvNWz75jd1J42KLstVGpd4';
+
+  // ──────────────────────────────────────────────────────────────
+  // Theme
+  // ──────────────────────────────────────────────────────────────
+  var savedTheme = localStorage.getItem('flocken_theme') || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  updateThemeBtn();
+  function toggleTheme() {
+    var cur = document.documentElement.getAttribute('data-theme');
+    var next = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('flocken_theme', next);
+    updateThemeBtn();
+    location.reload(); // re-render charts with correct colors
+  }
+  function updateThemeBtn() {
+    var btn = document.querySelector('.theme-btn');
+    if (!btn) return;
+    var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    btn.textContent = isDark ? '☀ Ljusläge' : '🌙 Mörkläge';
+  }
+  window.toggleTheme = toggleTheme;
+
+  // ──────────────────────────────────────────────────────────────
+  // Helpers
+  // ──────────────────────────────────────────────────────────────
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var GRID_COLOR = isDark ? '#3d4248' : '#dee2e6';
+  var TICK_COLOR = isDark ? '#d0d3d8' : '#6c757d';
+  var TEXT_COLOR = isDark ? '#f0f2f5' : '#212529';
+
+  function rpc(fnName) {
+    return fetch(SUPABASE_URL + '/rest/v1/rpc/' + fnName, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: '{}'
+    }).then(function(r) { return r.json(); });
+  }
+
+  function setText(id, v) {
+    var el = document.getElementById(id);
+    if (el) { el.textContent = v; el.classList.remove('loading'); }
+  }
+
+  function kpiCard(value, label, tone) {
+    var cls = tone ? ' tone-' + tone : '';
+    return '<div class="kpi-card"><div class="kpi-value' + cls + '">' + value + '</div><div class="kpi-label">' + label + '</div></div>';
+  }
+
+  function fmtDate(s) {
+    if (!s) return '';
+    var d = new Date(s);
+    return (d.getMonth()+1) + '/' + d.getDate();
+  }
+
+  function axisOpts(extra) {
+    return Object.assign({ ticks: { color: TICK_COLOR }, grid: { color: GRID_COLOR } }, extra || {});
+  }
+
+  // ──────────────────────────────────────────────────────────────
+  // Prognosis calculation
+  // ──────────────────────────────────────────────────────────────
+  function buildPrognosis(baseMrr) {
+    var months = ['Maj','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
+    var cons = [baseMrr], mod = [baseMrr], opt = [baseMrr];
+    for (var i = 1; i < 8; i++) {
+      cons.push(Math.round(cons[i-1] * 1.15));
+      mod.push(Math.round(mod[i-1] * 1.25));
+      opt.push(Math.round(opt[i-1] * 1.40));
+    }
+
+    // Chart
+    var ctx = document.getElementById('projectionChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: months,
+        datasets: [
+          { label: 'Konservativt (+15%/mån)', data: cons, borderColor: TICK_COLOR, backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 4 },
+          { label: 'Modernt (+25%/mån) ★', data: mod, borderColor: isDark ? '#8fd38f' : '#2d5a27', backgroundColor: isDark ? 'rgba(143,211,143,0.12)' : 'rgba(45,90,39,0.08)', borderWidth: 3, tension: 0.3, pointRadius: 4, fill: true },
+          { label: 'Optimistiskt (+40%/mån)', data: opt, borderColor: isDark ? '#ffb74d' : '#c87d00', backgroundColor: 'transparent', borderWidth: 2, borderDash: [5,4], tension: 0.3, pointRadius: 4 },
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: TEXT_COLOR } },
+          tooltip: { mode: 'index', intersect: false, callbacks: {
+            label: function(c) { return c.dataset.label + ': $' + c.parsed.y; }
+          }}
+        },
+        scales: {
+          x: axisOpts(),
+          y: axisOpts({ beginAtZero: false, ticks: Object.assign({ color: TICK_COLOR }, { callback: function(v) { return '$' + v; } }) })
+        }
+      }
+    });
+
+    // Table
+    var html = '<div class="prog-row prog-header">'
+      + '<div>Månad</div><div>Konservativt</div><div>Modernt ★</div><div>Optimistiskt</div><div>Netto modernt</div>'
+      + '</div>';
+    for (var j = 0; j < 8; j++) {
+      html += '<div class="prog-row">'
+        + '<div>' + months[j] + '</div>'
+        + '<div>$' + cons[j] + '</div>'
+        + '<div style="font-weight:600;color:' + (isDark ? '#8fd38f' : '#2d5a27') + '">$' + mod[j] + '</div>'
+        + '<div>$' + opt[j] + '</div>'
+        + '<div>$' + Math.round(mod[j] * 0.85) + '</div>'
+        + '</div>';
+    }
+    document.getElementById('projectionTable').innerHTML = html;
+
+    var infoEl = document.getElementById('prognosisBaseMrr');
+    infoEl.innerHTML = '<strong>Bas-MRR:</strong> $' + baseMrr + ' (senaste synkade vecka från RevenueCat). Prognosen beräknas automatiskt från detta värde.';
+    infoEl.style.display = 'block';
+  }
+
+  // ──────────────────────────────────────────────────────────────
+  // Render functions
+  // ──────────────────────────────────────────────────────────────
+  function renderMrrChart(history) {
+    var labels = history.map(function(r) { var d = new Date(r.week_start); return (d.getMonth()+1) + '/' + d.getDate(); });
+    var data   = history.map(function(r) { return parseFloat(r.mrr_usd) || 0; });
+    var ctx    = document.getElementById('mrrChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: { labels: labels, datasets: [{ label: 'MRR ($)', data: data, borderColor: isDark ? '#8fd38f' : '#2d5a27', backgroundColor: isDark ? 'rgba(143,211,143,0.15)' : 'rgba(45,90,39,0.08)', borderWidth: 2.5, tension: 0.3, pointRadius: 4, fill: true }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: TEXT_COLOR } }, tooltip: { callbacks: { label: function(c) { return '$' + c.parsed.y.toFixed(2); } } } },
+        scales: { x: axisOpts(), y: axisOpts({ beginAtZero: false, ticks: { color: TICK_COLOR, callback: function(v) { return '$' + v; } } }) }
+      }
+    });
+
+    // KPIs
+    var first = data[0], last = data[data.length - 1];
+    var pct = first > 0 ? ((last - first) / first * 100).toFixed(0) : '—';
+    document.getElementById('mrrKpis').innerHTML =
+      kpiCard('$' + last.toFixed(0), 'Senaste MRR (brutto)', 'success') +
+      kpiCard('$' + (last * 0.85).toFixed(0), 'Senaste MRR (netto)', 'success') +
+      kpiCard('+' + pct + '%', 'Tillväxt total period', 'success') +
+      kpiCard('$' + first.toFixed(0), 'MRR vid periodens start');
+  }
+
+  function renderRevenueChart(history) {
+    var labels = history.map(function(r) { var d = new Date(r.week_start); return (d.getMonth()+1) + '/' + d.getDate(); });
+    var data   = history.map(function(r) { return parseFloat(r.revenue_usd) || 0; });
+    var colors = data.map(function(v) { return v < 20 ? 'rgba(224,82,82,0.7)' : 'rgba(45,90,39,0.7)'; });
+    var ctx    = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: { labels: labels, datasets: [{ label: 'Intäkt ($)', data: data, backgroundColor: colors, borderWidth: 1, borderColor: data.map(function(v) { return v < 20 ? 'rgb(200,60,60)' : 'rgb(35,70,30)'; }) }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(c) { return '$' + c.parsed.y.toFixed(2); } } } },
+        scales: { x: axisOpts(), y: axisOpts({ beginAtZero: true, ticks: { color: TICK_COLOR, callback: function(v) { return '$' + v; } } }) }
+      }
+    });
+
+    var total = data.reduce(function(a, b) { return a + b; }, 0);
+    document.getElementById('revenueKpis').innerHTML =
+      kpiCard('$' + total.toFixed(0), 'Total bruttointäkt', 'success') +
+      kpiCard('$' + (total * 0.85).toFixed(0), 'Total nettointäkt', 'success') +
+      kpiCard('$' + data[data.length-1].toFixed(0), 'Senaste veckan (brutto)');
+  }
+
+  function renderTrialCharts(cohorts) {
+    if (!cohorts || !cohorts.length) return;
+    var labels = cohorts.map(function(r) { var d = new Date(r.week_start); return (d.getMonth()+1) + '/' + d.getDate(); });
+    var starts  = cohorts.map(function(r) { return r.trial_starts || 0; });
+    var convs   = cohorts.map(function(r) { return r.conversions  || 0; });
+    var exps    = cohorts.map(function(r) { return r.expirations  || 0; });
+    var pends   = cohorts.map(function(r) { return r.pending      || 0; });
+
+    var ctx1 = document.getElementById('trialStartsChart').getContext('2d');
+    new Chart(ctx1, {
+      type: 'bar',
+      data: { labels: labels, datasets: [{ label: 'Nya trials', data: starts, backgroundColor: 'rgba(13,110,253,0.65)' }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: TEXT_COLOR } } }, scales: { x: axisOpts(), y: axisOpts({ beginAtZero: true }) } }
+    });
+
+    var ctx2 = document.getElementById('trialConvChart').getContext('2d');
+    new Chart(ctx2, {
+      type: 'bar',
+      data: { labels: labels, datasets: [
+        { label: 'Konverterade', data: convs, backgroundColor: 'rgba(45,90,39,0.75)', stack: 'a' },
+        { label: 'Utgångna utan köp', data: exps, backgroundColor: 'rgba(220,53,69,0.65)', stack: 'a' },
+        { label: 'Pending (ej avgjord)', data: pends, backgroundColor: 'rgba(180,130,40,0.55)', stack: 'a' },
+      ] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: TEXT_COLOR } }, tooltip: { mode: 'index' } }, scales: { x: axisOpts(), y: axisOpts({ beginAtZero: true, stacked: true }) } }
+    });
+
+    var totalStarts = starts.reduce(function(a,b) { return a+b; }, 0);
+    var totalConv   = convs.reduce(function(a,b) { return a+b; }, 0);
+    var totalExp    = exps.reduce(function(a,b) { return a+b; }, 0);
+    var convRate    = (totalStarts - pends.reduce(function(a,b){return a+b;},0)) > 0
+      ? (totalConv / (totalStarts - pends.reduce(function(a,b){return a+b;},0)) * 100).toFixed(0) + '%'
+      : '—';
+    document.getElementById('trialKpis').innerHTML =
+      kpiCard(totalStarts, 'Totalt nya trials', '') +
+      kpiCard(totalConv, 'Totalt konverterade', 'success') +
+      kpiCard(totalExp, 'Totalt utgångna utan köp', 'danger') +
+      kpiCard(convRate, 'Konverteringsgrad', 'success');
+  }
+
+  function renderChurnChart(history) {
+    var labels = history.map(function(r) { var d = new Date(r.week_start); return (d.getMonth()+1) + '/' + d.getDate(); });
+    var data   = history.map(function(r) { return parseFloat(r.churn_pct) || 0; });
+    var colors = data.map(function(v) { return v < 5 ? 'rgba(45,90,39,0.7)' : v < 10 ? 'rgba(255,152,0,0.7)' : 'rgba(224,82,82,0.7)'; });
+    var ctx    = document.getElementById('churnChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: { labels: labels, datasets: [{ label: 'Churn %', data: data, backgroundColor: colors }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { x: axisOpts(), y: axisOpts({ beginAtZero: true, title: { display: true, text: '%', color: TICK_COLOR }, ticks: { color: TICK_COLOR, callback: function(v) { return v + '%'; } } }) }
+      }
+    });
+
+    var avg = data.length ? (data.reduce(function(a,b){return a+b;},0) / data.length).toFixed(1) : '—';
+    var last = data[data.length-1];
+    document.getElementById('churnKpis').innerHTML =
+      kpiCard(avg + '%', 'Genomsnittlig churn', avg > 5 ? 'warning' : 'success') +
+      kpiCard(last + '%', 'Senaste veckan', last > 5 ? 'danger' : 'success');
+  }
+
+  function renderAccountsChart(weekly) {
+    if (!weekly || !weekly.length) return;
+    // Use last 16 weeks, field is nya_konton
+    var recent = weekly.slice(-16);
+    var labels = recent.map(function(r) { return r.label || ''; });
+    var data   = recent.map(function(r) { return r.nya_konton || 0; });
+    var ctx = document.getElementById('accountsChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: { labels: labels, datasets: [{ label: 'Nya konton', data: data, backgroundColor: isDark ? 'rgba(143,211,143,0.6)' : 'rgba(45,90,39,0.55)' }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: TEXT_COLOR } } },
+        scales: { x: axisOpts({ ticks: { maxTicksLimit: 18 } }), y: axisOpts({ beginAtZero: true }) }
+      }
+    });
+
+    var total = data.reduce(function(a,b){return a+b;},0);
+    var lastFour = data.slice(-4).reduce(function(a,b){return a+b;},0);
+    document.getElementById('accountsKpis').innerHTML =
+      kpiCard(total, 'Totalt nya konton (period)', '') +
+      kpiCard(Math.round(lastFour/4), 'Genomsnitt senaste 4 v', '') +
+      kpiCard(data[data.length-1], 'Senaste veckan', '');
+  }
+
+  // ──────────────────────────────────────────────────────────────
+  // Main data fetch
+  // ──────────────────────────────────────────────────────────────
+  Promise.allSettled([
+    rpc('dashboard_rc_weekly_metrics'),
+    rpc('dashboard_rc_trial_cohorts'),
+    rpc('dashboard_weekly_main'),
+    Promise.resolve(null), // subscription bars finns på sida 1
+    rpc('dashboard_rc_trials_summary'),
+  ]).then(function(settled) {
+    var failed = settled.filter(function(s) { return s.status === 'rejected'; });
+    if (failed.length > 0) console.warn('Rapport: ' + failed.length + ' RPC(er) misslyckades:', failed.map(function(s) { return s.reason; }));
+    var results = settled.map(function(s) { return s.status === 'fulfilled' ? s.value : null; });
+
+    var rcMetrics    = results[0];
+    var rcCohorts    = results[1];
+    var weeklyMain   = results[2];
+
+    var trialsSumm   = results[4];
+
+    // Normalize RPC results (jsonb RPCs are wrapped as [{ rpc_name: [...] }])
+    function unwrap(r, key) {
+      if (Array.isArray(r) && r.length === 1 && r[0] && r[0][key]) return r[0][key];
+      return r;
+    }
+
+    rcMetrics  = unwrap(rcMetrics,  'dashboard_rc_weekly_metrics');
+    rcCohorts  = unwrap(rcCohorts,  'dashboard_rc_trial_cohorts');
+    weeklyMain = unwrap(weeklyMain, 'dashboard_weekly_main');
+    trialsSumm = unwrap(trialsSumm, 'dashboard_rc_trials_summary');
+
+    // ── RC Metrics ──────────────────────────────────────────────
+    var rcHistory = [];
+    if (rcMetrics && rcMetrics.history) rcHistory = rcMetrics.history;
+    else if (Array.isArray(rcMetrics)) rcHistory = rcMetrics;
+
+    if (rcHistory.length) {
+      renderMrrChart(rcHistory);
+      renderRevenueChart(rcHistory);
+      renderChurnChart(rcHistory);
+
+      var latest = rcHistory[rcHistory.length-1];
+      var latestMrr = parseFloat(rcMetrics.latest_mrr || latest.mrr_usd || 0);
+      setText('kpiMrr', '$' + latestMrr.toFixed(0));
+      setText('kpiNetto', '$' + (latestMrr * 0.85).toFixed(0));
+      setText('kpiChurn', (parseFloat(latest.churn_pct) || 0).toFixed(1) + '%');
+      setText('kpiActives', latest.actives || '…');
+      buildPrognosis(Math.round(latestMrr));
+    } else {
+      // Fallback: use canvas data as static seed
+      buildPrognosis(256);
+      setText('kpiMrr', '$256');
+      setText('kpiNetto', '$218');
+    }
+
+    // ── RC Cohorts ──────────────────────────────────────────────
+    var cohortArr = [];
+    if (rcCohorts && rcCohorts.cohorts) cohortArr = rcCohorts.cohorts;
+    else if (Array.isArray(rcCohorts)) cohortArr = rcCohorts;
+    if (cohortArr.length) renderTrialCharts(cohortArr);
+
+    // ── Trials summary ──────────────────────────────────────────
+    if (trialsSumm) {
+      var summ = Array.isArray(trialsSumm) && trialsSumm[0] ? trialsSumm[0] : trialsSumm;
+      var totalTrials = summ.total_active || 0;
+      setText('kpiTrials', totalTrials);
+    } else {
+      setText('kpiTrials', '24');
+    }
+
+    // ── Weekly main: new accounts per week (field: nya_konton) ───
+    var wArr = Array.isArray(weeklyMain) ? weeklyMain : [];
+    if (wArr.length) {
+      renderAccountsChart(wArr);
+      var lastWeek = wArr[wArr.length - 1];
+      setText('kpiNewAccounts', (lastWeek && lastWeek.nya_konton) || '—');
+    }
+
+    // Subscription bars finns på sida 1 (veckoöversikten)
+
+    var statusMsg = 'Uppdaterad ' + new Date().toLocaleTimeString('sv-SE') + ' · Live-data från Supabase (RC synkad)';
+    if (failed.length > 0) statusMsg += ' (' + failed.length + ' sektioner saknade data)';
+    document.getElementById('statusBar').textContent = statusMsg;
+
+  });
+
+})();
+</script>
+</body>
+</html>

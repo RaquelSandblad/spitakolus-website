@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <title>Flocken – Veckovis aktivitet</title>
-  <!-- Version: 2026-05-08b – Fix: renderPartialSection dayCount (kunde krascha hela sidan). Stapeldiagram tillbaka. Tom cache [] → demo-data. -->
+  <!-- Version: 2026-05-19d – RC Trials urgency-block (088-migration), funnel-diagram. -->
   <style>
     :root {
       --bg: #f8f9fa;
@@ -90,6 +90,9 @@
       margin-top: 0.5rem;
     }
     button:hover { opacity: 0.9; }
+    .dl-filter-btn { background: var(--border); color: var(--text); font-size: 0.85rem; padding: 0.3rem 0.75rem; margin-top: 0; }
+    .dl-filter-btn.active-filter { outline: 2px solid var(--text); outline-offset: 1px; opacity: 1; }
+    .dl-filter-btn:hover { opacity: 0.85; }
     .error { color: #b02a37; background: #f8d7da; padding: 0.5rem; border-radius: 6px; margin-top: 0.5rem; font-size: 0.9rem; }
     table {
       width: 100%;
@@ -132,6 +135,7 @@
     .dau-card .dau-value { font-size: 2rem; font-weight: 700; color: var(--accent); line-height: 1.1; font-variant-numeric: tabular-nums; }
     .dau-card .dau-title { font-size: 1rem; font-weight: 600; color: var(--text); margin: 0; }
     .dau-card .dau-hint { font-size: 0.85rem; color: var(--muted); margin: 0; flex: 1 1 100%; }
+    .dau-card .rn-line { font-size: 0.65rem; color: var(--muted); margin: 0.12rem 0 0; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -164,7 +168,10 @@
       updateBtn();
     })();
   </script>
-  <h1>Flocken – Veckovis aktivitet</h1>
+  <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:0.25rem;">
+    <h1 style="margin:0;">Flocken – Veckovis aktivitet</h1>
+    <a href="flocken-rapport.html" style="display:inline-block;padding:0.4rem 1rem;background:var(--accent);color:#fff;border-radius:6px;font-size:0.88rem;text-decoration:none;font-weight:600;">📊 Rapport &amp; Prognos →</a>
+  </div>
   <div id="textSummary" class="sr-only" role="region" aria-label="Textsammanfattning för skärmläsare och AI"></div>
   <div class="card dau-card" id="dauCard" aria-live="polite">
     <div id="outDau"></div>
@@ -179,9 +186,25 @@
   </div>
 
   <div class="card">
-    <h2>Användare per prenumerationstyp</h2>
-    <p class="help">Totalt antal användare: gratiskonto, gratis-premium (trial), betalande.</p>
-    <div id="outSubscriptionBars"></div>
+    <h2>Prenumerationer &amp; Intäkter</h2>
+    <p class="help">Supabase-data uppdateras automatiskt. RevenueCat-data (MRR, cancelled, trial-tratt) uppdateras manuellt via knappen nedan. Senast uppdaterat RC: <strong id="rcDataUpdated">–</strong></p>
+
+    <div class="kpi-grid" id="outRcKpis">
+      <div class="kpi-card"><div class="kpi-value" id="rcKpiPaying">–</div><div class="kpi-label">Aktiva betalande</div></div>
+      <div class="kpi-card"><div class="kpi-value" id="rcKpiTrials">–</div><div class="kpi-label">Aktiva trials</div></div>
+      <div class="kpi-card"><div class="kpi-value" id="rcKpiMrr">–</div><div class="kpi-label">MRR (USD)</div></div>
+      <div class="kpi-card"><div class="kpi-value" id="rcKpiCancelledPaying">–</div><div class="kpi-label">Cancelled betalande</div></div>
+      <div class="kpi-card"><div class="kpi-value" id="rcKpiCancelledTrials">–</div><div class="kpi-label">Cancelled trials</div></div>
+    </div>
+
+    <div id="outRcTrials" style="margin-top:1rem;"></div>
+
+    <!-- Trial-tratt per cohort finns på Rapport-sidan → flocken-rapport.html -->
+    <div id="outSubscriptionBars" style="margin-top:0.5rem;"></div>
+    <div id="outSubSummary" style="margin-top:1rem;"></div>
+
+    <div id="rcChartsSection" style="display:none;"></div>
+    <!-- Intäkter & churn finns på Rapport-sidan → flocken-rapport.html -->
   </div>
 
   <div class="card">
@@ -215,16 +238,26 @@
   </div>
 
   <div class="card">
-    <h2>Daglig återkomst (retention per kohort)</h2>
-    <p class="help">Av de som skapade konto en given dag – hur många öppnade appen igen? Dag 0 = senare samma dag. ~Dag 14/21/30 räknar ±1–2 dagar runt exakt dag för att fånga upp folk som kom tillbaka strax innan/efter. Visar antal och % av kohorten.</p>
-    <div id="outRetention"></div>
+    <h2>Nedladdningar – App Store &amp; Google Play</h2>
+    <p class="help">Dagliga nedladdningar från App Store (iOS) och Google Play (Android). Data hämtas automatiskt varje natt. Google Play har 1–2 dagars fördröjning; iOS-data aktiveras när Apple vendor number är konfigurerat.</p>
+    <div id="outDownloadsKpis" style="margin-bottom:1rem;"></div>
+    <div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.75rem;">
+      <button type="button" id="btnDlAll" class="dl-filter-btn active-filter" onclick="setDownloadFilter('all')">Totalt</button>
+      <button type="button" id="btnDlAndroid" class="dl-filter-btn" onclick="setDownloadFilter('android')" style="background:#3ddc84;color:#000;">Android</button>
+      <button type="button" id="btnDlIos" class="dl-filter-btn" onclick="setDownloadFilter('ios')" style="background:#007aff;">iOS</button>
+    </div>
+    <div class="chart-wrap" style="height:220px;"><canvas id="downloadsChart"></canvas></div>
   </div>
 
   <div class="card">
-    <h2>Veckovis översikt (råtal + andelar)</h2>
-    <div class="table-wrap"><div id="outMain"></div></div>
-    <div id="outPartial" style="margin-top:1rem;"></div>
-    <h3 style="margin-top:1.25rem;">Trendlinjer (samma mått som tabellen)</h3>
+    <h2>Konverteringstratt – Anonyma → Konto</h2>
+    <p class="help">Dagliga app-öppningar av anonyma enheter (ingen inloggning), jämfört med nya nedladdningar och nya konton. <strong>Returning anonymous</strong> = öppningar − nedladdningar = folk som redan hade appen men ännu inte skapat konto. Dessa är prime targets för konvertering med push-notis eller in-app prompt.</p>
+    <div id="outFunnelKpis" style="display:flex;gap:1.5rem;flex-wrap:wrap;margin-bottom:1rem;"></div>
+    <div class="chart-wrap" style="height:250px;"><canvas id="funnelChart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <h2>Trendlinjer veckovis</h2>
     <p class="help">Linjediagram för längre uppföljning. Vid <strong>månad</strong> summeras rörelsetal (konton, hundar, meddelanden, …); procenttal (reply rate) vägs med antal konversationer; för notis-<em>unika</em> används max av veckorna i månaden.</p>
     <div class="chart-toolbar" id="mainTrendToolbar"></div>
     <div id="outCharts"></div>
@@ -239,6 +272,12 @@
       <button type="button" id="btnMain">Visa uppdaterad huvudtabell</button>
       <div id="errMain" class="error" style="display:none;"></div>
     </details>
+  </div>
+
+  <div class="card">
+    <h2>Daglig återkomst (retention per kohort)</h2>
+    <p class="help">Av de som skapade konto en given dag – hur många öppnade appen igen? Dag 0 = senare samma dag. ~Dag 14/21/30 räknar ±1–2 dagar runt exakt dag för att fånga upp folk som kom tillbaka strax innan/efter. Visar antal och % av kohorten.</p>
+    <div id="outRetention"></div>
   </div>
 
   <p class="disclaimer">Alla siffror exkluderar Raquel Sandblad, Torbjörn Sandblad och tb.sandblad-konton (analytics_excluded_users).</p>
@@ -368,13 +407,54 @@
         html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Unika inloggade användare</p>';
         html += '</div>';
 
-        // Kolumn 2 – Nedladdningar (anonyma enheter)
+        // Kolumn 2 – App-öppningar anonyma (ej riktiga nedladdningar)
         html += '<div>';
         html += '<div style="display:flex;align-items:baseline;gap:0.5rem;">';
         html += '<span class="dau-value" style="color:var(--muted);">' + (anonymousOpens != null ? anonymousOpens : '—') + '</span>';
         html += '</div>';
-        html += '<p class="dau-title" style="margin:0.15rem 0 0;">Nedladdningar</p>';
-        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Endast anonyma enheter</p>';
+        html += '<p class="dau-title" style="margin:0.15rem 0 0;">App-öppningar (anon)</p>';
+        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Anonyma sessions – ej riktiga nedladdningar</p>';
+        html += '</div>';
+
+        // Kolumn 2b – Senaste riktiga nedladdningar (från App Store + Google Play)
+        html += '<div>';
+        html += '<div style="display:flex;align-items:baseline;gap:0.5rem;">';
+        var rn = (todayData.rn != null && todayData.rn > 0) ? todayData.rn : null;
+        // Use latest_ios_date / latest_android_date from summary for fallback
+        var latestDlDate = null;
+        var latestDlTotal = null;
+        if (lastDownloadsSummary) {
+          var iosDate = lastDownloadsSummary.latest_ios_date ? lastDownloadsSummary.latest_ios_date.slice(0, 10) : null;
+          var andDate = lastDownloadsSummary.latest_android_date ? lastDownloadsSummary.latest_android_date.slice(0, 10) : null;
+          if (iosDate && andDate && iosDate === andDate) {
+            // Båda plattformarna har data från samma dag → summera
+            latestDlDate = iosDate;
+            latestDlTotal = (lastDownloadsSummary.latest_ios || 0) + (lastDownloadsSummary.latest_android || 0);
+          } else {
+            // Olika datum → hitta senaste dag i historiken där BÅDA plattformarna rapporterade
+            var dlHistory = lastDownloadsSummary.history || [];
+            for (var dhi = dlHistory.length - 1; dhi >= 0; dhi--) {
+              if (dlHistory[dhi].android > 0 && dlHistory[dhi].ios > 0) {
+                latestDlDate = dlHistory[dhi].date ? dlHistory[dhi].date.slice(0, 10) : null;
+                latestDlTotal = dlHistory[dhi].total || (dlHistory[dhi].android + dlHistory[dhi].ios);
+                break;
+              }
+            }
+          }
+          if (latestDlTotal === 0) latestDlTotal = null;
+        }
+        var rnDisplay = rn != null ? rn : (latestDlTotal != null ? latestDlTotal : '—');
+        var rnColor = (rn != null || latestDlTotal != null) ? 'var(--accent)' : 'var(--muted)';
+        html += '<span class="dau-value" style="color:' + rnColor + ';">' + rnDisplay + '</span>';
+        html += '</div>';
+        html += '<p class="dau-title" style="margin:0.15rem 0 0;">Nedladdningar (store)</p>';
+        if (rn != null) {
+          html += '<p class="dau-hint" style="margin:0.1rem 0 0;">iOS + Android idag</p>';
+        } else if (latestDlDate) {
+          html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Senaste data: ' + latestDlDate + '</p>';
+        } else {
+          html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Ej tillgänglig ännu</p>';
+        }
         html += '</div>';
 
         // Kolumn 3 – Nya konton
@@ -488,7 +568,7 @@
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-              legend: { display: true, position: 'top' },
+              legend: { display: true, position: 'top', labels: { color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#f0f2f5' : '#212529' } },
               tooltip: {
                 callbacks: {
                   label: function(ctx) {
@@ -1179,27 +1259,402 @@
       var lastRetentionData = null;
       var lastSubscriptionData = null;
       var lastEventsDailyData = null;
+      var DEFAULT_RC_DATA = {
+        "updated": "2026-05-19",
+        "mrr_usd": 270,
+        "active_trials": 24,
+        "active_paying": 38,
+        "cancelled_paying": 4,
+        "cancelled_trials": 2,
+        "revenue_weekly": [],
+        "trial_funnel": [],
+        "churn_weekly": []
+      };
+      var lastRcData = DEFAULT_RC_DATA;
+      var lastSubSummaryData = null;
+      var lastDownloadsSummary = null;
+      var downloadsChartInstance = null;
+      var activeDownloadFilter = 'all';
+      var lastFunnelData = null;
+      var funnelChartInstance = null;
+      var lastRcTrialsData = null;
+      var lastRcWeeklyMetrics = null;
+
+      function setDownloadFilter(filter) {
+        activeDownloadFilter = filter;
+        ['all','android','ios'].forEach(function(f) {
+          var btn = document.getElementById('btnDl' + f.charAt(0).toUpperCase() + f.slice(1));
+          if (btn) btn.classList.toggle('active-filter', f === filter);
+        });
+        if (lastDownloadsSummary) renderDownloadsChart(lastDownloadsSummary);
+      }
+
+      function renderDownloadsKpis(summary) {
+        var el = document.getElementById('outDownloadsKpis');
+        if (!el) return;
+        var html = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.75rem;">';
+        var latestAndroid = summary.latest_android != null ? summary.latest_android : '—';
+        var latestIos = summary.latest_ios != null ? summary.latest_ios : '—';
+        var androidDate = summary.latest_android_date ? summary.latest_android_date : '';
+        var iosDate = summary.latest_ios_date ? summary.latest_ios_date : '';
+        html += '<div class="kpi-card"><div class="kpi-value" style="color:#3ddc84;">' + latestAndroid + '</div><div class="kpi-label">Android' + (androidDate ? '<br><small style="font-size:0.75rem;color:var(--muted);">' + androidDate + '</small>' : '') + '</div></div>';
+        html += '<div class="kpi-card"><div class="kpi-value" style="color:#007aff;">' + latestIos + '</div><div class="kpi-label">iOS' + (iosDate ? '<br><small style="font-size:0.75rem;color:var(--muted);">' + iosDate + '</small>' : '<br><small style="font-size:0.75rem;color:var(--muted);">Aktiveras snart</small>') + '</div></div>';
+
+        // Totalt: visa bara om båda plattformarna har data från SAMMA dag.
+        // Annars: hitta senaste dag i historiken där båda plattformarna har data.
+        if (androidDate && iosDate && androidDate === iosDate) {
+          var total = (summary.latest_android || 0) + (summary.latest_ios || 0);
+          html += '<div class="kpi-card"><div class="kpi-value">' + total + '</div><div class="kpi-label">Totalt<br><small style="font-size:0.75rem;color:var(--muted);">' + androidDate + '</small></div></div>';
+        } else {
+          // Hitta senaste gemensamma dag i historiken
+          var lastBoth = null;
+          var history = summary.history || [];
+          for (var i = history.length - 1; i >= 0; i--) {
+            if (history[i].android > 0 && history[i].ios > 0) {
+              lastBoth = history[i];
+              break;
+            }
+          }
+          if (lastBoth) {
+            html += '<div class="kpi-card"><div class="kpi-value">' + (lastBoth.total || (lastBoth.android + lastBoth.ios)) + '</div>'
+              + '<div class="kpi-label">Totalt (senaste kompletta dag)<br><small style="font-size:0.75rem;color:var(--muted);">' + lastBoth.date + '</small></div></div>';
+          } else {
+            html += '<div class="kpi-card"><div class="kpi-value" style="color:var(--muted);">—</div>'
+              + '<div class="kpi-label">Totalt<br><small style="font-size:0.75rem;color:#dc3545;">Plattformarna har ej samma datum</small></div></div>';
+          }
+        }
+
+        html += '</div>';
+        el.innerHTML = html;
+      }
+
+      function renderDownloadsChart(summary) {
+        var canvas = document.getElementById('downloadsChart');
+        if (!canvas || !summary || !summary.history || !summary.history.length) return;
+        if (downloadsChartInstance) { downloadsChartInstance.destroy(); downloadsChartInstance = null; }
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        var history = summary.history;
+        var labels = history.map(function(d) { return d.date.slice(5); });
+        var datasets = [];
+        var f = activeDownloadFilter;
+        if (f === 'all' || f === 'android') {
+          datasets.push({
+            label: 'Android',
+            data: history.map(function(d) { return d.android || 0; }),
+            borderColor: '#3ddc84', backgroundColor: 'rgba(61,220,132,0.12)',
+            tension: 0.3, pointRadius: 3, fill: f === 'android'
+          });
+        }
+        if (f === 'all' || f === 'ios') {
+          datasets.push({
+            label: 'iOS',
+            data: history.map(function(d) { return d.ios || 0; }),
+            borderColor: '#007aff', backgroundColor: 'rgba(0,122,255,0.12)',
+            tension: 0.3, pointRadius: 3, fill: f === 'ios'
+          });
+        }
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        if (f === 'all') {
+          datasets.push({
+            label: 'Totalt',
+            data: history.map(function(d) { return d.total || 0; }),
+            borderColor: isDark ? '#8fd38f' : '#2d5a27', backgroundColor: 'rgba(141,211,141,0.08)',
+            tension: 0.3, pointRadius: 3, borderWidth: 2, fill: false
+          });
+        }
+        downloadsChartInstance = new Chart(canvas.getContext('2d'), {
+          type: 'line',
+          data: { labels: labels, datasets: datasets },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: isDark ? '#f0f2f5' : '#212529', font: { size: 12 } } } },
+            scales: {
+              x: { ticks: { color: isDark ? '#d0d3d8' : '#6c757d', maxTicksLimit: 14, font: { size: 11 } }, grid: { color: isDark ? '#3d4248' : '#dee2e6' } },
+              y: { beginAtZero: true, ticks: { color: isDark ? '#d0d3d8' : '#6c757d', font: { size: 11 } }, grid: { color: isDark ? '#3d4248' : '#dee2e6' } }
+            }
+          }
+        });
+      }
+
+      function renderFunnelChart(data) {
+        var canvas = document.getElementById('funnelChart');
+        var kpiEl = document.getElementById('outFunnelKpis');
+        if (!canvas || !data || !data.length) return;
+        if (funnelChartInstance) { funnelChartInstance.destroy(); funnelChartInstance = null; }
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+        var labels = data.map(function(d) { return d.date.slice(5, 10); });
+        var anonOpens = data.map(function(d) { return d.anonymous_opens || 0; });
+        var storeDownloads = data.map(function(d) { return d.store_downloads != null ? d.store_downloads : null; });
+        var newAccounts = data.map(function(d) { return d.new_accounts || 0; });
+        // Returning anonymous = anon_opens − store_downloads.
+        // Visa null om store_downloads saknas (ingen data alls den dagen) —
+        // annars blir "returning" konstgjort hög när nedladdningsdata fattas.
+        var returning = data.map(function(d) {
+          if (d.store_downloads == null) return null;
+          return Math.max(0, (d.anonymous_opens || 0) - d.store_downloads);
+        });
+
+        // Last-14-day KPIs
+        var recent = data.slice(-14);
+        var sumAnon = recent.reduce(function(s,d){ return s + (d.anonymous_opens||0); }, 0);
+        var sumDl   = recent.reduce(function(s,d){ return s + (d.store_downloads||0); }, 0);
+        var sumAcc  = recent.reduce(function(s,d){ return s + (d.new_accounts||0); }, 0);
+        // Räkna bara dagar med store_downloads-data för "returning"
+        var sumRet = recent.reduce(function(s,d){ return s + (d.store_downloads != null ? Math.max(0,(d.anonymous_opens||0)-d.store_downloads) : 0); }, 0);
+        var convRate = sumAnon > 0 ? (sumAcc / sumAnon * 100).toFixed(1).replace('.', ',') : '—';
+        if (kpiEl) {
+          kpiEl.innerHTML =
+            '<div class="kpi-card"><div class="kpi-value" style="color:#9b59b6;">' + sumAnon + '</div><div class="kpi-label">Anonyma öppningar<br><small style="color:var(--muted);font-size:0.75rem;">senaste 14 dagar</small></div></div>' +
+            '<div class="kpi-card"><div class="kpi-value" style="color:#e67e22;">' + sumRet + '</div><div class="kpi-label">Returning anonymous<br><small style="color:var(--muted);font-size:0.75rem;">anon − nedladdningar</small></div></div>' +
+            '<div class="kpi-card"><div class="kpi-value" style="color:var(--accent);">' + sumAcc + '</div><div class="kpi-label">Nya konton<br><small style="color:var(--muted);font-size:0.75rem;">senaste 14 dagar</small></div></div>' +
+            '<div class="kpi-card"><div class="kpi-value">' + convRate + ' %</div><div class="kpi-label">Konversion<br><small style="color:var(--muted);font-size:0.75rem;">konton / anon-öppningar</small></div></div>';
+        }
+
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        funnelChartInstance = new Chart(canvas.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Anonyma öppningar',
+                data: anonOpens,
+                borderColor: '#9b59b6', backgroundColor: 'rgba(155,89,182,0.10)',
+                tension: 0.3, pointRadius: 2, fill: false, borderWidth: 2
+              },
+              {
+                label: 'Returning anonymous',
+                data: returning,
+                borderColor: '#e67e22', backgroundColor: 'rgba(230,126,34,0.10)',
+                tension: 0.3, pointRadius: 2, fill: false, borderWidth: 2, borderDash: [5,3]
+              },
+              {
+                label: 'Nedladdningar (nya)',
+                data: storeDownloads,
+                borderColor: '#3ddc84', backgroundColor: 'rgba(61,220,132,0.10)',
+                tension: 0.3, pointRadius: 2, fill: false, borderWidth: 2, spanGaps: true
+              },
+              {
+                label: 'Nya konton',
+                data: newAccounts,
+                borderColor: isDark ? '#8fd38f' : '#2d5a27',
+                backgroundColor: isDark ? 'rgba(143,211,143,0.20)' : 'rgba(45,90,39,0.10)',
+                tension: 0.3, pointRadius: 2, fill: false, borderWidth: 2
+              }
+            ]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: isDark ? '#f0f2f5' : '#212529', font: { size: 11 } } } },
+            scales: {
+              x: { ticks: { color: isDark ? '#d0d3d8' : '#6c757d', maxTicksLimit: 20, font: { size: 10 } }, grid: { color: isDark ? '#3d4248' : '#dee2e6' } },
+              y: { beginAtZero: true, ticks: { color: isDark ? '#d0d3d8' : '#6c757d', font: { size: 11 } }, grid: { color: isDark ? '#3d4248' : '#dee2e6' } }
+            }
+          }
+        });
+      }
+
+      var rcChartFunnelLive = null;
+
+      function renderRcTrials(d) {
+        var el = document.getElementById('outRcTrials');
+        if (!el || !d) return;
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        var total    = d.total_active   || 0;
+        var exp24h   = d.expiring_24h   || 0;
+        var exp48h   = d.expiring_48h   || 0;
+        var exp7d    = d.expiring_7d    || 0;
+        var paying   = d.paying_monthly || 0;
+        var convRate = (total + paying) > 0
+          ? (paying / (total + paying) * 100).toFixed(0) + ' %'
+          : '—';
+
+        var urgencyHtml = '';
+        if (exp24h > 0) {
+          urgencyHtml += '<div style="background:#dc3545;color:#fff;border-radius:8px;padding:0.6rem 1rem;font-weight:700;font-size:1rem;">'
+            + '🔴 ' + exp24h + ' trial' + (exp24h > 1 ? 's' : '') + ' löper ut inom 24 timmar!'
+            + '</div>';
+        }
+        if (exp48h - exp24h > 0) {
+          urgencyHtml += '<div style="background:#fd7e14;color:#fff;border-radius:8px;padding:0.5rem 1rem;font-weight:600;">'
+            + '🟠 ' + (exp48h - exp24h) + ' trial' + ((exp48h-exp24h) > 1 ? 's' : '') + ' löper ut inom 48 timmar'
+            + '</div>';
+        }
+        if (exp7d - exp48h > 0) {
+          urgencyHtml += '<div style="background:#ffc107;color:#000;border-radius:8px;padding:0.5rem 1rem;font-weight:600;">'
+            + '🟡 ' + (exp7d - exp48h) + ' trial' + ((exp7d-exp48h) > 1 ? 's' : '') + ' löper ut inom 7 dagar'
+            + '</div>';
+        }
+        if (urgencyHtml === '') {
+          urgencyHtml = '<div style="color:var(--muted);font-size:0.9rem;">Inga trials löper ut inom 7 dagar.</div>';
+        }
+
+        el.innerHTML =
+          '<div style="border:2px solid var(--accent);border-radius:10px;padding:1rem;margin-bottom:0.5rem;">'
+          + '<h3 style="margin:0 0 0.75rem;font-size:1rem;color:var(--accent);">⚡ RC Trials (30-dagars free trial)</h3>'
+          + '<div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:0.75rem;">'
+          + '<div class="kpi-card"><div class="kpi-value" style="color:#e67e22;">' + total + '</div><div class="kpi-label">Aktiva trials nu</div></div>'
+          + '<div class="kpi-card"><div class="kpi-value" style="color:var(--accent);">' + paying + '</div><div class="kpi-label">Betalande monthly<br><small style="font-size:0.75rem;color:var(--muted);">har passerat trial</small></div></div>'
+          + '<div class="kpi-card"><div class="kpi-value">' + convRate + '</div><div class="kpi-label">Konversion<br><small style="font-size:0.75rem;color:var(--muted);">betalande / (trial+bet)</small></div></div>'
+          + '<div class="kpi-card" style="border-color:#dc3545;"><div class="kpi-value" style="color:#dc3545;">' + exp24h + '</div><div class="kpi-label">Löper ut &lt;24h</div></div>'
+          + '<div class="kpi-card" style="border-color:#fd7e14;"><div class="kpi-value" style="color:#fd7e14;">' + exp7d + '</div><div class="kpi-label">Löper ut &lt;7 dagar</div></div>'
+          + '</div>'
+          + '<div style="display:flex;flex-direction:column;gap:0.4rem;">' + urgencyHtml + '</div>'
+          + '</div>';
+
+        // Render trial funnel chart — prioritera RC-data (rc_cohorts), annars Supabase (weekly_cohorts)
+        var rcCohorts = d.rc_cohorts || [];   // från analytics_rc_trial_cohorts via RC API
+        var sbCohorts = d.weekly_cohorts || []; // från Supabase profiles (felaktig konverteringsdata)
+        var cohorts = rcCohorts.length > 0 ? rcCohorts : sbCohorts;
+        var isRcData = rcCohorts.length > 0;
+
+        if (cohorts.length > 0) {
+          if (rcChartFunnelLive) { rcChartFunnelLive.destroy(); rcChartFunnelLive = null; }
+          var funnelCanvas = document.getElementById('rcTrialFunnelChart');
+          if (funnelCanvas) {
+            var MONTHS = ['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec'];
+            var fLabels = cohorts.map(function(r) {
+              var dt = new Date((r.week_start || r.date || '').slice(0,10));
+              return dt.getDate() + ' ' + MONTHS[dt.getMonth()];
+            });
+            var fNew  = cohorts.map(function(r) { return r.trial_starts || r.new_trials  || 0; });
+            var fConv = cohorts.map(function(r) { return r.conversions  || r.converted   || 0; });
+            var fExp  = cohorts.map(function(r) { return r.expirations  || r.expired     || 0; });
+            var fPend = isRcData ? cohorts.map(function(r) { return r.pending || 0; }) : null;
+
+            var datasets = [
+              { label: 'Nya trials', data: fNew, backgroundColor: 'rgba(100,160,235,0.7)', stack: 'a' },
+              { label: 'Konverterade', data: fConv, backgroundColor: 'rgba(45,90,39,0.75)', stack: 'b' },
+              { label: 'Avslutade utan köp', data: fExp, backgroundColor: 'rgba(224,82,82,0.7)', stack: 'b' }
+            ];
+            if (fPend) {
+              datasets.push({ label: 'Pending (ej avgjord)', data: fPend, backgroundColor: 'rgba(180,130,40,0.6)', stack: 'b' });
+            }
+
+            rcChartFunnelLive = new Chart(funnelCanvas.getContext('2d'), {
+              type: 'bar',
+              data: { labels: fLabels, datasets: datasets },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                  legend: { position: 'top', labels: { color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#f0f2f5' : '#212529' } },
+                  tooltip: { mode: 'index', intersect: false },
+                  title: isRcData
+                    ? { display: true, text: 'Källa: RevenueCat (synkad ' + (cohorts[cohorts.length-1]?.synced_at || '').slice(0,10) + ')', font: { size: 11 }, color: '#888', padding: { bottom: 4 } }
+                    : { display: false }
+                },
+                scales: {
+                  y: { beginAtZero: true, ticks: { color: isDark ? '#d0d3d8' : '#6c757d' }, grid: { color: isDark ? '#3d4248' : '#dee2e6' } },
+                  x: { ticks: { color: isDark ? '#d0d3d8' : '#6c757d' }, grid: { color: isDark ? '#3d4248' : '#dee2e6' } }
+                }
+              }
+            });
+          }
+        }
+      }
+
+      var rcChartRevenueLive = null;
+      var rcChartChurnLive   = null;
+
+      function renderRcWeeklyCharts(data) {
+        if (!data || !data.history || !data.history.length) return;
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        var MONTHS = ['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec'];
+        var history = data.history;
+
+        // Uppdatera MRR + Actives KPI-kort med live-data
+        if (data.latest_mrr != null) {
+          setText('rcKpiMrr', '$' + parseFloat(data.latest_mrr).toFixed(0));
+        }
+        if (data.latest_actives != null) {
+          setText('rcKpiPaying', data.latest_actives);
+        }
+
+        var labels = history.map(function(r) {
+          var d = new Date(r.week_start.slice(0, 10));
+          return d.getDate() + ' ' + MONTHS[d.getMonth()];
+        });
+
+        // Revenue chart
+        var revCanvas = document.getElementById('rcRevenueChart');
+        if (revCanvas) {
+          if (rcChartRevenueLive) { rcChartRevenueLive.destroy(); rcChartRevenueLive = null; }
+          var revData = history.map(function(r) { return r.revenue_usd || 0; });
+          rcChartRevenueLive = new Chart(revCanvas.getContext('2d'), {
+            type: 'bar',
+            data: {
+              labels: labels,
+              datasets: [{ label: 'Intäkt $', data: revData, backgroundColor: 'rgba(45,90,39,0.7)', borderColor: 'rgba(45,90,39,0.9)', borderWidth: 1 }]
+            },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: function(c) { return '$' + c.parsed.y.toFixed(2); } } }
+              },
+              scales: {
+                y: { beginAtZero: true, ticks: { color: isDark ? '#d0d3d8' : '#6c757d' }, grid: { color: isDark ? '#3d4248' : '#dee2e6' } },
+                x: { ticks: { color: isDark ? '#d0d3d8' : '#6c757d' }, grid: { color: isDark ? '#3d4248' : '#dee2e6' } }
+              }
+            }
+          });
+        }
+
+        // Churn chart
+        var churnCanvas = document.getElementById('rcChurnChart');
+        if (churnCanvas) {
+          if (rcChartChurnLive) { rcChartChurnLive.destroy(); rcChartChurnLive = null; }
+          var cVals   = history.map(function(r) { return r.churn_pct || 0; });
+          var cColors = cVals.map(function(v) {
+            return v < 5 ? 'rgba(45,90,39,0.7)' : v < 10 ? 'rgba(255,152,0,0.7)' : 'rgba(224,82,82,0.7)';
+          });
+          rcChartChurnLive = new Chart(churnCanvas.getContext('2d'), {
+            type: 'bar',
+            data: { labels: labels, datasets: [{ label: 'Churn %', data: cVals, backgroundColor: cColors }] },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                y: { beginAtZero: true, title: { display: true, text: '%', color: isDark ? '#d0d3d8' : '#6c757d' }, ticks: { color: isDark ? '#d0d3d8' : '#6c757d' }, grid: { color: isDark ? '#3d4248' : '#dee2e6' } },
+                x: { ticks: { color: isDark ? '#d0d3d8' : '#6c757d' }, grid: { color: isDark ? '#3d4248' : '#dee2e6' } }
+              }
+            }
+          });
+        }
+      }
 
       function renderSubscriptionBars(data) {
         var container = document.getElementById('outSubscriptionBars');
         if (!container) return;
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         if (!data || (data.gratis_konto == null && data.gratis_erbjudande_premium == null && data.betalande == null)) {
           container.innerHTML = '<p class="help">Ingen data tillgänglig än.</p>';
           return;
         }
         var gratis = data.gratis_konto || 0;
-        var trial = data.gratis_erbjudande_premium || 0;
+        var gratisPremium = data.gratis_erbjudande_premium || 0;
         var betalande = data.betalande || 0;
-        var total = gratis + trial + betalande;
+        var total = gratis + gratisPremium + betalande;
         var pct = function(n) { return total > 0 ? (n / total * 100).toFixed(1).replace('.', ',') : '0'; };
-        var labels = [
-          'Gratiskonto (' + pct(gratis) + ' %)',
-          'Gratis-premium (' + pct(trial) + ' %)',
-          'Betalande (' + pct(betalande) + ' %)'
-        ];
-        var values = [gratis, trial, betalande];
-        var colors = ['rgba(100, 100, 100, 0.6)', 'rgba(255, 152, 0, 0.6)', 'rgba(45, 90, 39, 0.6)'];
-        var borderColors = ['rgb(80,80,80)', 'rgb(255, 152, 0)', 'rgb(45, 90, 39)'];
+
+        var labels = ['Gratiskonto (' + pct(gratis) + ' %)'];
+        var values = [gratis];
+        var colors = ['rgba(100, 100, 100, 0.6)'];
+        var borderColors = ['rgb(80,80,80)'];
+
+        if (gratisPremium > 0) {
+          labels.push('Gratis-premium (' + pct(gratisPremium) + ' %)');
+          values.push(gratisPremium);
+          colors.push('rgba(204, 140, 30, 0.7)');
+          borderColors.push('rgb(180, 120, 20)');
+        }
+
+        labels.push('Betalande (' + pct(betalande) + ' %)');
+        values.push(betalande);
+        colors.push('rgba(45, 90, 39, 0.6)');
+        borderColors.push('rgb(45, 90, 39)');
+
         container.innerHTML = '<div class="chart-wrap" style="height:200px;"><canvas id="subscriptionBarsChart"></canvas></div>';
         var ctx = document.getElementById('subscriptionBarsChart').getContext('2d');
         new Chart(ctx, {
@@ -1229,9 +1684,172 @@
                 }
               }
             },
-            scales: { x: { }, y: { beginAtZero: true } }
+            scales: {
+              x: { ticks: { color: isDark ? '#d0d3d8' : '#6c757d' }, grid: { color: isDark ? '#3d4248' : '#dee2e6' } },
+              y: { beginAtZero: true, ticks: { color: isDark ? '#d0d3d8' : '#6c757d' }, grid: { color: isDark ? '#3d4248' : '#dee2e6' } }
+            }
           }
         });
+      }
+
+      // ─── RevenueCat charts ───────────────────────────────────────────────
+      var rcChartRevenue = null;
+      var rcChartChurn = null;
+
+      function renderRcSection(rc) {
+        if (!rc) return;
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        var green = isDark ? '#8fd38f' : '#2d5a27';
+        var red = '#e05252';
+        var orange = isDark ? '#ffb74d' : '#ff9800';
+
+        // KPI values
+        var setText = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
+        setText('rcDataUpdated', rc.updated || '–');
+        setText('rcKpiPaying', rc.active_paying != null ? rc.active_paying : '–');
+        setText('rcKpiTrials', rc.active_trials != null ? rc.active_trials : '–');
+        setText('rcKpiMrr', rc.mrr_usd != null ? '$' + rc.mrr_usd : '–');
+        setText('rcKpiCancelledPaying', rc.cancelled_paying != null ? rc.cancelled_paying : '–');
+        setText('rcKpiCancelledTrials', rc.cancelled_trials != null ? rc.cancelled_trials : '–');
+
+        // Color cancelled KPIs red if > 0
+        var cpEl = document.getElementById('rcKpiCancelledPaying');
+        if (cpEl && rc.cancelled_paying > 0) cpEl.style.color = red;
+        var ctEl = document.getElementById('rcKpiCancelledTrials');
+        if (ctEl && rc.cancelled_trials > 0) ctEl.style.color = orange;
+
+        var hasCharts = (rc.revenue_weekly && rc.revenue_weekly.length > 0) ||
+                        (rc.trial_funnel && rc.trial_funnel.length > 0) ||
+                        (rc.churn_weekly && rc.churn_weekly.length > 0);
+
+        var chartsSection = document.getElementById('rcChartsSection');
+        var noData = document.getElementById('rcNoData');
+        if (chartsSection) chartsSection.style.display = hasCharts ? '' : 'none';
+        if (noData) noData.style.display = hasCharts ? 'none' : '';
+
+        if (!hasCharts) return;
+
+        // Revenue per week chart
+        if (rc.revenue_weekly && rc.revenue_weekly.length > 0) {
+          if (rcChartRevenue) { rcChartRevenue.destroy(); rcChartRevenue = null; }
+          var revCanvas = document.getElementById('rcRevenueChart');
+          if (revCanvas) {
+            var revLabels = rc.revenue_weekly.map(function(r) { return r.week; });
+            var revGross = rc.revenue_weekly.map(function(r) { return r.gross_usd || 0; });
+            var revNet = rc.revenue_weekly.map(function(r) { return r.net_usd != null ? r.net_usd : null; });
+            var hasNet = revNet.some(function(v) { return v != null; });
+            var datasets = [{
+              label: 'Brutto $',
+              data: revGross,
+              backgroundColor: green,
+              borderColor: green,
+              borderWidth: 1
+            }];
+            if (hasNet) {
+              datasets.push({
+                label: 'Netto $ (–15%)',
+                data: revNet,
+                backgroundColor: 'transparent',
+                borderColor: isDark ? '#ffb74d' : '#999',
+                borderWidth: 2,
+                type: 'line',
+                pointRadius: 3,
+                tension: 0
+              });
+            }
+            rcChartRevenue = new Chart(revCanvas.getContext('2d'), {
+              type: 'bar',
+              data: { labels: revLabels, datasets: datasets },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                  legend: { display: hasNet, labels: { color: isDark ? '#f0f2f5' : '#212529' } },
+                  tooltip: { mode: 'index', intersect: false }
+                },
+                scales: {
+                  y: { beginAtZero: true, ticks: { color: isDark ? '#d0d3d8' : '#6c757d' }, grid: { color: isDark ? '#3d4248' : '#dee2e6' } },
+                  x: { ticks: { color: isDark ? '#d0d3d8' : '#6c757d' }, grid: { color: isDark ? '#3d4248' : '#dee2e6' } }
+                }
+              }
+            });
+          }
+        }
+
+        // Churn chart
+        if (rc.churn_weekly && rc.churn_weekly.length > 0) {
+          if (rcChartChurn) { rcChartChurn.destroy(); rcChartChurn = null; }
+          var churnCanvas = document.getElementById('rcChurnChart');
+          if (churnCanvas) {
+            var cLabels = rc.churn_weekly.map(function(r) { return r.label; });
+            var cVals = rc.churn_weekly.map(function(r) { return r.churn_pct || 0; });
+            var cColors = cVals.map(function(v) { return v < 5 ? 'rgba(45,90,39,0.7)' : v < 10 ? 'rgba(255,152,0,0.7)' : 'rgba(224,82,82,0.7)'; });
+            rcChartChurn = new Chart(churnCanvas.getContext('2d'), {
+              type: 'bar',
+              data: {
+                labels: cLabels,
+                datasets: [{ label: 'Churn %', data: cVals, backgroundColor: cColors }]
+              },
+              options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                  y: { beginAtZero: true, title: { display: true, text: '%', color: isDark ? '#d0d3d8' : '#6c757d' }, ticks: { color: isDark ? '#d0d3d8' : '#6c757d' }, grid: { color: isDark ? '#3d4248' : '#dee2e6' } },
+                  x: { ticks: { color: isDark ? '#d0d3d8' : '#6c757d' }, grid: { color: isDark ? '#3d4248' : '#dee2e6' } }
+                }
+              }
+            });
+          }
+        }
+      }
+
+      // ─── Subscription summary by account type ────────────────────────────
+      function renderSubSummary(data) {
+        var container = document.getElementById('outSubSummary');
+        if (!container || !data) return;
+
+        var byType = data.by_account_type || [];
+        var totals = data.totals || {};
+        var ending7d = data.trials_ending_7d != null ? data.trials_ending_7d : null;
+        var ending24h = data.trials_ending_24h != null ? data.trials_ending_24h : null;
+
+        var TYPE_LABELS = { dog_owner: 'Hundägare', dog_sitter: 'Hundvakt', kennel: 'Kennel', dog_daycare: 'Hunddagis', okand: 'Okänd' };
+
+        var html = '';
+        if (ending7d != null || ending24h != null) {
+          var urgentColor = ending24h > 0 ? '#b02a37' : ending7d > 0 ? '#856404' : '#0d6832';
+          html += '<div class="sanity-alert" style="border-color:' + urgentColor + '; background:' + (ending24h > 0 ? '#f8d7da' : ending7d > 0 ? '#fff3cd' : '#d4edda') + '; color:' + urgentColor + '; margin-bottom:0.75rem;">' +
+            '<strong>Trials som löper ut:</strong> ' +
+            (ending24h > 0 ? '<strong>' + ending24h + ' st inom 24h</strong>' : (ending7d > 0 ? ending7d + ' st inom 7 dagar' : 'Inga de närmaste 7 dagarna')) +
+            (ending7d > 0 && ending24h !== ending7d ? (ending24h > 0 ? ' (' + ending7d + ' totalt inom 7 dagar)' : '') : '') +
+            '</div>';
+        }
+
+        html += '<div class="table-wrap"><table><thead><tr>' +
+          '<th>Kontotyp</th>' +
+          '<th class="num">Betalande</th>' +
+          '<th class="num">– Månads</th>' +
+          '<th class="num">– Årsvis</th>' +
+          '</tr></thead><tbody>';
+
+        byType.forEach(function(t) {
+          var hasPaying = (t.paying || 0) > 0;
+          if (!hasPaying) return;
+          html += '<tr>' +
+            '<td>' + (TYPE_LABELS[t.account_type] || t.account_type) + '</td>' +
+            '<td class="num"><strong>' + (t.paying || 0) + '</strong></td>' +
+            '<td class="num">' + (t.monthly || 0) + '</td>' +
+            '<td class="num">' + (t.annual || 0) + '</td>' +
+            '</tr>';
+        });
+
+        html += '</tbody><tfoot><tr style="font-weight:600; background:var(--accent-light);">' +
+          '<td>Totalt</td>' +
+          '<td class="num">' + (totals.paying_total || 0) + '</td>' +
+          '<td class="num">' + (totals.monthly_count || 0) + '</td>' +
+          '<td class="num">' + (totals.annual_count || 0) + '</td>' +
+          '</tr></tfoot></table></div>';
+
+        container.innerHTML = html;
       }
 
       function renderRetention(data) {
@@ -1558,6 +2176,7 @@
           var dauToday = lastTodayData.dau;
           var newAccountsTotal = lastTodayData.new_accounts_total;
           if (anonymousOpens != null) text += '- Nedladdningar (endast anonyma enheter): ' + anonymousOpens + '\n';
+          if (lastTodayData.rn != null) text += '- rn: ' + lastTodayData.rn + '\n';
           if (newAccountsTotal != null) text += '- Nya konton idag (registreringar): ' + newAccountsTotal + '\n';
           if (newAccountsTotal != null && anonymousOpens != null && anonymousOpens > 0) {
             text += '- Konversion (nya konton / nedladdningar): ' + (newAccountsTotal / anonymousOpens * 100).toFixed(1) + '%\n';
@@ -1594,7 +2213,12 @@
         renderDau(lastTodayData);
         renderHighlights(md, lastTodayData);
         renderSubscriptionBars(lastSubscriptionData);
+        renderSubSummary(lastSubSummaryData);
+        renderRcSection(lastRcData);
         renderRetention(lastRetentionData);
+        if (lastDownloadsSummary) { renderDownloadsKpis(lastDownloadsSummary); renderDownloadsChart(lastDownloadsSummary); }
+        if (lastFunnelData) renderFunnelChart(lastFunnelData);
+        if (lastRcTrialsData) renderRcTrials(lastRcTrialsData);
         try { renderCharts(md); } catch (eR) { console.error('renderCharts', eR); }
         try { renderEventsLineCharts(ev); } catch (eE) { console.error('renderEventsLineCharts', eE); }
         renderAccountTypes(lastAccountData);
@@ -1606,6 +2230,7 @@
         var ev = safeEventsForRender(lastEventsData);
         try { renderCharts(dm); } catch (e1) { console.warn('renderCharts:', e1); }
         try { renderEventsLineCharts(ev); } catch (e3) { console.warn('renderEventsLineCharts:', e3); }
+        try { renderRcSection(lastRcData); } catch (e4) { console.warn('renderRcSection:', e4); }
       });
 
       document.addEventListener('DOMContentLoaded', function() {
@@ -1647,13 +2272,33 @@
           if (savedRetention) { lastRetentionData = JSON.parse(savedRetention); }
           var savedSubscription = localStorage.getItem('flocken_dashboard_subscription');
           if (savedSubscription) { lastSubscriptionData = JSON.parse(savedSubscription); }
+          var savedRc = localStorage.getItem('flocken_dashboard_rc');
+          if (savedRc) { lastRcData = JSON.parse(savedRc); }
+          var savedSubSum = localStorage.getItem('flocken_dashboard_sub_summary');
+          if (savedSubSum) { lastSubSummaryData = JSON.parse(savedSubSum); }
+          var savedDl = localStorage.getItem('flocken_dashboard_downloads');
+          if (savedDl) { lastDownloadsSummary = JSON.parse(savedDl); }
+          var savedFunnel = localStorage.getItem('flocken_dashboard_funnel');
+          if (savedFunnel) { lastFunnelData = JSON.parse(savedFunnel); }
+          var savedRcTrials = localStorage.getItem('flocken_dashboard_rc_trials');
+          if (savedRcTrials) { lastRcTrialsData = JSON.parse(savedRcTrials); }
         } catch (e) {}
         renderAll(main, events);
 
         // Auto-fetch live data from Supabase
         if (statusEl) statusEl.textContent = 'Hämtar live-data...';
-        Promise.all([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types'), rpc('dashboard_today_highlights'), rpc('dashboard_retention'), rpc('dashboard_subscription_bars'), rpc('dashboard_events_daily_current_week')])
-          .then(function(results) {
+        // Använd allSettled så att en misslyckad RPC inte kraschar hela hämtningen
+        Promise.allSettled([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types'), rpc('dashboard_today_highlights'), rpc('dashboard_retention'), rpc('dashboard_subscription_bars'), rpc('dashboard_events_daily_current_week'), rpc('dashboard_subscription_summary'), rpc('dashboard_store_downloads_summary'), rpc('dashboard_funnel_history'), rpc('dashboard_rc_trials_summary'), rpc('dashboard_rc_trial_cohorts'), rpc('dashboard_rc_weekly_metrics')])
+          .then(function(settled) {
+            var failed = settled.filter(function(s) { return s.status === 'rejected'; });
+            if (failed.length > 0) {
+              console.warn('Dashboard: ' + failed.length + ' RPC(er) misslyckades:', failed.map(function(s) { return s.reason; }));
+            }
+            // Extrahera värden – null om misslyckad
+            var results = settled.map(function(s) { return s.status === 'fulfilled' ? s.value : null; });
+            if (failed.length > 0 && failed.length < settled.length) {
+              if (statusEl) { statusEl.textContent = 'Live-data (delvis, ' + failed.length + ' av 15 misslyckades)'; statusEl.style.color = '#e67e22'; }
+            }
             var mainResult = results[0];
             var eventsResult = results[1];
             var replyResult = results[2];
@@ -1742,14 +2387,83 @@
             if (Array.isArray(results[8]) && results[8].length === 1 && results[8][0] && results[8][0].dashboard_events_daily_current_week) {
               lastEventsDailyData = results[8][0].dashboard_events_daily_current_week;
             }
+            // results[9] = dashboard_subscription_summary
+            var subSumResult = results[9];
+            var subSumObj = subSumResult;
+            if (Array.isArray(subSumResult) && subSumResult.length === 1 && subSumResult[0] && subSumResult[0].dashboard_subscription_summary) {
+              subSumObj = subSumResult[0].dashboard_subscription_summary;
+            }
+            if (subSumObj && subSumObj.by_account_type) {
+              lastSubSummaryData = subSumObj;
+              try { localStorage.setItem('flocken_dashboard_sub_summary', JSON.stringify(subSumObj)); } catch (e) {}
+              renderSubSummary(subSumObj);
+            }
+            // results[10] = dashboard_store_downloads_summary
+            var dlResult = results[10];
+            var dlObj = dlResult;
+            if (Array.isArray(dlResult) && dlResult.length === 1 && dlResult[0] && dlResult[0].dashboard_store_downloads_summary) {
+              dlObj = dlResult[0].dashboard_store_downloads_summary;
+            }
+            if (typeof dlObj === 'string') { try { dlObj = JSON.parse(dlObj); } catch(e) { dlObj = null; } }
+            if (dlObj && dlObj.history) {
+              lastDownloadsSummary = dlObj;
+              try { localStorage.setItem('flocken_dashboard_downloads', JSON.stringify(dlObj)); } catch(e) {}
+              renderDownloadsKpis(dlObj);
+              renderDownloadsChart(dlObj);
+            }
+            // results[11] = dashboard_funnel_history
+            var funnelResult = results[11];
+            var funnelArr = funnelResult;
+            if (Array.isArray(funnelResult) && funnelResult.length === 1 && funnelResult[0] && funnelResult[0].dashboard_funnel_history) {
+              funnelArr = funnelResult[0].dashboard_funnel_history;
+            }
+            if (typeof funnelArr === 'string') { try { funnelArr = JSON.parse(funnelArr); } catch(e) { funnelArr = null; } }
+            if (Array.isArray(funnelArr) && funnelArr.length > 0) {
+              lastFunnelData = funnelArr;
+              try { localStorage.setItem('flocken_dashboard_funnel', JSON.stringify(funnelArr)); } catch(e) {}
+              renderFunnelChart(funnelArr);
+            }
+            // results[12] = dashboard_rc_trials_summary (KPI-block + urgency)
+            var rcTrialsResult = results[12];
+            var rcTrialsObj = rcTrialsResult;
+            if (Array.isArray(rcTrialsResult) && rcTrialsResult.length === 1 && rcTrialsResult[0] && rcTrialsResult[0].dashboard_rc_trials_summary) {
+              rcTrialsObj = rcTrialsResult[0].dashboard_rc_trials_summary;
+            }
+            if (typeof rcTrialsObj === 'string') { try { rcTrialsObj = JSON.parse(rcTrialsObj); } catch(e) { rcTrialsObj = null; } }
+
+            // results[13] = dashboard_rc_trial_cohorts (RC-baserat funnel-diagram)
+            var rcCohortsRaw = results[13];
+            var rcCohortsArr = rcCohortsRaw;
+            if (Array.isArray(rcCohortsRaw) && rcCohortsRaw.length === 1 && rcCohortsRaw[0] && rcCohortsRaw[0].dashboard_rc_trial_cohorts) {
+              rcCohortsArr = rcCohortsRaw[0].dashboard_rc_trial_cohorts;
+            }
+            if (typeof rcCohortsArr === 'string') { try { rcCohortsArr = JSON.parse(rcCohortsArr); } catch(e) { rcCohortsArr = null; } }
+
+            // Sätt RC cohorts på trials-objektet så renderRcTrials kan rita funnel-diagrammet
+            if (rcTrialsObj && rcTrialsObj.total_active != null) {
+              if (Array.isArray(rcCohortsArr) && rcCohortsArr.length > 0) {
+                rcTrialsObj.rc_cohorts = rcCohortsArr;
+              }
+              lastRcTrialsData = rcTrialsObj;
+              try { localStorage.setItem('flocken_dashboard_rc_trials', JSON.stringify(rcTrialsObj)); } catch(e) {}
+              renderRcTrials(rcTrialsObj);
+            }
+
+            // results[14] = dashboard_rc_weekly_metrics (revenue, churn, MRR, actives)
+            var rcWeeklyRaw = results[14];
+            var rcWeeklyObj = rcWeeklyRaw;
+            if (Array.isArray(rcWeeklyRaw) && rcWeeklyRaw.length === 1 && rcWeeklyRaw[0] && rcWeeklyRaw[0].dashboard_rc_weekly_metrics) {
+              rcWeeklyObj = rcWeeklyRaw[0].dashboard_rc_weekly_metrics;
+            }
+            if (typeof rcWeeklyObj === 'string') { try { rcWeeklyObj = JSON.parse(rcWeeklyObj); } catch(e) { rcWeeklyObj = null; } }
+            if (rcWeeklyObj && rcWeeklyObj.history) {
+              lastRcWeeklyMetrics = rcWeeklyObj;
+              renderRcWeeklyCharts(rcWeeklyObj);
+            }
             renderAll(lastMainData, lastEventsData);
-            if (statusEl) statusEl.textContent = 'Uppdaterad ' + new Date().toLocaleString('sv-SE');
-            if (statusEl) statusEl.style.color = '#0d6832';
-          })
-          .catch(function(err) {
-            console.error('Dashboard fetch error:', err);
-            if (statusEl) statusEl.textContent = 'Kunde inte hämta live-data (visar cachad)';
-            if (statusEl) statusEl.style.color = '#b02a37';
+            if (!failed.length) {
+              if (statusEl) { statusEl.textContent = 'Uppdaterad ' + new Date().toLocaleString('sv-SE'); statusEl.style.color = '#0d6832'; }
+            }
           });
       });
 
@@ -1801,6 +2515,11 @@
         localStorage.removeItem('flocken_dashboard_today');
         localStorage.removeItem('flocken_dashboard_retention');
         localStorage.removeItem('flocken_dashboard_subscription');
+        localStorage.removeItem('flocken_dashboard_rc');
+        localStorage.removeItem('flocken_dashboard_sub_summary');
+        localStorage.removeItem('flocken_dashboard_downloads');
+        localStorage.removeItem('flocken_dashboard_funnel');
+        localStorage.removeItem('flocken_dashboard_rc_trials');
         console.log('✅ Cache cleared. Reloading page...');
         location.reload();
       };
@@ -1836,6 +2555,8 @@
           showErr('errEvents', 'Ogiltig JSON: ' + e.message);
         }
       };
+
+      // RC-sektionen (intäkter, churn) finns nu på flocken-rapport.html
     })();
   </script>
 </body>
