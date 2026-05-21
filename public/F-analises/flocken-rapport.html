@@ -189,7 +189,7 @@
   <h2>MRR-prognos juni – december 2026</h2>
   <p class="help">
     Beräknas automatiskt från senaste MRR i databasen.
-    Tre scenarion: Konservativt (+15%/mån), Modernt (+25%/mån), Optimistiskt (+40%/mån).
+    Tre scenarion: Konservativt (+15%/mån), Realistiskt (+25%/mån), Optimistiskt (+40%/mån).
   </p>
   <div id="prognosisBaseMrr" class="callout callout-info" style="display:none;"></div>
   <div class="chart-wrap" style="height:260px;"><canvas id="projectionChart"></canvas></div>
@@ -202,7 +202,7 @@
       <p style="font-size:0.85rem;">Trolig <strong>nedre gräns</strong> om marknadsföringen inte skalas.</p>
     </div>
     <div class="card" style="margin:0;border:2px solid var(--accent);">
-      <h3 style="color:var(--accent);">Modernt (+25%/mån) ★ Troligast</h3>
+      <h3 style="color:var(--accent);">Realistiskt (+25%/mån) ★ Huvudscenario</h3>
       <p style="font-size:0.85rem;">Marknadsföringspushen ger +30–50% fler nedladdningar. Trial-inflöde ökar. Konvertering håller 35%.</p>
       <p style="font-size:0.85rem;"><strong>Kräver ~120 trials/mån från juni.</strong></p>
     </div>
@@ -316,7 +316,7 @@
         labels: months,
         datasets: [
           { label: 'Konservativt (+15%/mån)', data: cons, borderColor: TICK_COLOR, backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 4 },
-          { label: 'Modernt (+25%/mån) ★', data: mod, borderColor: isDark ? '#8fd38f' : '#2d5a27', backgroundColor: isDark ? 'rgba(143,211,143,0.12)' : 'rgba(45,90,39,0.08)', borderWidth: 3, tension: 0.3, pointRadius: 4, fill: true },
+          { label: 'Realistiskt (+25%/mån) ★', data: mod, borderColor: isDark ? '#8fd38f' : '#2d5a27', backgroundColor: isDark ? 'rgba(143,211,143,0.12)' : 'rgba(45,90,39,0.08)', borderWidth: 3, tension: 0.3, pointRadius: 4, fill: true },
           { label: 'Optimistiskt (+40%/mån)', data: opt, borderColor: isDark ? '#ffb74d' : '#c87d00', backgroundColor: 'transparent', borderWidth: 2, borderDash: [5,4], tension: 0.3, pointRadius: 4 },
         ]
       },
@@ -337,7 +337,7 @@
 
     // Table
     var html = '<div class="prog-row prog-header">'
-      + '<div>Månad</div><div>Konservativt</div><div>Modernt ★</div><div>Optimistiskt</div><div>Netto modernt</div>'
+      + '<div>Månad</div><div>Konservativt</div><div>Realistiskt ★</div><div>Optimistiskt</div><div>Netto realistiskt</div>'
       + '</div>';
     for (var j = 0; j < 8; j++) {
       html += '<div class="prog-row">'
