@@ -463,7 +463,7 @@
         html += '<span class="dau-value" style="color:var(--accent);">' + (newAccountsTotal != null ? newAccountsTotal : '—') + '</span>';
         html += '</div>';
         html += '<p class="dau-title" style="margin:0.15rem 0 0;">Nya konton</p>';
-        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Registreringar idag</p>';
+        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Registreringar idag (uppdateras vid sidladdning)</p>';
         html += '</div>';
 
         // Kolumn 4 – Konversion
@@ -1466,6 +1466,9 @@
         var exp48h   = d.expiring_48h   || 0;
         var exp7d    = d.expiring_7d    || 0;
         var paying   = d.paying_monthly || 0;
+        // Uppdatera RC KPI-blocket med live-data (Supabase-källa)
+        var setText2 = function(id, val) { var el2 = document.getElementById(id); if (el2) el2.textContent = val; };
+        setText2('rcKpiTrials', total);
         var convRate = (total + paying) > 0
           ? (paying / (total + paying) * 100).toFixed(0) + ' %'
           : '—';
@@ -1703,11 +1706,18 @@
         var red = '#e05252';
         var orange = isDark ? '#ffb74d' : '#ff9800';
 
-        // KPI values
+        // KPI values — OBS: rcKpiPaying och rcKpiTrials sätts av live-RPCer (renderRcWeeklyCharts/renderRcTrials)
+        // och ska INTE skrivas över med cachad JSON-data här
         var setText = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
         setText('rcDataUpdated', rc.updated || '–');
-        setText('rcKpiPaying', rc.active_paying != null ? rc.active_paying : '–');
-        setText('rcKpiTrials', rc.active_trials != null ? rc.active_trials : '–');
+        // rcKpiPaying: sätts av renderRcWeeklyCharts (latest_actives från Supabase-synkad RC-tabell)
+        // rcKpiTrials: sätts av renderRcTrials (total_active från dashboard_rc_trials_summary)
+        if (!document.getElementById('rcKpiPaying') || document.getElementById('rcKpiPaying').textContent === '–') {
+          setText('rcKpiPaying', rc.active_paying != null ? rc.active_paying : '–');
+        }
+        if (!document.getElementById('rcKpiTrials') || document.getElementById('rcKpiTrials').textContent === '–') {
+          setText('rcKpiTrials', rc.active_trials != null ? rc.active_trials : '–');
+        }
         setText('rcKpiMrr', rc.mrr_usd != null ? '$' + rc.mrr_usd : '–');
         setText('rcKpiCancelledPaying', rc.cancelled_paying != null ? rc.cancelled_paying : '–');
         setText('rcKpiCancelledTrials', rc.cancelled_trials != null ? rc.cancelled_trials : '–');
