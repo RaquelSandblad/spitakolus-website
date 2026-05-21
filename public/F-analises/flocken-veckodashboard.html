@@ -1566,12 +1566,17 @@
         var MONTHS = ['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec'];
         var history = data.history;
 
-        // Uppdatera MRR + Actives KPI-kort med live-data
+        // Uppdatera RC KPI-kort med live-data från Supabase-synkad RC-tabell
         if (data.latest_mrr != null) {
           setText('rcKpiMrr', '$' + parseFloat(data.latest_mrr).toFixed(0));
         }
         if (data.latest_actives != null) {
           setText('rcKpiPaying', data.latest_actives);
+        }
+        if (data.latest_synced_at) {
+          // Visa synk-datum: "2026-05-19 12:07" → "2026-05-19"
+          var syncedDate = data.latest_synced_at.slice(0, 10);
+          setText('rcDataUpdated', syncedDate);
         }
 
         var labels = history.map(function(r) {
@@ -1706,19 +1711,9 @@
         var red = '#e05252';
         var orange = isDark ? '#ffb74d' : '#ff9800';
 
-        // KPI values — OBS: rcKpiPaying och rcKpiTrials sätts av live-RPCer (renderRcWeeklyCharts/renderRcTrials)
-        // och ska INTE skrivas över med cachad JSON-data här
+        // KPI values — rcKpiPaying, rcKpiTrials, rcKpiMrr och rcDataUpdated sätts av live-RPCer.
+        // renderRcSection (cachad JSON) sätter BARA cancelled-fälten som saknar live-källa.
         var setText = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
-        setText('rcDataUpdated', rc.updated || '–');
-        // rcKpiPaying: sätts av renderRcWeeklyCharts (latest_actives från Supabase-synkad RC-tabell)
-        // rcKpiTrials: sätts av renderRcTrials (total_active från dashboard_rc_trials_summary)
-        if (!document.getElementById('rcKpiPaying') || document.getElementById('rcKpiPaying').textContent === '–') {
-          setText('rcKpiPaying', rc.active_paying != null ? rc.active_paying : '–');
-        }
-        if (!document.getElementById('rcKpiTrials') || document.getElementById('rcKpiTrials').textContent === '–') {
-          setText('rcKpiTrials', rc.active_trials != null ? rc.active_trials : '–');
-        }
-        setText('rcKpiMrr', rc.mrr_usd != null ? '$' + rc.mrr_usd : '–');
         setText('rcKpiCancelledPaying', rc.cancelled_paying != null ? rc.cancelled_paying : '–');
         setText('rcKpiCancelledTrials', rc.cancelled_trials != null ? rc.cancelled_trials : '–');
 
