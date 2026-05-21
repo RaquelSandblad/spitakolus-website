@@ -187,7 +187,7 @@
 
   <div class="card">
     <h2>Prenumerationer &amp; Intäkter</h2>
-    <p class="help">Supabase-data uppdateras automatiskt. RevenueCat-data (MRR, cancelled, trial-tratt) uppdateras manuellt via knappen nedan. Senast uppdaterat RC: <strong id="rcDataUpdated">–</strong></p>
+    <p class="help">All data uppdateras automatiskt. RC-data (MRR, aktiva, trials) synkas dagligen kl 07:00. Senast synkat RC: <strong id="rcDataUpdated">–</strong></p>
 
     <div class="kpi-grid" id="outRcKpis">
       <div class="kpi-card"><div class="kpi-value" id="rcKpiPaying">–</div><div class="kpi-label">Aktiva betalande</div></div>
@@ -1565,6 +1565,7 @@
         var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         var MONTHS = ['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec'];
         var history = data.history;
+        var setText = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
 
         // Uppdatera RC KPI-kort med live-data från Supabase-synkad RC-tabell
         if (data.latest_mrr != null) {
@@ -1574,7 +1575,7 @@
           setText('rcKpiPaying', data.latest_actives);
         }
         if (data.latest_synced_at) {
-          // Visa synk-datum: "2026-05-19 12:07" → "2026-05-19"
+          // Visa synk-datum: "2026-05-21 12:35" → "2026-05-21"
           var syncedDate = data.latest_synced_at.slice(0, 10);
           setText('rcDataUpdated', syncedDate);
         }
