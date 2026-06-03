@@ -176,7 +176,7 @@
   <div class="card dau-card" id="dauCard" aria-live="polite">
     <div id="outDau"></div>
   </div>
-  <p class="help"><strong>Här nedan ser du:</strong> antal nya konton, hundar, hundvaktprofiler, konversationer, meddelanden, promenader och hundvänliga platser vecka för vecka – plus app-events (inloggningar, annonser skapade, kontakt med hundvakt). Alla siffror exkluderar Raquel, Torbjörn och tb.sandblad.</p>
+  <p class="help"><strong>Här nedan ser du:</strong> antal nya konton, hundar, hundvaktprofiler, konversationer, meddelanden, promenader, community-platser och Besöka-aktivitet (ortssökningar, platsklick, kategorival) vecka för vecka – plus app-events (inloggningar, annonser skapade, kontakt med hundvakt). Alla siffror exkluderar Raquel, Torbjörn och tb.sandblad.</p>
   <p class="help" style="margin-bottom:0;"><strong>Live-data</strong> <span id="fetchStatus" style="font-weight:600;"></span></p>
 
   <div class="card">
@@ -648,8 +648,8 @@
       function renderMainTable(data) {
         if (!Array.isArray(data) || data.length === 0) return '<p>Inga rader att visa.</p>';
         var full = getFullWeeks(data);
-        var keys = ['nya_konton','nya_hundar','nya_hundvakt_profiler','sitter_konversationer','tindog_konversationer','sitter_meddelanden','tindog_meddelanden','promenader','hundvanliga_platser','bokningar'];
-        var keyLabels = { nya_konton: 'Nya konton', nya_hundar: 'Nya hundar', nya_hundvakt_profiler: 'Nya vaktprofiler', sitter_konversationer: 'Sitter-konv', tindog_konversationer: 'Tindog-konv', sitter_meddelanden: 'Sitter-medd', tindog_meddelanden: 'Tindog-medd', promenader: 'Promenader', hundvanliga_platser: 'Platser', bokningar: 'Bokningar', medd_per_konv: 'Medd/konv' };
+        var keys = ['nya_konton','nya_hundar','nya_hundvakt_profiler','sitter_konversationer','tindog_konversationer','sitter_meddelanden','tindog_meddelanden','promenader','hundvanliga_platser','bokningar','besoka_sokningar','besoka_klick','besoka_kategori_val'];
+        var keyLabels = { nya_konton: 'Nya konton', nya_hundar: 'Nya hundar', nya_hundvakt_profiler: 'Nya vaktprofiler', sitter_konversationer: 'Sitter-konv', tindog_konversationer: 'Tindog-konv', sitter_meddelanden: 'Sitter-medd', tindog_meddelanden: 'Tindog-medd', promenader: 'Promenader', hundvanliga_platser: 'Platser (community)', bokningar: 'Bokningar', medd_per_konv: 'Medd/konv', besoka_sokningar: 'Besöka: sökningar', besoka_klick: 'Besöka: platsklick', besoka_kategori_val: 'Besöka: kategorival' };
         if (full.length === 0) return '<p>Inga fulla veckor.</p>';
         full.sort(function(a,b) { return (a.week_num != null && b.week_num != null) ? a.week_num - b.week_num : 0; });
         var html = '<table><thead><tr><th>Vecka</th>';
@@ -899,6 +899,9 @@
             tindog_meddelanden: tindogM,
             promenader: sum('promenader'),
             hundvanliga_platser: sum('hundvanliga_platser'),
+            besoka_sokningar: sum('besoka_sokningar'),
+            besoka_klick: sum('besoka_klick'),
+            besoka_kategori_val: sum('besoka_kategori_val'),
             bokningar: sum('bokningar'),
             notiser_skickade: sum('notiser_skickade'),
             unika_mottagare: maxUnikaNotis || null,
@@ -981,7 +984,10 @@
         { key: 'sitter_meddelanden', label: 'Sitter-meddelanden', derived: false, förklaring: 'Antal meddelanden skickade i hundvakt-konversationer per vecka: ' },
         { key: 'tindog_meddelanden', label: 'Tindog-meddelanden', derived: false, förklaring: 'Antal meddelanden skickade i Tindog-konversationer per vecka: ' },
         { key: 'promenader', label: 'Promenader', derived: false, förklaring: 'Antal promenader loggade i appen per vecka: ' },
-        { key: 'hundvanliga_platser', label: 'Hundvänliga platser', derived: false, förklaring: 'Antal hundvänliga platser tillagda eller besökta per vecka: ' },
+        { key: 'hundvanliga_platser', label: 'Hundvänliga platser (community)', derived: false, förklaring: 'Antal nya community-platser som användare själva lagt till per vecka (mäter INTE sökningar): ' },
+        { key: 'besoka_sokningar', label: 'Besöka: ortssökningar', derived: false, förklaring: 'Antal gånger användare sökte en stad/ort i Besöka-läget per vecka (event: places_location_searched): ' },
+        { key: 'besoka_klick', label: 'Besöka: platsklick', derived: false, förklaring: 'Antal gånger användare tryckte på en plats/markör i Besöka-läget per vecka (event: places_place_tapped): ' },
+        { key: 'besoka_kategori_val', label: 'Besöka: kategorival', derived: false, förklaring: 'Antal gånger användare valde/avvalde kategori (café/restaurang/bar) per vecka (event: places_category_toggled): ' },
         { key: 'bokningar', label: 'Bokningar', derived: false, förklaring: 'Antal bokningar av hundvakt genom appen per vecka: ' },
         { key: 'hund_aktivering_pct', label: 'Hund-aktivering (procent)', derived: true, förklaring: 'Andel nya konton som lade till minst en hund (procent): ' },
         { key: 'vakt_aktivering_pct', label: 'Vakt-aktivering (procent)', derived: true, förklaring: 'Andel nya konton som skapade hundvaktprofil (procent): ' },
@@ -2089,7 +2095,7 @@
         eventsData = safeEventsForRender(eventsData);
         var t = 'Jag har veckovis statistik från en hund-app (Flocken). Analysera siffrorna och ge mig:\n';
         t += '1) Bra indikatorer (vad som ser starkt ut)\n2) Vad jag ska vara uppmärksam på\n3) Dåliga indikatorer / risker\n4) Korta, konkreta råd.\n\n';
-        t += '--- Veckovis översikt (vecka, nya konton, nya hundar, nya hundvaktprofiler, sitter-konv, tindog-konv, sitter-medd, tindog-medd, promenader, hundvänliga platser, bokningar) ---\n';
+        t += '--- Veckovis översikt (vecka, nya konton, nya hundar, nya hundvaktprofiler, sitter-konv, tindog-konv, sitter-medd, tindog-medd, promenader, platser community, besöka sökningar/klick/kategorival, bokningar) ---\n';
         t += JSON.stringify(mainData, null, 2) + '\n\n';
         t += '--- App-events veckovis (vecka, event_name, antal_events, unika_anvandare) ---\n';
         t += JSON.stringify(eventsData, null, 2) + '\n\n';
@@ -2163,7 +2169,10 @@
         text += '- Sitter-meddelanden: ' + (curr.sitter_meddelanden || 0) + '\n';
         text += '- Tindog-meddelanden: ' + (curr.tindog_meddelanden || 0) + '\n';
         text += '- Promenader: ' + (curr.promenader || 0) + '\n';
-        text += '- Hundvänliga platser: ' + (curr.hundvanliga_platser || 0) + '\n';
+        text += '- Hundvänliga platser (community): ' + (curr.hundvanliga_platser || 0) + '\n';
+        text += '- Besöka: ortssökningar: ' + (curr.besoka_sokningar || 0) + '\n';
+        text += '- Besöka: platsklick: ' + (curr.besoka_klick || 0) + '\n';
+        text += '- Besöka: kategorival: ' + (curr.besoka_kategori_val || 0) + '\n';
         text += '- Bokningar: ' + (curr.bokningar || 0) + '\n';
         text += '- Push-notiser skickade: ' + (curr.notiser_skickade || 0) + '\n';
         text += '- Unika notis-mottagare: ' + (curr.unika_mottagare || 0) + '\n';
@@ -2477,7 +2486,7 @@
         var data = safeMainForRender(lastMainData);
         var full = getFullWeeks(data);
         if (full.length === 0) return;
-        var headers = ['Vecka','Nya konton','Nya hundar','Nya vaktprofiler','Sitter-konv','Tindog-konv','Sitter-medd','Tindog-medd','Promenader','Platser','Bokningar','Hund-akt %','Vakt-akt %','Konv/100','Medd/konv','Push-notiser','Unika mottagare'];
+        var headers = ['Vecka','Nya konton','Nya hundar','Nya vaktprofiler','Sitter-konv','Tindog-konv','Sitter-medd','Tindog-medd','Promenader','Platser (community)','Besöka: sökningar','Besöka: platsklick','Besöka: kategorival','Bokningar','Hund-akt %','Vakt-akt %','Konv/100','Medd/konv','Push-notiser','Unika mottagare'];
         var rows = [headers.join(';')];
         full.forEach(function(row) {
           var d = computeDerived(row);
@@ -2492,6 +2501,9 @@
             row.tindog_meddelanden ?? '',
             row.promenader ?? '',
             row.hundvanliga_platser ?? '',
+            row.besoka_sokningar ?? '',
+            row.besoka_klick ?? '',
+            row.besoka_kategori_val ?? '',
             row.bokningar ?? '',
             d.hund_aktivering_pct ? d.hund_aktivering_pct.toFixed(1) : '',
             d.vakt_aktivering_pct ? d.vakt_aktivering_pct.toFixed(1) : '',
