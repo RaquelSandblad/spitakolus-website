@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>Flocken – Rapport &amp; Prognos</title>
+  <!-- Version: 2026-06-04 – Branschbaserad prognos, 100k-spårning, live-signaler -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     :root {
@@ -64,11 +65,34 @@
     .loading { color: var(--muted); font-style: italic; }
     #statusBar { font-size: 0.82rem; color: var(--muted); margin-bottom: 1rem; }
     .theme-btn { position: fixed; top: 1rem; right: 1rem; padding: 0.35rem 0.8rem; border-radius: 20px; border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; font-size: 0.8rem; z-index: 100; }
-    .prog-row { display: grid; grid-template-columns: 80px repeat(3, 1fr) 1fr; gap: 0; }
+    .prog-row { display: grid; grid-template-columns: 110px repeat(4, 1fr); gap: 0; }
+    .prog-row-5 { grid-template-columns: 110px repeat(4, 1fr) 1.2fr; }
     .prog-row > div { padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--border); font-size: 0.84rem; }
     .prog-row > div:first-child { font-weight: 600; }
     .prog-header > div { background: var(--accent-light); color: var(--accent); font-weight: 700; padding: 0.5rem 0.6rem; border-radius: 4px 4px 0 0; }
     [data-theme="dark"] .prog-header > div { background: #2d3d2d; color: #8fd38f; }
+    .four-col { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+    .signal-list { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.75rem 0 0; }
+    .signal-item { border-radius: 8px; padding: 0.65rem 0.85rem; font-size: 0.88rem; border-left: 4px solid; }
+    .signal-critical { border-color: #dc3545; background: rgba(220,53,69,.08); }
+    .signal-warning { border-color: #ffc107; background: rgba(255,193,7,.10); }
+    .signal-good { border-color: #2d5a27; background: rgba(45,90,39,.07); }
+    .signal-info { border-color: #0d6efd; background: rgba(13,110,253,.07); }
+    [data-theme="dark"] .signal-critical { background: rgba(220,53,69,.15); }
+    [data-theme="dark"] .signal-warning { background: rgba(255,193,7,.12); }
+    [data-theme="dark"] .signal-good { background: rgba(143,211,143,.10); }
+    [data-theme="dark"] .signal-info { background: rgba(13,110,253,.12); }
+    .signal-item strong { display: block; margin-bottom: 0.15rem; }
+    .signal-action { font-size: 0.82rem; color: var(--muted); margin-top: 0.25rem; }
+    .goal-bar-wrap { background: var(--border); border-radius: 999px; height: 12px; overflow: hidden; margin: 0.5rem 0; }
+    .goal-bar-fill { height: 100%; background: var(--accent); border-radius: 999px; transition: width .4s ease; }
+    .toolbar-row { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 0.75rem; }
+    .toolbar-row button { margin: 0; font-size: 0.85rem; }
+    .playbook-step { font-size: 0.88rem; margin: 0.35rem 0; padding-left: 1.5rem; position: relative; }
+    .playbook-step::before { content: ''; position: absolute; left: 0; top: 0.15rem; width: 1rem; height: 1rem; border-radius: 50%; border: 2px solid var(--border); }
+    .playbook-step.ok::before { content: '✓'; border-color: #2d5a27; color: #2d5a27; font-size: 0.7rem; line-height: 1rem; text-align: center; font-weight: 700; }
+    .playbook-step.warn::before { content: '!'; border-color: #c87d00; color: #c87d00; font-size: 0.75rem; line-height: 1rem; text-align: center; font-weight: 700; }
+    .playbook-step.bad::before { content: '✕'; border-color: #dc3545; color: #dc3545; font-size: 0.65rem; line-height: 1rem; text-align: center; font-weight: 700; }
   </style>
 </head>
 <body>
@@ -81,10 +105,39 @@
 </div>
 
 <div id="statusBar">Hämtar data…</div>
+<div class="toolbar-row">
+  <button type="button" class="btn" onclick="location.reload()">↻ Uppdatera nu</button>
+  <span class="help" style="margin:0;">Live vid sidladdning · RC synkas dagligen kl 07:00 (Europa-DB)</span>
+</div>
 
 <!-- ═══════════════════════════════════════════════════════════
-     KPI-topp
+     Live-signaler & 100k-spårning
 ════════════════════════════════════════════════════════════ -->
+<div class="card">
+  <h2>🎯 Mot 100&nbsp;000 kr/mån — live-status</h2>
+  <p class="help">Uppdateras automatiskt från RevenueCat + Supabase varje gång sidan laddas. Signaler = regler baserade på er faktiska data (trials, churn, tratt).</p>
+  <div class="kpi-grid" id="goalKpis">
+    <div class="kpi-card"><div class="kpi-value loading" id="goalCurrent">…</div><div class="kpi-label">Netto idag (EU)</div></div>
+    <div class="kpi-card"><div class="kpi-value loading" id="goalPct">…</div><div class="kpi-label">% av 100k-mål</div></div>
+    <div class="kpi-card"><div class="kpi-value loading" id="goalEta">…</div><div class="kpi-label">ETA multi-region ★</div></div>
+    <div class="kpi-card"><div class="kpi-value loading" id="goalTrialsWeek">…</div><div class="kpi-label">Trials senaste fulla v</div></div>
+    <div class="kpi-card"><div class="kpi-value loading" id="goalConv">…</div><div class="kpi-label">Konv. (mogna cohorts)</div></div>
+    <div class="kpi-card"><div class="kpi-value loading" id="goalHealth">…</div><div class="kpi-label">Systemhälsa</div></div>
+  </div>
+  <p class="help">Framsteg mot mål (EU netto idag):</p>
+  <div class="goal-bar-wrap"><div class="goal-bar-fill" id="goalBarFill" style="width:0%"></div></div>
+  <div id="liveSignals" class="signal-list"><p class="help">Analyserar…</p></div>
+</div>
+
+<div class="card">
+  <h2>📋 100k-playbook — vad datan säger just nu</h2>
+  <p class="help">Checklistan markeras automatiskt utifrån live-KPI:er. Grön = OK, gul = bevaka, röd = åtgärda.</p>
+  <div id="playbookSteps"></div>
+</div>
+
+<hr class="divider">
+
+<!-- KPI-topp (historik) -->
 <div class="kpi-grid" id="topKpis">
   <div class="kpi-card"><div class="kpi-value loading" id="kpiMrr">…</div><div class="kpi-label">MRR (brutto)</div></div>
   <div class="kpi-card"><div class="kpi-value loading" id="kpiActives">…</div><div class="kpi-label">Betalande prenumeranter</div></div>
@@ -183,39 +236,56 @@
 <hr class="divider">
 
 <!-- ═══════════════════════════════════════════════════════════
-     MRR-prognos (dynamisk)
+     Prognos (branschbaserad, dynamisk)
 ════════════════════════════════════════════════════════════ -->
 <div class="card">
-  <h2>MRR-prognos juni – december 2026</h2>
+  <h2>Prognos — prenumerationer &amp; intäkt</h2>
   <p class="help">
-    Beräknas automatiskt från senaste MRR i databasen.
-    Tre scenarion: Konservativt (+15%/mån), Realistiskt (+25%/mån), Optimistiskt (+40%/mån).
+    Beräknas från live RC-data + branschbenchmarks (RevenueCat State of Subscription Apps 2026, nisch-marknadsplats-tillväxt).
+    Modellen: nya betalande/månad + månadschurn + avmattning år 2 — <em>inte</em> fast procent på MRR varje månad.
+    Netto = efter 15&nbsp;% Apple/Google.
   </p>
   <div id="prognosisBaseMrr" class="callout callout-info" style="display:none;"></div>
-  <div class="chart-wrap" style="height:260px;"><canvas id="projectionChart"></canvas></div>
-  <h3>Prognostiserade MRR-värden</h3>
-  <div id="projectionTable"></div>
-  <div class="three-col" style="margin-top:1rem;">
+  <h3>Kort sikt — december 2026</h3>
+  <div class="chart-wrap" style="height:240px;"><canvas id="projectionChartShort"></canvas></div>
+  <div id="projectionTableShort"></div>
+
+  <h3 style="margin-top:1.5rem;">Multi-region — väg mot 100&nbsp;000 kr/mån</h3>
+  <p class="help">Scenario ★: SE+NO+DK (Europa-RC) + Brasilien från aug 2026. Streckad röd linje = målet.</p>
+  <div class="chart-wrap" style="height:280px;"><canvas id="projectionChart100k"></canvas></div>
+  <div id="projectionTable100k"></div>
+
+  <h3 style="margin-top:1.5rem;">En region (SE+NO+DK) — 2 år</h3>
+  <div class="chart-wrap" style="height:260px;"><canvas id="projectionChartLong"></canvas></div>
+  <div id="projectionTableLong"></div>
+
+  <div class="four-col" style="margin-top:1rem;">
     <div class="card" style="margin:0;border:1px solid var(--border);">
-      <h3 style="color:var(--muted);">Konservativt (+15%/mån)</h3>
-      <p style="font-size:0.85rem;">Organisk tillväxt, nedladdningar håller ~800/mån iOS. Ingen ny marknadsföringspush.</p>
-      <p style="font-size:0.85rem;">Trolig <strong>nedre gräns</strong> om marknadsföringen inte skalas.</p>
+      <h3 style="color:var(--muted);">1. Underpresterar</h3>
+      <p style="font-size:0.85rem;">Fler tekniska incidenter, svag marknadsföring. RC bottenkvartil (~−33&nbsp;% YoY). Churn 5,5–7&nbsp;%/mån.</p>
     </div>
     <div class="card" style="margin:0;border:2px solid var(--accent);">
-      <h3 style="color:var(--accent);">Realistiskt (+25%/mån) ★ Huvudscenario</h3>
-      <p style="font-size:0.85rem;">Marknadsföringspushen ger +30–50% fler nedladdningar. Trial-inflöde ökar. Konvertering håller 35%.</p>
-      <p style="font-size:0.85rem;"><strong>Kräver ~120 trials/mån från juni.</strong></p>
+      <h3 style="color:var(--accent);">2. Typisk nisch-app ★</h3>
+      <p style="font-size:0.85rem;">Stabil produkt, ~35 nya betalande/mån initialt. Median–snitt för prenumerationsappar. Churn sjunker mot 4&nbsp;%.</p>
     </div>
     <div class="card" style="margin:0;border:1px solid var(--border);">
-      <h3 style="color:#c87d00;">Optimistiskt (+40%/mån)</h3>
-      <p style="font-size:0.85rem;">Marknadsföringen ger starkt lyft + höst-säsong (hundvakt-peak aug–sep). Viral spridning möjlig.</p>
-      <p style="font-size:0.85rem;">Möjligt om nedladdningarna dubbleras (1 600+/mån iOS) och churn håller under 5%.</p>
+      <h3 style="color:#2d5a27;">3. Stark execution</h3>
+      <p style="font-size:0.85rem;">Topp 25&nbsp;% (RC: ~80&nbsp;%+ YoY). Marknadsföring skalar, 55&nbsp;% trial→paid håller. Churn ~3,5&nbsp;%.</p>
+    </div>
+    <div class="card" style="margin:0;border:1px solid var(--border);">
+      <h3 style="color:#c87d00;">4. Vinnare (sällsynt)</h3>
+      <p style="font-size:0.85rem;">Topp 10&nbsp;% + marketplace-likviditet. Kräver nästan inga driftstopp och stark word-of-mouth.</p>
     </div>
   </div>
-  <div class="callout callout-success" style="margin-top:1rem;">
-    Alla scenarier = brutto-MRR. Netto ≈ MRR × 0.85 (efter App Store-avgifter).
-    Prognosen förutsätter nuvarande konverteringsgrad (35% trial→paid) och churn under 5%.
-    <strong>Nästa nyckeltal:</strong> Hur många av de pending trials (cohort maj 10+) konverterar? Avgör om maj avslutas med MRR över $300.
+  <div class="callout callout-warning" style="margin-top:1rem;">
+    <strong>Varför inte +25&nbsp;% MRR/månad?</strong> Det motsvarar ~1&nbsp;200&nbsp;% per år — långt över branschens topp 10&nbsp;%.
+    Den gamla modellen fungerade grovt för 6–7 månader från liten bas, men blir orealistisk på 2 år.
+  </div>
+  <div class="callout callout-info">
+    Källor:
+    <a href="https://www.revenuecat.com/state-of-subscription-apps/" target="_blank" rel="noopener">RevenueCat State of Subscription Apps 2026</a>,
+    nisch-marknadsplats-tillväxt (likviditet före skalning).
+    Bas justeras från senaste RC-synk (committed subs ≈ 78&nbsp;% av aktiva betalande).
   </div>
 </div>
 
@@ -233,6 +303,12 @@
   // ──────────────────────────────────────────────────────────────
   var SUPABASE_URL      = 'https://jzbdxcsocwdxwzjjlnrw.supabase.co';
   var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6YmR4Y3NvY3dkeHd6ampsbnJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyMjY4NTEsImV4cCI6MjA3NjgwMjg1MX0.eWpRvtv_2dClpwRYnLsD8yvNWz75jd1J42KLstVGpd4';
+  var SUPABASE_BR_URL   = 'https://vdpdehoreqjlenvqumho.supabase.co';
+  var SUPABASE_BR_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkcGRlaG9yZXFqbGVudnF1bWhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0OTY0NDQsImV4cCI6MjA5NDA3MjQ0NH0.kVj5K22XGa5caJtSvzQwWYSB57C4nEY3-gapI-v_PSU';
+
+  var GOAL_NET_SEK = 100000;
+  var BR_LAUNCH = new Date('2026-08-01T00:00:00');
+  var chartInstances = [];
 
   // ──────────────────────────────────────────────────────────────
   // Theme
@@ -264,16 +340,21 @@
   var TICK_COLOR = isDark ? '#d0d3d8' : '#6c757d';
   var TEXT_COLOR = isDark ? '#f0f2f5' : '#212529';
 
-  function rpc(fnName) {
-    return fetch(SUPABASE_URL + '/rest/v1/rpc/' + fnName, {
+  function rpc(fnName, region) {
+    var url = region === 'brazil' ? SUPABASE_BR_URL : SUPABASE_URL;
+    var key = region === 'brazil' ? SUPABASE_BR_KEY : SUPABASE_ANON_KEY;
+    return fetch(url + '/rest/v1/rpc/' + fnName, {
       method: 'POST',
       headers: {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'apikey': key,
+        'Authorization': 'Bearer ' + key,
         'Content-Type': 'application/json'
       },
       body: '{}'
-    }).then(function(r) { return r.json(); });
+    }).then(function(r) {
+      if (!r.ok) throw new Error(fnName + ' ' + r.status);
+      return r.json();
+    });
   }
 
   function setText(id, v) {
@@ -297,62 +378,412 @@
   }
 
   // ──────────────────────────────────────────────────────────────
-  // Prognosis calculation
+  // Prognosis — branschbaserad modell (nya subs + churn, inte % MRR/mån)
   // ──────────────────────────────────────────────────────────────
-  function buildPrognosis(baseMrr) {
-    var months = ['Maj','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
-    var cons = [baseMrr], mod = [baseMrr], opt = [baseMrr];
-    for (var i = 1; i < 8; i++) {
-      cons.push(Math.round(cons[i-1] * 1.15));
-      mod.push(Math.round(mod[i-1] * 1.25));
-      opt.push(Math.round(opt[i-1] * 1.40));
+  var USD_SEK = 10.65;
+  var PLATFORM_FEE = 0.15;
+  var COMMITTED_RATIO = 0.78; // set-to-renew andel (justera vid behov)
+
+  var SCENARIO_DEFS = [
+    { id: 'bear',   label: '1. Underpresterar', shortLabel: 'Under',  color: function() { return TICK_COLOR; }, dash: [4, 3],
+      newPaidStart: 22, newPaidGrowthMo: 1.005, newPaidDecayYear2: 0.99,
+      churnEarly: 0.07, churnMid: 0.06, churnLate: 0.055, isBase: false },
+    { id: 'base',   label: '2. Typisk nisch-app ★', shortLabel: 'Typisk ★', color: function() { return isDark ? '#8fd38f' : '#2d5a27'; }, dash: [],
+      newPaidStart: 35, newPaidGrowthMo: 1.015, newPaidDecayYear2: 0.985,
+      churnEarly: 0.055, churnMid: 0.045, churnLate: 0.04, isBase: true },
+    { id: 'bull',   label: '3. Stark execution', shortLabel: 'Stark', color: function() { return isDark ? '#7eb8ff' : '#0d6efd'; }, dash: [],
+      newPaidStart: 48, newPaidGrowthMo: 1.02, newPaidDecayYear2: 0.99,
+      churnEarly: 0.05, churnMid: 0.04, churnLate: 0.035, isBase: false },
+    { id: 'winner', label: '4. Vinnare', shortLabel: 'Vinnare', color: function() { return isDark ? '#ffb74d' : '#c87d00'; }, dash: [5, 4],
+      newPaidStart: 58, newPaidGrowthMo: 1.025, newPaidDecayYear2: 0.995,
+      churnEarly: 0.045, churnMid: 0.035, churnLate: 0.03, isBase: false },
+  ];
+
+  function cloneScenarioDefs() {
+    return SCENARIO_DEFS.map(function(d) {
+      return {
+        id: d.id, label: d.label, shortLabel: d.shortLabel, color: d.color, dash: d.dash.slice(),
+        newPaidStart: d.newPaidStart, newPaidGrowthMo: d.newPaidGrowthMo, newPaidDecayYear2: d.newPaidDecayYear2,
+        churnEarly: d.churnEarly, churnMid: d.churnMid, churnLate: d.churnLate, isBase: d.isBase
+      };
+    });
+  }
+
+  function fmtKr(n) {
+    return Math.round(n).toLocaleString('sv-SE') + ' kr';
+  }
+
+  function monthLabel(offset) {
+    var d = new Date();
+    d.setDate(1);
+    d.setMonth(d.getMonth() + offset);
+    var names = ['Jan','Feb','Mar','Apr','Maj','Jun','Jul','Aug','Sep','Okt','Nov','Dec'];
+    return names[d.getMonth()] + ' ' + String(d.getFullYear()).slice(2);
+  }
+
+  function deriveNewPaidFromCohorts(cohorts) {
+    if (!cohorts || !cohorts.length) return null;
+    var good = cohorts.filter(function(c) {
+      return (c.trial_starts || 0) >= 10 && (c.pending || 0) === 0;
+    }).slice(-3);
+    if (!good.length) return null;
+    var conv = good.reduce(function(a, c) { return a + (c.conversions || 0); }, 0);
+    return Math.round(conv / good.length * 4.33); // veckovis → per månad
+  }
+
+  function simulateScenario(startSubs, arpuNetSek, def, months) {
+    var subs = startSubs;
+    var arpu = arpuNetSek;
+    var newPaid = def.newPaidStart;
+    var series = [{ month: 0, subs: subs, mrrNet: Math.round(subs * arpu), label: 'Idag' }];
+    for (var m = 1; m <= months; m++) {
+      var churn = m <= 6 ? def.churnEarly : m <= 12 ? def.churnMid : def.churnLate;
+      if (m === 13) arpu *= 1.05;
+      if (m > 12) newPaid *= def.newPaidDecayYear2;
+      else if (m > 1) newPaid *= def.newPaidGrowthMo;
+      subs = Math.max(0, subs - Math.round(subs * churn) + Math.round(newPaid));
+      series.push({ month: m, subs: subs, mrrNet: Math.round(subs * arpu), label: monthLabel(m) });
+    }
+    return series;
+  }
+
+  function brLaunchMonthOffset() {
+    var now = new Date();
+    if (now >= BR_LAUNCH) return 0;
+    return Math.max(1, (BR_LAUNCH.getFullYear() - now.getFullYear()) * 12 + (BR_LAUNCH.getMonth() - now.getMonth()));
+  }
+
+  function simulateMultiRegion(startEU, arpuEU, euNpStart, brNpStart, months) {
+    var brStart = brLaunchMonthOffset();
+    var arpuBR = Math.round(arpuEU * 0.58);
+    var eu = startEU, euNp = euNpStart, br = 0, brNp = brNpStart;
+    var series = [{ month: 0, label: 'Idag', euSubs: eu, brSubs: br, mrrNet: Math.round(eu * arpuEU + br * arpuBR) }];
+    for (var m = 1; m <= months; m++) {
+      if (m > 1) euNp *= 1.015;
+      if (m > 18) euNp *= 0.992;
+      eu = eu - Math.round(eu * 0.04) + Math.round(euNp);
+      if (m >= brStart) {
+        brNp *= (m < brStart + 8) ? 1.07 : 1.025;
+        if (m > brStart + 14) brNp *= 0.995;
+        br = br - Math.round(br * 0.045) + Math.round(brNp);
+      }
+      series.push({
+        month: m, label: monthLabel(m),
+        euSubs: eu, brSubs: br,
+        mrrNet: Math.round(eu * arpuEU + br * arpuBR)
+      });
+    }
+    return { series: series, arpuBR: arpuBR };
+  }
+
+  function whenGoal100k(multiSeries) {
+    for (var i = 0; i < multiSeries.length; i++) {
+      if (multiSeries[i].mrrNet >= GOAL_NET_SEK) return { month: multiSeries[i].month, label: multiSeries[i].label, point: multiSeries[i] };
+    }
+    return null;
+  }
+
+  function analyzeCohorts(cohorts) {
+    var arr = cohorts || [];
+    var mature = arr.filter(function(c) { return (c.pending || 0) === 0 && (c.trial_starts || 0) > 0; });
+    var lastMature = mature.length ? mature[mature.length - 1] : null;
+    var lastAny = arr.length ? arr[arr.length - 1] : null;
+    var good = arr.filter(function(c) { return (c.trial_starts || 0) >= 10 && (c.pending || 0) === 0; });
+    var avgTrialsGood = good.length ? good.reduce(function(a, c) { return a + c.trial_starts; }, 0) / good.length : null;
+    var convNum = 0, convDen = 0;
+    mature.forEach(function(c) {
+      convNum += c.conversions || 0;
+      convDen += c.trial_starts || 0;
+    });
+    var convPct = convDen > 0 ? Math.round(convNum / convDen * 100) : null;
+    var pendingTotal = arr.reduce(function(a, c) { return a + (c.pending || 0); }, 0);
+    return { lastMature: lastMature, lastAny: lastAny, avgTrialsGood: avgTrialsGood, convPct: convPct, pendingTotal: pendingTotal, good: good };
+  }
+
+  function computeSignals(ctx) {
+    var signals = [];
+    var ca = ctx.cohortAnalysis;
+    var latest = ctx.latest;
+    var prev = ctx.rcHistory.length > 1 ? ctx.rcHistory[ctx.rcHistory.length - 2] : null;
+    var netNow = ctx.netEurSek;
+
+    if (ctx.syncAgeHours !== null && ctx.syncAgeHours > 36) {
+      signals.push({ level: 'warning', title: 'RC-data kan vara inaktuell', message: 'Senaste synk: ' + Math.round(ctx.syncAgeHours) + ' timmar sedan.', action: 'Kör sync-rc-metrics / kontrollera cron kl 07:00.' });
     }
 
-    // Chart
-    var ctx = document.getElementById('projectionChart').getContext('2d');
+    if (ca.lastMature) {
+      var ts = ca.lastMature.trial_starts || 0;
+      if (ca.avgTrialsGood && ts < ca.avgTrialsGood * 0.55) {
+        signals.push({ level: 'critical', title: 'Trials kraschade — maj17-mönster?', message: 'Senaste mogna veckan: ' + ts + ' trials (snitt bra veckor: ' + Math.round(ca.avgTrialsGood) + ').', action: 'Testa kontoskapande + trial + betalning OMEDELBART. Blockera release tills smoke-test passerar.' });
+      } else if (ca.avgTrialsGood && ts >= ca.avgTrialsGood * 0.85) {
+        signals.push({ level: 'good', title: 'Trial-inflöde ser healthy ut', message: ts + ' trials senaste mogna veckan (snitt: ' + Math.round(ca.avgTrialsGood) + ').', action: 'Fortsätt marknadsföring i SE+NO+DK.' });
+      }
+    }
+
+    if (ca.lastAny && (ca.lastAny.pending || 0) > 12) {
+      signals.push({ level: 'warning', title: 'Många pending trials', message: ca.lastAny.pending + ' trials i cohort ' + ca.lastAny.week_start + ' ej avgjorda.', action: 'Följ upp om 7–14 dagar — avgör om konvertering håller 50%+.' });
+    }
+
+    if (ca.convPct !== null) {
+      if (ca.convPct >= 50) {
+        signals.push({ level: 'good', title: 'Konvertering stark', message: ca.convPct + '% trial→paid på mogna cohorts.', action: 'Skydda onboarding — det här är er superkraft.' });
+      } else if (ca.convPct < 35) {
+        signals.push({ level: 'warning', title: 'Låg konvertering', message: ca.convPct + '% på mogna cohorts (mål: 50%+).', action: 'Granska trial-upplevelse, pris, första värde i appen.' });
+      }
+    }
+
+    var churn = parseFloat(latest.churn_pct) || 0;
+    if (churn > 10) {
+      signals.push({ level: 'critical', title: 'Hög churn', message: churn + '% senaste veckan.', action: 'Undersök avslut — onboarding, buggar, fel kontotyp.' });
+    } else if (churn > 5) {
+      signals.push({ level: 'warning', title: 'Churn över mål', message: churn + '% (mål: under 5%).', action: 'Kolla set-to-cancel i RC + förbättra dag 1–7 i trial.' });
+    } else if (churn > 0) {
+      signals.push({ level: 'good', title: 'Churn under kontroll', message: churn + '% senaste veckan.', action: 'Behåll fokus på retention medan ni skalar.' });
+    }
+
+    if (prev && latest) {
+      var mrrNow = parseFloat(latest.mrr_usd) || 0;
+      var mrrPrev = parseFloat(prev.mrr_usd) || 0;
+      if (mrrPrev > 0 && mrrNow <= mrrPrev * 0.98) {
+        signals.push({ level: 'warning', title: 'MRR sjunker', message: 'Från $' + mrrPrev.toFixed(0) + ' till $' + mrrNow.toFixed(0) + ' vecka‑över‑vecka.', action: 'Kolla avhop + att nya trials fortfarande startar.' });
+      }
+    }
+
+    if (ctx.weeklyMain && ctx.weeklyMain.length >= 2 && ca.lastMature) {
+      var w = ctx.weeklyMain;
+      var accNow = w[w.length - 2].nya_konton || 0;
+      if (accNow > 80 && (ca.lastMature.trial_starts || 0) < 12) {
+        signals.push({ level: 'critical', title: 'Tratt-läcka: konton utan trials', message: accNow + ' nya konton men bara ' + ca.lastMature.trial_starts + ' trials.', action: 'Betalvägg/konto/IAP — samma typ av fel som maj 17.' });
+      }
+    }
+
+    if (ctx.brMetrics && ctx.brMetrics.latest_actives > 0) {
+      signals.push({ level: 'good', title: 'Brasilien-data kopplad', message: ctx.brMetrics.latest_actives + ' betalande i BR-DB.', action: 'Följ BR separat tills aggregering i denna vy är komplett.' });
+    } else {
+      signals.push({ level: 'info', title: 'Brasilien inte i RC-synk än', message: 'Launch ~aug 2026 — BR-RC saknas eller är tom.', action: 'Efter launch: kör sync-rc-metrics mot Brazil-DB + aktivera BR i prognosen.' });
+    }
+
+    var eta = ctx.goalEta;
+    if (eta) {
+      signals.push({ level: 'info', title: '100k ETA (multi-region ★)', message: 'Ca ' + eta.label + ' vid nuvarande antaganden (~' + fmtKr(eta.point.mrrNet) + '/mån).', action: 'Kräver stabil produkt + NO/DK + BR-volym.' });
+    } else {
+      signals.push({ level: 'warning', title: '100k inte inom modellhorisont', message: 'Nuvarande takt når inte 100k inom 48 mån i försiktigt scenario.', action: 'Öka trials/marknadsföring eller höj ARPU (kennel/dagis).' });
+    }
+
+    var pct = Math.min(100, Math.round(netNow / GOAL_NET_SEK * 100));
+    if (pct < 5) {
+      signals.push({ level: 'info', title: 'Ni är i tidig fas', message: fmtKr(netNow) + ' netto = ' + pct + '% av 100k. Normalt med ~1 månad stabil betalning.', action: 'Prioritet: noll incidenter, sedan skala NO/DK + BR.' });
+    }
+
+    var order = { critical: 0, warning: 1, info: 2, good: 3 };
+    signals.sort(function(a, b) { return order[a.level] - order[b.level]; });
+    return signals;
+  }
+
+  function renderSignals(signals) {
+    var html = signals.map(function(s) {
+      return '<div class="signal-item signal-' + s.level + '"><strong>' + s.title + '</strong>' + s.message
+        + (s.action ? '<div class="signal-action">→ ' + s.action + '</div>' : '') + '</div>';
+    }).join('');
+    document.getElementById('liveSignals').innerHTML = html || '<p class="help">Inga signaler.</p>';
+  }
+
+  function renderPlaybook(ctx) {
+    var ca = ctx.cohortAnalysis;
+    var churn = parseFloat(ctx.latest.churn_pct) || 0;
+    var steps = [
+      { id: 'product', text: 'Produkten: konto + trial + betalning fungerar', status: (ca.lastMature && ca.avgTrialsGood && ca.lastMature.trial_starts >= ca.avgTrialsGood * 0.55) ? 'ok' : 'bad' },
+      { id: 'conv', text: 'Konvertering trial→paid ≥ 50% (mogna cohorts)', status: (ca.convPct !== null && ca.convPct >= 50) ? 'ok' : (ca.convPct !== null && ca.convPct >= 40) ? 'warn' : 'bad' },
+      { id: 'churn', text: 'Veckochurn under 5%', status: churn <= 5 && churn > 0 ? 'ok' : churn > 5 ? 'warn' : 'warn' },
+      { id: 'norden', text: 'NO/DK bidrar (trials ≥ 15/v eller konton växer)', status: (ca.avgTrialsGood && ca.avgTrialsGood >= 15) ? 'ok' : 'warn' },
+      { id: 'brazil', text: 'Brasilien launch + RC-synk', status: (ctx.brMetrics && ctx.brMetrics.latest_actives > 0) ? 'ok' : 'warn' },
+      { id: 'scale', text: 'Trials ≥ 20/v i snitt (SE+NO+DK)', status: (ca.avgTrialsGood && ca.avgTrialsGood >= 20) ? 'ok' : 'warn' },
+    ];
+    document.getElementById('playbookSteps').innerHTML = steps.map(function(s) {
+      return '<div class="playbook-step ' + s.status + '">' + s.text + '</div>';
+    }).join('');
+  }
+
+  function renderGoalKpis(ctx) {
+    var net = ctx.netEurSek;
+    var pct = Math.min(100, Math.round(net / GOAL_NET_SEK * 100));
+    setText('goalCurrent', fmtKr(net));
+    setText('goalPct', pct + '%');
+    document.getElementById('goalBarFill').style.width = pct + '%';
+    setText('goalEta', ctx.goalEta ? ctx.goalEta.label : '48m+');
+    var ca = ctx.cohortAnalysis;
+    setText('goalTrialsWeek', ca.lastMature ? String(ca.lastMature.trial_starts) : '—');
+    setText('goalConv', ca.convPct !== null ? ca.convPct + '%' : '—');
+    var crit = ctx.signals.filter(function(s) { return s.level === 'critical'; }).length;
+    var warn = ctx.signals.filter(function(s) { return s.level === 'warning'; }).length;
+    var healthEl = document.getElementById('goalHealth');
+    if (crit > 0) { healthEl.textContent = 'KRITISK'; healthEl.className = 'kpi-value tone-danger'; }
+    else if (warn > 0) { healthEl.textContent = 'Bevaka'; healthEl.className = 'kpi-value tone-warning'; }
+    else { healthEl.textContent = 'OK'; healthEl.className = 'kpi-value tone-success'; }
+    healthEl.classList.remove('loading');
+  }
+
+  function render100kChart(multiResult, pickIndices) {
+    var series = multiResult.series;
+    var picked = pickIndices.map(function(i) { return series[i]; });
+    var labels = picked.map(function(p) { return p.label; });
+    var data = picked.map(function(p) { return p.mrrNet; });
+    var ctx = document.getElementById('projectionChart100k').getContext('2d');
     new Chart(ctx, {
       type: 'line',
       data: {
-        labels: months,
+        labels: labels,
         datasets: [
-          { label: 'Konservativt (+15%/mån)', data: cons, borderColor: TICK_COLOR, backgroundColor: 'transparent', borderWidth: 2, tension: 0.3, pointRadius: 4 },
-          { label: 'Realistiskt (+25%/mån) ★', data: mod, borderColor: isDark ? '#8fd38f' : '#2d5a27', backgroundColor: isDark ? 'rgba(143,211,143,0.12)' : 'rgba(45,90,39,0.08)', borderWidth: 3, tension: 0.3, pointRadius: 4, fill: true },
-          { label: 'Optimistiskt (+40%/mån)', data: opt, borderColor: isDark ? '#ffb74d' : '#c87d00', backgroundColor: 'transparent', borderWidth: 2, borderDash: [5,4], tension: 0.3, pointRadius: 4 },
+          { label: 'Multi-region ★ (netto kr/mån)', data: data, borderColor: isDark ? '#8fd38f' : '#2d5a27', backgroundColor: isDark ? 'rgba(143,211,143,0.12)' : 'rgba(45,90,39,0.08)', borderWidth: 3, tension: 0.3, pointRadius: 4, fill: true },
+          { label: 'Mål 100 000 kr', data: labels.map(function() { return GOAL_NET_SEK; }), borderColor: 'rgba(220,53,69,0.65)', borderDash: [8, 4], pointRadius: 0, borderWidth: 2, fill: false }
         ]
       },
       options: {
         responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: TEXT_COLOR } }, tooltip: { mode: 'index', callbacks: { label: function(c) { return c.dataset.label + ': ' + fmtKr(c.parsed.y); } } } },
+        scales: { x: axisOpts(), y: axisOpts({ beginAtZero: true, ticks: { callback: function(v) { return fmtKr(v); } } }) }
+      }
+    });
+    var pick = [0, 6, 12, 18, 24, 30, 36].filter(function(i) { return i < series.length; });
+    var rows = pick.map(function(i) {
+      var p = series[i];
+      return '<div class="prog-row"><div>' + p.label + '</div><div>' + p.euSubs + '</div><div>' + p.brSubs + '</div><div style="font-weight:600">' + fmtKr(p.mrrNet) + '</div></div>';
+    }).join('');
+    document.getElementById('projectionTable100k').innerHTML =
+      '<div class="prog-row prog-header" style="grid-template-columns:110px 1fr 1fr 1.2fr"><div>Månad</div><div>EU subs</div><div>BR subs</div><div>Netto kr/mån</div></div>' + rows;
+  }
+
+  function renderProjectionChart(canvasId, allSeries, goalLine) {
+    var ctx = document.getElementById(canvasId).getContext('2d');
+    var labels = allSeries[0].map(function(p) { return p.label; });
+    var datasets = SCENARIO_DEFS.map(function(def, i) {
+      return {
+        label: def.label,
+        data: allSeries[i].map(function(p) { return p.mrrNet; }),
+        borderColor: def.color(),
+        backgroundColor: def.isBase ? (isDark ? 'rgba(143,211,143,0.10)' : 'rgba(45,90,39,0.07)') : 'transparent',
+        borderWidth: def.isBase ? 3 : 2,
+        borderDash: def.dash,
+        tension: 0.3,
+        pointRadius: 3,
+        fill: def.isBase
+      };
+    });
+    if (goalLine) {
+      datasets.push({
+        label: 'Mål 100 000 kr',
+        data: labels.map(function() { return GOAL_NET_SEK; }),
+        borderColor: 'rgba(220,53,69,0.55)',
+        borderDash: [8, 4],
+        pointRadius: 0,
+        borderWidth: 2
+      });
+    }
+    new Chart(ctx, {
+      type: 'line',
+      data: { labels: labels, datasets: datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
         plugins: {
-          legend: { labels: { color: TEXT_COLOR } },
+          legend: { labels: { color: TEXT_COLOR, font: { size: 11 } } },
           tooltip: { mode: 'index', intersect: false, callbacks: {
-            label: function(c) { return c.dataset.label + ': $' + c.parsed.y; }
+            label: function(c) { return c.dataset.label + ': ' + fmtKr(c.parsed.y); }
           }}
         },
         scales: {
-          x: axisOpts(),
-          y: axisOpts({ beginAtZero: false, ticks: Object.assign({ color: TICK_COLOR }, { callback: function(v) { return '$' + v; } }) })
+          x: axisOpts({ ticks: { maxTicksLimit: 10 } }),
+          y: axisOpts({ beginAtZero: true, ticks: { color: TICK_COLOR, callback: function(v) { return fmtKr(v); } } })
         }
       }
     });
+  }
 
-    // Table
-    var html = '<div class="prog-row prog-header">'
-      + '<div>Månad</div><div>Konservativt</div><div>Realistiskt ★</div><div>Optimistiskt</div><div>Netto realistiskt</div>'
-      + '</div>';
-    for (var j = 0; j < 8; j++) {
-      html += '<div class="prog-row">'
-        + '<div>' + months[j] + '</div>'
-        + '<div>$' + cons[j] + '</div>'
-        + '<div style="font-weight:600;color:' + (isDark ? '#8fd38f' : '#2d5a27') + '">$' + mod[j] + '</div>'
-        + '<div>$' + opt[j] + '</div>'
-        + '<div>$' + Math.round(mod[j] * 0.85) + '</div>'
-        + '</div>';
+  function buildProjectionTable(containerId, allSeries, pickMonths) {
+    var header = '<div class="prog-row prog-header prog-row-5">'
+      + '<div>Månad</div>'
+      + SCENARIO_DEFS.map(function(d) { return '<div>' + d.shortLabel + ' (subs)</div>'; }).join('')
+      + '<div>Typisk ★ netto/mån</div></div>';
+    var rows = pickMonths.map(function(mi) {
+      var cells = SCENARIO_DEFS.map(function(def, si) {
+        var p = allSeries[si][mi];
+        return '<div>' + p.subs + '</div>';
+      }).join('');
+      var baseMrr = allSeries[1][mi].mrrNet;
+      return '<div class="prog-row prog-row-5"><div>' + allSeries[0][mi].label + '</div>' + cells
+        + '<div style="font-weight:600;color:' + (isDark ? '#8fd38f' : '#2d5a27') + '">' + fmtKr(baseMrr) + '</div></div>';
+    }).join('');
+    document.getElementById(containerId).innerHTML = header + rows;
+  }
+
+  function buildPrognosis(latestMrrUsd, latestActives, cohortArr, rcMetrics, weeklyMain, brMetrics) {
+    var actives = latestActives || 64;
+    var startSubs = Math.max(1, Math.round(actives * COMMITTED_RATIO));
+    var arpuNetSek = (latestMrrUsd * USD_SEK * (1 - PLATFORM_FEE)) / actives;
+    var netEurSek = Math.round(latestMrrUsd * USD_SEK * (1 - PLATFORM_FEE));
+
+    var defs = cloneScenarioDefs();
+    var derivedNewPaid = deriveNewPaidFromCohorts(cohortArr);
+    if (derivedNewPaid && derivedNewPaid >= 20) {
+      defs[1].newPaidStart = derivedNewPaid;
+      defs[2].newPaidStart = Math.round(derivedNewPaid * 1.35);
+      defs[0].newPaidStart = Math.round(derivedNewPaid * 0.65);
+      defs[3].newPaidStart = Math.round(derivedNewPaid * 1.65);
     }
-    document.getElementById('projectionTable').innerHTML = html;
 
+    var euNp = derivedNewPaid && derivedNewPaid >= 20 ? derivedNewPaid : 55;
+    var multi = simulateMultiRegion(startSubs, arpuNetSek, euNp, Math.round(euNp * 0.8), 36);
+    var goalHit = whenGoal100k(multi.series);
+    var pick100k = [0, 6, 12, 18, 24, 30, 36].filter(function(i) { return i < multi.series.length; });
+    render100kChart(multi, pick100k);
+
+    var shortMonths = 7;
+    var longMonths = 24;
+    var shortSeries = defs.map(function(d) { return simulateScenario(startSubs, arpuNetSek, d, shortMonths); });
+    var longSeries = defs.map(function(d) { return simulateScenario(startSubs, arpuNetSek, d, longMonths); });
+
+    var shortPick = [0, 3, 6, 7].filter(function(i) { return i <= shortMonths; });
+    var longPick = [0, 6, 12, 18, 24];
+
+    function pickSeries(full, indices) {
+      return full.map(function(s) { return indices.map(function(i) { return s[i]; }); });
+    }
+
+    renderProjectionChart('projectionChartShort', shortSeries, false);
+    renderProjectionChart('projectionChartLong', pickSeries(longSeries, longPick), true);
+    buildProjectionTable('projectionTableShort', shortSeries, shortPick);
+    buildProjectionTable('projectionTableLong', longSeries, longPick);
+
+    var baseEnd = longSeries[1][24];
     var infoEl = document.getElementById('prognosisBaseMrr');
-    infoEl.innerHTML = '<strong>Bas-MRR:</strong> $' + baseMrr + ' (senaste synkade vecka från RevenueCat). Prognosen beräknas automatiskt från detta värde.';
+    infoEl.innerHTML = '<strong>Bas (live RC):</strong> '
+      + actives + ' betalande → ' + startSubs + ' committed subs. ARPU netto ≈ ' + Math.round(arpuNetSek) + ' kr/sub. '
+      + (derivedNewPaid ? '~' + derivedNewPaid + ' nya betalande/mån (senaste bra cohorts). ' : '')
+      + '<strong>EU-only jun 2028:</strong> ~' + baseEnd.subs + ' subs, ' + fmtKr(baseEnd.mrrNet) + '/mån. '
+      + (goalHit ? '<strong>100k multi-region ★:</strong> ca ' + goalHit.label + '.' : '<strong>100k:</strong> kräver snabbare BR-ramp eller högre ARPU.');
     infoEl.style.display = 'block';
+
+    return { netEurSek: netEurSek, goalEta: goalHit, arpuNetSek: arpuNetSek, derivedNewPaid: euNp };
+  }
+
+  function buildLiveInsights(rcMetrics, rcHistory, latest, cohortArr, weeklyMain, brMetrics) {
+    var cohortAnalysis = analyzeCohorts(cohortArr);
+    var syncAgeHours = null;
+    if (rcMetrics && rcMetrics.latest_synced_at) {
+      syncAgeHours = (Date.now() - new Date(rcMetrics.latest_synced_at).getTime()) / 3600000;
+    }
+    var latestMrr = parseFloat(rcMetrics.latest_mrr || latest.mrr_usd || 0);
+    var actives = parseInt(rcMetrics.latest_actives || latest.actives, 10) || 64;
+    var prog = buildPrognosis(latestMrr, actives, cohortArr, rcMetrics, weeklyMain, brMetrics);
+    var ctx = {
+      rcHistory: rcHistory, latest: latest, cohortAnalysis: cohortAnalysis,
+      weeklyMain: weeklyMain, brMetrics: brMetrics, syncAgeHours: syncAgeHours,
+      netEurSek: prog.netEurSek, goalEta: prog.goalEta
+    };
+    ctx.signals = computeSignals(ctx);
+    renderSignals(ctx.signals);
+    renderPlaybook(ctx);
+    renderGoalKpis(ctx);
+    return ctx;
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -497,8 +928,9 @@
     rpc('dashboard_rc_weekly_metrics'),
     rpc('dashboard_rc_trial_cohorts'),
     rpc('dashboard_weekly_main'),
-    Promise.resolve(null), // subscription bars finns på sida 1
+    rpc('dashboard_subscription_bars'),
     rpc('dashboard_rc_trials_summary'),
+    rpc('dashboard_rc_weekly_metrics', 'brazil').catch(function() { return null; }),
   ]).then(function(settled) {
     var failed = settled.filter(function(s) { return s.status === 'rejected'; });
     if (failed.length > 0) console.warn('Rapport: ' + failed.length + ' RPC(er) misslyckades:', failed.map(function(s) { return s.reason; }));
@@ -507,8 +939,9 @@
     var rcMetrics    = results[0];
     var rcCohorts    = results[1];
     var weeklyMain   = results[2];
-
+    var subBars      = results[3];
     var trialsSumm   = results[4];
+    var brMetricsRaw = results[5];
 
     // Normalize RPC results (jsonb RPCs are wrapped as [{ rpc_name: [...] }])
     function unwrap(r, key) {
@@ -520,6 +953,7 @@
     rcCohorts  = unwrap(rcCohorts,  'dashboard_rc_trial_cohorts');
     weeklyMain = unwrap(weeklyMain, 'dashboard_weekly_main');
     trialsSumm = unwrap(trialsSumm, 'dashboard_rc_trials_summary');
+    var brMetrics = brMetricsRaw && !brMetricsRaw.message ? unwrap(brMetricsRaw, 'dashboard_rc_weekly_metrics') : null;
 
     // ── RC Metrics ──────────────────────────────────────────────
     var rcHistory = [];
@@ -537,12 +971,17 @@
       setText('kpiNetto', '$' + (latestMrr * 0.85).toFixed(0));
       setText('kpiChurn', (parseFloat(latest.churn_pct) || 0).toFixed(1) + '%');
       setText('kpiActives', latest.actives || '…');
-      buildPrognosis(Math.round(latestMrr));
+
+      var cohortArrEarly = [];
+      if (rcCohorts && rcCohorts.cohorts) cohortArrEarly = rcCohorts.cohorts;
+      else if (Array.isArray(rcCohorts)) cohortArrEarly = rcCohorts;
+
+      var wArrEarly = Array.isArray(weeklyMain) ? weeklyMain : [];
+      buildLiveInsights(rcMetrics, rcHistory, latest, cohortArrEarly, wArrEarly, brMetrics);
     } else {
-      // Fallback: use canvas data as static seed
-      buildPrognosis(256);
-      setText('kpiMrr', '$256');
-      setText('kpiNetto', '$218');
+      buildLiveInsights({ latest_mrr: 282, latest_actives: 64 }, [], { actives: 64, mrr_usd: 282, churn_pct: 6 }, [], [], null);
+      setText('kpiMrr', '$282');
+      setText('kpiNetto', '$240');
     }
 
     // ── RC Cohorts ──────────────────────────────────────────────
@@ -570,8 +1009,13 @@
 
     // Subscription bars finns på sida 1 (veckoöversikten)
 
-    var statusMsg = 'Uppdaterad ' + new Date().toLocaleTimeString('sv-SE') + ' · Live-data från Supabase (RC synkad)';
-    if (failed.length > 0) statusMsg += ' (' + failed.length + ' sektioner saknade data)';
+    var statusMsg = 'Uppdaterad ' + new Date().toLocaleTimeString('sv-SE') + ' · Live-data från Supabase';
+    if (rcMetrics && rcMetrics.latest_synced_at) {
+      statusMsg += ' · RC synkad ' + rcMetrics.latest_synced_at.slice(0, 16).replace('T', ' ');
+    } else {
+      statusMsg += ' · RC synkas dagligen kl 07:00';
+    }
+    if (failed.length > 0) statusMsg += ' (' + failed.length + ' RPC misslyckades)';
     document.getElementById('statusBar').textContent = statusMsg;
 
   });
