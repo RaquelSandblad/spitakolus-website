@@ -190,7 +190,8 @@
     <p class="help">All data uppdateras automatiskt. RC-data (MRR, aktiva, trials) synkas dagligen kl 07:00. Senast synkat RC: <strong id="rcDataUpdated">–</strong></p>
 
     <div class="kpi-grid" id="outRcKpis">
-      <div class="kpi-card"><div class="kpi-value" id="rcKpiPaying">–</div><div class="kpi-label">Aktiva betalande<br><small id="rcKpiPayingSub" style="font-size:0.75em;opacity:0.8;"></small></div></div>
+      <div class="kpi-card"><div class="kpi-value" id="rcKpiPaying">–</div><div class="kpi-label">Aktiva betalande</div></div>
+      <div class="kpi-card"><div class="kpi-value" id="rcKpiRenewPaying">–</div><div class="kpi-label">På renew (betalande)<br><small style="font-size:0.75em;opacity:0.7;">aktiva som INTE avbrutit</small></div></div>
       <div class="kpi-card"><div class="kpi-value" id="rcKpiTrials">–</div><div class="kpi-label">Aktiva RC-trials</div></div>
       <div class="kpi-card"><div class="kpi-value" id="rcKpiMrr">–</div><div class="kpi-label">MRR (USD)</div></div>
       <div class="kpi-card"><div class="kpi-value" id="rcKpiCancelledPaying">–</div><div class="kpi-label">Cancelled betalande<br><small style="font-size:0.75em;opacity:0.7;">förnyas ej, aktiva till periodslut</small></div></div>
@@ -1472,9 +1473,12 @@
         lastRcSnapshot = rc;
         var set = function(id, val) { var el = document.getElementById(id); if (el && val != null) el.textContent = val; };
         set('rcKpiPaying', rc.paid_active);
-        set('rcKpiPayingSub', rc.paid_will_renew != null ? rc.paid_will_renew + ' på renew' : null);
+        set('rcKpiRenewPaying', rc.paid_will_renew);
         set('rcKpiCancelledPaying', rc.paid_will_not_renew);
         set('rcKpiCancelledTrials', rc.trials_will_not_renew);
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        var rp = document.getElementById('rcKpiRenewPaying');
+        if (rp && rc.paid_will_renew > 0) rp.style.color = isDark ? '#8fd38f' : '#2d5a27';
         var cp = document.getElementById('rcKpiCancelledPaying');
         if (cp && rc.paid_will_not_renew > 0) cp.style.color = '#e05252';
         var ct = document.getElementById('rcKpiCancelledTrials');
