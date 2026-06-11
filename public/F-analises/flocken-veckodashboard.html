@@ -190,11 +190,11 @@
     <p class="help">All data uppdateras automatiskt. RC-data (MRR, aktiva, trials) synkas dagligen kl 07:00. Senast synkat RC: <strong id="rcDataUpdated">–</strong></p>
 
     <div class="kpi-grid" id="outRcKpis">
-      <div class="kpi-card"><div class="kpi-value" id="rcKpiPaying">–</div><div class="kpi-label">Aktiva betalande</div></div>
+      <div class="kpi-card"><div class="kpi-value" id="rcKpiPaying">–</div><div class="kpi-label">Aktiva betalande<br><small id="rcKpiPayingSub" style="font-size:0.75em;opacity:0.8;"></small></div></div>
       <div class="kpi-card"><div class="kpi-value" id="rcKpiTrials">–</div><div class="kpi-label">Aktiva RC-trials</div></div>
       <div class="kpi-card"><div class="kpi-value" id="rcKpiMrr">–</div><div class="kpi-label">MRR (USD)</div></div>
-      <div class="kpi-card"><div class="kpi-value" id="rcKpiCancelledPaying">–</div><div class="kpi-label">Cancelled betalande</div></div>
-      <div class="kpi-card"><div class="kpi-value" id="rcKpiCancelledTrials">–</div><div class="kpi-label">Cancelled trials</div></div>
+      <div class="kpi-card"><div class="kpi-value" id="rcKpiCancelledPaying">–</div><div class="kpi-label">Cancelled betalande<br><small style="font-size:0.75em;opacity:0.7;">förnyas ej, aktiva till periodslut</small></div></div>
+      <div class="kpi-card"><div class="kpi-value" id="rcKpiCancelledTrials">–</div><div class="kpi-label">Cancelled trials<br><small style="font-size:0.75em;opacity:0.7;">förnyas ej, aktiva till slutdatum</small></div></div>
     </div>
 
     <div id="outRcTrials" style="margin-top:1rem;"></div>
@@ -1463,6 +1463,24 @@
 
       var rcChartFunnelLive = null;
 
+      // Senaste RC-snapshot (dashboard_subscription_summary → rc). När den finns
+      // äger den KPI-korten Aktiva betalande / Cancelled betalande / Cancelled trials
+      // — äldre källor (cachad JSON, RC weekly actives) får inte skriva över.
+      var lastRcSnapshot = null;
+      function updateRcKpisFromSnapshot(rc) {
+        if (!rc) return;
+        lastRcSnapshot = rc;
+        var set = function(id, val) { var el = document.getElementById(id); if (el && val != null) el.textContent = val; };
+        set('rcKpiPaying', rc.paid_active);
+        set('rcKpiPayingSub', rc.paid_will_renew != null ? rc.paid_will_renew + ' på renew' : null);
+        set('rcKpiCancelledPaying', rc.paid_will_not_renew);
+        set('rcKpiCancelledTrials', rc.trials_will_not_renew);
+        var cp = document.getElementById('rcKpiCancelledPaying');
+        if (cp && rc.paid_will_not_renew > 0) cp.style.color = '#e05252';
+        var ct = document.getElementById('rcKpiCancelledTrials');
+        if (ct && rc.trials_will_not_renew > 0) ct.style.color = '#ff9800';
+      }
+
       function renderRcTrials(d) {
         var el = document.getElementById('outRcTrials');
         if (!el || !d) return;
@@ -1475,6 +1493,7 @@
         // Uppdatera RC KPI-blocket med live-data (Supabase-källa)
         var setText2 = function(id, val) { var el2 = document.getElementById(id); if (el2) el2.textContent = val; };
         setText2('rcKpiTrials', total);
+        if (d.trials_will_not_renew != null) setText2('rcKpiCancelledTrials', d.trials_will_not_renew);
         var convRate = (total + paying) > 0
           ? (paying / (total + paying) * 100).toFixed(0) + ' %'
           : '—';
@@ -1508,6 +1527,8 @@
           + '<div class="kpi-card"><div class="kpi-value">' + convRate + '</div><div class="kpi-label">Konversion<br><small style="font-size:0.75rem;color:var(--muted);">betalande / (trial+bet)</small></div></div>'
           + '<div class="kpi-card" style="border-color:#dc3545;"><div class="kpi-value" style="color:#dc3545;">' + exp24h + '</div><div class="kpi-label">Löper ut &lt;24h</div></div>'
           + '<div class="kpi-card" style="border-color:#fd7e14;"><div class="kpi-value" style="color:#fd7e14;">' + exp7d + '</div><div class="kpi-label">Löper ut &lt;7 dagar</div></div>'
+          + (d.trials_will_renew != null ? '<div class="kpi-card"><div class="kpi-value" style="color:' + (isDark ? '#8fd38f' : '#2d5a27') + ';">' + d.trials_will_renew + '</div><div class="kpi-label">På renew</div></div>' : '')
+          + (d.trials_will_not_renew != null ? '<div class="kpi-card"><div class="kpi-value" style="color:#e05252;">' + d.trials_will_not_renew + '</div><div class="kpi-label">Avbrutna<br><small style="font-size:0.75rem;color:var(--muted);">aktiva till slutdatum</small></div></div>' : '')
           + '</div>'
           + '<div style="display:flex;flex-direction:column;gap:0.4rem;">' + urgencyHtml + '</div>'
           + '</div>';
@@ -1577,7 +1598,9 @@
         if (data.latest_mrr != null) {
           setText('rcKpiMrr', '$' + parseFloat(data.latest_mrr).toFixed(0));
         }
-        if (data.latest_actives != null) {
+        // RC-snapshoten (per-kund-avläsning) äger Aktiva betalande när den finns;
+        // weekly actives räknar annorlunda (inkl. trials) och är bara fallback.
+        if (data.latest_actives != null && !lastRcSnapshot) {
           setText('rcKpiPaying', data.latest_actives);
         }
         if (data.latest_synced_at) {
@@ -1719,16 +1742,20 @@
         var orange = isDark ? '#ffb74d' : '#ff9800';
 
         // KPI values — rcKpiPaying, rcKpiTrials, rcKpiMrr och rcDataUpdated sätts av live-RPCer.
-        // renderRcSection (cachad JSON) sätter BARA cancelled-fälten som saknar live-källa.
+        // Cancelled-fälten ägs av RC-snapshoten (updateRcKpisFromSnapshot); den cachade
+        // JSON:ens cancelled_paying/cancelled_trials är stale och används bara som
+        // sista utväg innan snapshoten laddats.
         var setText = function(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
-        setText('rcKpiCancelledPaying', rc.cancelled_paying != null ? rc.cancelled_paying : '–');
-        setText('rcKpiCancelledTrials', rc.cancelled_trials != null ? rc.cancelled_trials : '–');
+        if (!lastRcSnapshot) {
+          setText('rcKpiCancelledPaying', rc.cancelled_paying != null ? rc.cancelled_paying : '–');
+          setText('rcKpiCancelledTrials', rc.cancelled_trials != null ? rc.cancelled_trials : '–');
 
-        // Color cancelled KPIs red if > 0
-        var cpEl = document.getElementById('rcKpiCancelledPaying');
-        if (cpEl && rc.cancelled_paying > 0) cpEl.style.color = red;
-        var ctEl = document.getElementById('rcKpiCancelledTrials');
-        if (ctEl && rc.cancelled_trials > 0) ctEl.style.color = orange;
+          // Color cancelled KPIs red if > 0
+          var cpEl = document.getElementById('rcKpiCancelledPaying');
+          if (cpEl && rc.cancelled_paying > 0) cpEl.style.color = red;
+          var ctEl = document.getElementById('rcKpiCancelledTrials');
+          if (ctEl && rc.cancelled_trials > 0) ctEl.style.color = orange;
+        }
 
         var hasCharts = (rc.revenue_weekly && rc.revenue_weekly.length > 0) ||
                         (rc.trial_funnel && rc.trial_funnel.length > 0) ||
@@ -1821,42 +1848,14 @@
 
         var byType = data.by_account_type || [];
         var totals = data.totals || {};
-        // RevenueCat-snapshot (daglig sync, verkliga siffror) – fall tillbaka på
-        // gamla Supabase-baserade siffror om snapshot saknas.
-        var rc = data.rc || null;
-        var ending7d = rc ? rc.trials_ending_7d : (data.trials_ending_7d != null ? data.trials_ending_7d : null);
-        var ending24h = rc ? rc.trials_ending_24h : (data.trials_ending_24h != null ? data.trials_ending_24h : null);
-        var srcLabel = rc ? 'RevenueCat' : 'Supabase';
+        // RevenueCat-snapshot (daglig sync) → uppdaterar KPI-korten överst
+        // (Aktiva betalande, Cancelled betalande, Cancelled trials).
+        // Trials-detaljer (löper ut 24h/7d, renew/cancel) visas i RC Trials-blocket.
+        updateRcKpisFromSnapshot(data.rc || null);
 
         var TYPE_LABELS = { dog_owner: 'Hundägare', dog_sitter: 'Hundvakt', kennel: 'Kennel', dog_daycare: 'Hunddagis', okand: 'Okänd' };
 
         var html = '';
-        if (ending7d != null || ending24h != null) {
-          var urgentColor = ending24h > 0 ? '#b02a37' : ending7d > 0 ? '#856404' : '#0d6832';
-          html += '<div class="sanity-alert" style="border-color:' + urgentColor + '; background:' + (ending24h > 0 ? '#f8d7da' : ending7d > 0 ? '#fff3cd' : '#d4edda') + '; color:' + urgentColor + '; margin-bottom:0.75rem;">' +
-            '<strong>Trials som löper ut (' + srcLabel + '):</strong> ' +
-            (ending24h > 0 ? '<strong>' + ending24h + ' st inom 24h</strong>' : (ending7d > 0 ? ending7d + ' st inom 7 dagar' : 'Inga de närmaste 7 dagarna')) +
-            (ending7d > 0 && ending24h > 0 && ending24h !== ending7d ? ' (' + ending7d + ' totalt inom 7 dagar)' : '') +
-            (rc && rc.trials_active != null ? ' · ' + rc.trials_active + ' aktiva trials totalt' : '') +
-            '</div>';
-        }
-
-        // Renew vs cancel – verklig auto-renewal-status från RevenueCat
-        if (rc && rc.paid_active != null) {
-          html += '<div class="table-wrap" style="margin-bottom:0.75rem;"><table><thead><tr>' +
-            '<th>RevenueCat-status</th><th class="num">Aktiva</th><th class="num">Förnyar (renew)</th><th class="num">Avslutar (cancel)</th>' +
-            '</tr></thead><tbody>' +
-            '<tr><td>Betalda prenumerationer</td>' +
-            '<td class="num"><strong>' + (rc.paid_active || 0) + '</strong></td>' +
-            '<td class="num" style="color:#0d6832;"><strong>' + (rc.paid_will_renew || 0) + '</strong></td>' +
-            '<td class="num" style="color:#b02a37;"><strong>' + (rc.paid_will_not_renew || 0) + '</strong></td></tr>' +
-            '<tr><td>Trials</td>' +
-            '<td class="num"><strong>' + (rc.trials_active || 0) + '</strong></td>' +
-            '<td class="num" style="color:#0d6832;">' + (rc.trials_will_renew || 0) + '</td>' +
-            '<td class="num" style="color:#b02a37;">' + (rc.trials_will_not_renew || 0) + '</td></tr>' +
-            '</tbody></table></div>' +
-            '<p class="help" style="margin:-0.25rem 0 0.75rem;">Synkad från RevenueCat ' + (rc.synced_at ? String(rc.synced_at).slice(0, 16).replace('T', ' ') : rc.snapshot_date || '') + ' (dagligen kl 07:00). "Avslutar" = aktiv t.o.m. periodens slut men förnyas inte.</p>';
-        }
 
         html += '<div class="table-wrap"><table><thead><tr>' +
           '<th>Kontotyp</th>' +
