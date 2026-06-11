@@ -1821,8 +1821,12 @@
 
         var byType = data.by_account_type || [];
         var totals = data.totals || {};
-        var ending7d = data.trials_ending_7d != null ? data.trials_ending_7d : null;
-        var ending24h = data.trials_ending_24h != null ? data.trials_ending_24h : null;
+        // RevenueCat-snapshot (daglig sync, verkliga siffror) – fall tillbaka på
+        // gamla Supabase-baserade siffror om snapshot saknas.
+        var rc = data.rc || null;
+        var ending7d = rc ? rc.trials_ending_7d : (data.trials_ending_7d != null ? data.trials_ending_7d : null);
+        var ending24h = rc ? rc.trials_ending_24h : (data.trials_ending_24h != null ? data.trials_ending_24h : null);
+        var srcLabel = rc ? 'RevenueCat' : 'Supabase';
 
         var TYPE_LABELS = { dog_owner: 'Hundägare', dog_sitter: 'Hundvakt', kennel: 'Kennel', dog_daycare: 'Hunddagis', okand: 'Okänd' };
 
@@ -1830,10 +1834,28 @@
         if (ending7d != null || ending24h != null) {
           var urgentColor = ending24h > 0 ? '#b02a37' : ending7d > 0 ? '#856404' : '#0d6832';
           html += '<div class="sanity-alert" style="border-color:' + urgentColor + '; background:' + (ending24h > 0 ? '#f8d7da' : ending7d > 0 ? '#fff3cd' : '#d4edda') + '; color:' + urgentColor + '; margin-bottom:0.75rem;">' +
-            '<strong>Trials som löper ut:</strong> ' +
+            '<strong>Trials som löper ut (' + srcLabel + '):</strong> ' +
             (ending24h > 0 ? '<strong>' + ending24h + ' st inom 24h</strong>' : (ending7d > 0 ? ending7d + ' st inom 7 dagar' : 'Inga de närmaste 7 dagarna')) +
-            (ending7d > 0 && ending24h !== ending7d ? (ending24h > 0 ? ' (' + ending7d + ' totalt inom 7 dagar)' : '') : '') +
+            (ending7d > 0 && ending24h > 0 && ending24h !== ending7d ? ' (' + ending7d + ' totalt inom 7 dagar)' : '') +
+            (rc && rc.trials_active != null ? ' · ' + rc.trials_active + ' aktiva trials totalt' : '') +
             '</div>';
+        }
+
+        // Renew vs cancel – verklig auto-renewal-status från RevenueCat
+        if (rc && rc.paid_active != null) {
+          html += '<div class="table-wrap" style="margin-bottom:0.75rem;"><table><thead><tr>' +
+            '<th>RevenueCat-status</th><th class="num">Aktiva</th><th class="num">Förnyar (renew)</th><th class="num">Avslutar (cancel)</th>' +
+            '</tr></thead><tbody>' +
+            '<tr><td>Betalda prenumerationer</td>' +
+            '<td class="num"><strong>' + (rc.paid_active || 0) + '</strong></td>' +
+            '<td class="num" style="color:#0d6832;"><strong>' + (rc.paid_will_renew || 0) + '</strong></td>' +
+            '<td class="num" style="color:#b02a37;"><strong>' + (rc.paid_will_not_renew || 0) + '</strong></td></tr>' +
+            '<tr><td>Trials</td>' +
+            '<td class="num"><strong>' + (rc.trials_active || 0) + '</strong></td>' +
+            '<td class="num" style="color:#0d6832;">' + (rc.trials_will_renew || 0) + '</td>' +
+            '<td class="num" style="color:#b02a37;">' + (rc.trials_will_not_renew || 0) + '</td></tr>' +
+            '</tbody></table></div>' +
+            '<p class="help" style="margin:-0.25rem 0 0.75rem;">Synkad från RevenueCat ' + (rc.synced_at ? String(rc.synced_at).slice(0, 16).replace('T', ' ') : rc.snapshot_date || '') + ' (dagligen kl 07:00). "Avslutar" = aktiv t.o.m. periodens slut men förnyas inte.</p>';
         }
 
         html += '<div class="table-wrap"><table><thead><tr>' +
