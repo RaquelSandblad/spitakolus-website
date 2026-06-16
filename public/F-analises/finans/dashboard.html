@@ -29,6 +29,12 @@
     button.btn:hover { background: #047857; }
     ul.notif { list-style: none; padding: 0; margin: 0; }
     ul.notif li { padding: 0.6rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+    ul.bot { list-style: none; padding: 0; margin: 0; }
+    ul.bot li { padding: 0.85rem; margin-bottom: 0.5rem; border-radius: 8px; border: 1px solid var(--border); background: #111827; font-size: 0.9rem; }
+    ul.bot li.alert { border-color: #854d0e; background: #422006; }
+    .bot-meta { font-size: 0.75rem; color: var(--muted); margin-top: 0.35rem; }
+    .bot-tag { display: inline-block; padding: 0.1rem 0.45rem; border-radius: 999px; font-size: 0.7rem; background: #1e293b; color: var(--muted); margin-right: 0.35rem; }
+    .bot-tag.alarm { background: #854d0e; color: #fcd34d; }
     a { color: var(--accent); }
   </style>
 </head>
@@ -44,6 +50,12 @@
 <div id="api-error" class="error" style="display:none;"></div>
 <div id="grid" class="grid"></div>
 <section class="card" style="margin-bottom:1rem;">
+  <h2 style="font-size:1rem;color:var(--text);margin-bottom:0.25rem;">🤖 Nyhetsbot</h2>
+  <p class="muted" style="margin:0 0 0.75rem;">Boten läser nyheterna åt dig och pingar bara när något sticker ut.</p>
+  <div id="bot-banner" class="alert" style="display:none;"></div>
+  <ul class="bot" id="bot-insights"></ul>
+</section>
+<section class="card" style="margin-bottom:1rem;">
   <h2 style="font-size:1rem;color:var(--text);margin-bottom:0.75rem;">Watchlist</h2>
   <div style="overflow-x:auto;"><table><thead><tr><th>Ticker</th><th>Kurs</th><th>Δ%</th><th>Signal</th><th>Trend</th><th></th></tr></thead><tbody id="watchlist"></tbody></table></div>
 </section>
@@ -51,12 +63,13 @@
   <h2 style="font-size:1rem;color:var(--text);margin-bottom:0.75rem;">Senaste notiser</h2>
   <ul class="notif" id="notifs"></ul>
 </section>
+<script src="config.js"></script>
 <script>
 (function(){
   // Byt till din publika API-URL när API är deployat (Railway m.m.)
   var API = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
     ? 'http://localhost:8000'
-    : 'https://REPLACE-WITH-YOUR-API-URL.example.com';
+    : (window.FINANS_API_URL || 'https://REPLACE-WITH-YOUR-API-URL.example.com');
 
   var statusEl = document.getElementById('status');
   var errEl = document.getElementById('api-error');
@@ -106,6 +119,32 @@
       document.getElementById('notifs').innerHTML = notifs.slice(0, 8).map(function(n) {
         return '<li><strong>' + n.title + '</strong><br><span class="muted">' + n.body + '</span></li>';
       }).join('') || '<li class="muted">Inga notiser ännu.</li>';
+
+      var insights = await api('/api/bot/insights');
+      var alerts = insights.filter(function(i) { return i.alert; });
+      var banner = document.getElementById('bot-banner');
+      if (alerts.length) {
+        banner.style.display = 'block';
+        banner.innerHTML = '<strong>' + alerts.length + ' larm</strong> – boten tycker att du bör titta på detta.';
+      } else {
+        banner.style.display = 'none';
+      }
+      document.getElementById('bot-insights').innerHTML = insights.length ? insights.map(function(i) {
+        var imp = Math.round((i.importance || 0) * 100);
+        var cls = i.alert ? 'alert' : '';
+        return '<li class="' + cls + '">' +
+          '<span class="bot-tag">' + i.ticker + '</span>' +
+          (i.alert ? '<span class="bot-tag alarm">Larm</span>' : '') +
+          '<span class="bot-tag">' + imp + '% prioritet</span>' +
+          '<div style="margin-top:0.35rem;">' + i.summary + '</div>' +
+          (i.why_it_matters ? '<div class="muted" style="margin-top:0.25rem;"><strong>Varför:</strong> ' + i.why_it_matters + '</div>' : '') +
+          '<div style="margin-top:0.25rem;color:var(--accent);"><strong>Botens förslag:</strong> ' + i.action_hint + '</div>' +
+          '<div class="bot-meta">' + (i.articles_analyzed || 0) + ' artiklar · ' +
+          (i.source === 'perplexity' ? 'Perplexity Sonar' :
+           i.source === 'anthropic' ? 'Claude' :
+           i.source === 'openai' ? 'GPT-4o' : 'regelbaserad') + '</div>' +
+          '</li>';
+      }).join('') : '<li class="muted">Inga analyser ännu – boten körs var 10:e minut när API:t är igång.</li>';
 
     } catch (e) {
       errEl.style.display = 'block';
