@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <title>Finans – Dashboard</title>
+  <style>
+    :root { --bg:#0f1419; --card:#1a2332; --border:#2a3544; --text:#e7ecf1; --muted:#94a3b8; --accent:#6ee7b7; --red:#f87171; --green:#34d399; }
+    * { box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 1rem; }
+    header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+    h1 { margin: 0; font-size: 1.4rem; color: var(--accent); }
+    .muted { color: var(--muted); font-size: 0.85rem; }
+    .grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-bottom: 1.5rem; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; }
+    .card h2 { margin: 0 0 0.5rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+    .card .val { font-size: 1.5rem; font-weight: 600; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    th, td { padding: 0.6rem 0.5rem; text-align: left; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; }
+    .badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 999px; font-size: 0.75rem; background: #064e3b; color: var(--accent); }
+    .badge.sell { background: #450a0a; color: var(--red); }
+    .badge.wait { background: #1e293b; color: var(--muted); }
+    .up { color: var(--green); } .down { color: var(--red); }
+    .alert { background: #422006; border: 1px solid #854d0e; color: #fcd34d; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem; }
+    .error { background: #450a0a; border: 1px solid #991b1b; color: #fecaca; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1rem; }
+    button.btn { background: #059669; color: #fff; border: none; padding: 0.4rem 0.75rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem; }
+    button.btn:hover { background: #047857; }
+    ul.notif { list-style: none; padding: 0; margin: 0; }
+    ul.notif li { padding: 0.6rem 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+<script>if(!sessionStorage.getItem('finans_dashboard_ok')){location.replace('index.html');}</script>
+<header>
+  <div>
+    <h1>Finans Dashboard</h1>
+    <p class="muted">Beslutsstöd – inte finansiell rådgivning · Uppdateras var 60:e sekund</p>
+  </div>
+  <div class="muted" id="status">Laddar…</div>
+</header>
+<div id="api-error" class="error" style="display:none;"></div>
+<div id="grid" class="grid"></div>
+<section class="card" style="margin-bottom:1rem;">
+  <h2 style="font-size:1rem;color:var(--text);margin-bottom:0.75rem;">Watchlist</h2>
+  <div style="overflow-x:auto;"><table><thead><tr><th>Ticker</th><th>Kurs</th><th>Δ%</th><th>Signal</th><th>Trend</th><th></th></tr></thead><tbody id="watchlist"></tbody></table></div>
+</section>
+<section class="card">
+  <h2 style="font-size:1rem;color:var(--text);margin-bottom:0.75rem;">Senaste notiser</h2>
+  <ul class="notif" id="notifs"></ul>
+</section>
+<script>
+(function(){
+  // Byt till din publika API-URL när API är deployat (Railway m.m.)
+  var API = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+    ? 'http://localhost:8000'
+    : 'https://REPLACE-WITH-YOUR-API-URL.example.com';
+
+  var statusEl = document.getElementById('status');
+  var errEl = document.getElementById('api-error');
+
+  function signalClass(s) {
+    if (!s) return 'wait';
+    if (s.indexOf('BUY') >= 0) return '';
+    if (s.indexOf('SELL') >= 0) return 'sell';
+    return 'wait';
+  }
+
+  async function api(path, opts) {
+    var r = await fetch(API + path, Object.assign({ headers: { 'Content-Type': 'application/json' } }, opts || {}));
+    if (!r.ok) throw new Error('API ' + r.status);
+    return r.json();
+  }
+
+  async function load() {
+    try {
+      errEl.style.display = 'none';
+      var health = await api('/api/health');
+      statusEl.textContent = 'API v' + health.version + ' · DB ' + health.database + ' · ' + new Date().toLocaleTimeString('sv-SE');
+
+      var dash = await api('/api/portfolio/dashboard');
+      var p = dash.portfolio;
+      document.getElementById('grid').innerHTML =
+        '<div class="card"><h2>Portfölj</h2><div class="val">' + p.total_value.toLocaleString('sv-SE') + ' ' + p.base_currency + '</div></div>' +
+        '<div class="card"><h2>Kontant</h2><div class="val">' + p.cash_balance.toLocaleString('sv-SE') + '</div></div>' +
+        '<div class="card"><h2>Watchlist</h2><div class="val">' + p.watchlist_count + '</div></div>' +
+        '<div class="card"><h2>Riskprofil</h2><div class="val" style="text-transform:capitalize;">' + p.risk_profile + '</div></div>';
+
+      var tbody = document.getElementById('watchlist');
+      tbody.innerHTML = dash.watchlist.map(function(row) {
+        var ch = row.change_percent != null ? row.change_percent.toFixed(2) + '%' : '—';
+        var chCls = (row.change_percent || 0) >= 0 ? 'up' : 'down';
+        var sig = row.latest_signal ? row.latest_signal.display_signal : '—';
+        var sigKey = row.latest_signal ? row.latest_signal.signal : '';
+        return '<tr><td><strong>' + row.ticker + '</strong><br><span class="muted">' + (row.name || '') + '</span></td>' +
+          '<td>' + (row.price != null ? row.price.toFixed(2) : '—') + '</td>' +
+          '<td class="' + chCls + '">' + ch + '</td>' +
+          '<td><span class="badge ' + signalClass(sigKey) + '">' + sig + '</span></td>' +
+          '<td>' + (row.trend || '—') + '</td>' +
+          '<td><button class="btn" onclick="syncTicker(\'' + row.ticker + '\')">Synka</button></td></tr>';
+      }).join('') || '<tr><td colspan="6" class="muted">Ingen watchlist – lägg till via API lokalt.</td></tr>';
+
+      var notifs = await api('/api/notifications');
+      document.getElementById('notifs').innerHTML = notifs.slice(0, 8).map(function(n) {
+        return '<li><strong>' + n.title + '</strong><br><span class="muted">' + n.body + '</span></li>';
+      }).join('') || '<li class="muted">Inga notiser ännu.</li>';
+
+    } catch (e) {
+      errEl.style.display = 'block';
+      errEl.innerHTML = '<strong>Kunde inte nå API.</strong> Sidan på spitakolus.com behöver ett API som körs på internet (inte bara din dator). ' +
+        'Lokal test: kör <code>scripts/start-finans.ps1</code> och öppna <a href="http://localhost:3000">localhost:3000</a>. ' +
+        'För spitakolus: deploya API (se finans/docs/DEPLOY-SPITAKOLUS.md) och uppdatera API-URL i denna fil.';
+      statusEl.textContent = 'API otillgängligt';
+    }
+  }
+
+  window.syncTicker = async function(ticker) {
+    try {
+      await api('/api/stocks/' + encodeURIComponent(ticker) + '/sync', { method: 'POST' });
+      await load();
+    } catch (e) { alert('Synk misslyckades för ' + ticker); }
+  };
+
+  load();
+  setInterval(load, 60000);
+})();
+</script>
+</body>
+</html>
