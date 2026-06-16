@@ -1,2 +1,2 @@
-// Byt till din Railway-URL efter deploy (utan avslutande /)
-window.FINANS_API_URL = "https://REPLACE-WITH-YOUR-API-URL.example.com";
+// Railway production API (finans-api)
+window.FINANS_API_URL = "https://finans-api-production.up.railway.app";
