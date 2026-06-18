@@ -185,6 +185,12 @@
     <div id="outHighlights"></div>
   </div>
 
+  <div class="card" id="cardMessageReminderCampaign">
+    <h2>📧 Mejlkampanj: väntande meddelanden <span class="badge">tillfällig</span></h2>
+    <p class="help">Uppföljning av utskicket <em>Du har ett nytt meddelande i Flocken</em> (18 jun 2026). Visar vem som <strong>öppnat appen</strong> eller <strong>svarat</strong> efter mejlet, samt vem som fick meddelande men <strong>inte</strong> fick mejlet.</p>
+    <div id="outMessageReminderCampaign"><p class="help">Laddar kampanjdata…</p></div>
+  </div>
+
   <div class="card">
     <h2>Prenumerationer &amp; Intäkter</h2>
     <p class="help">All data uppdateras automatiskt. RC-data (MRR, aktiva, trials) synkas dagligen kl 07:00. Senast synkat RC: <strong id="rcDataUpdated">–</strong></p>
@@ -483,6 +489,82 @@
         html += '<p class="dau-hint" style="margin-top:0.6rem;">Händelse <code>app_opened</code> idag. Konversion = andel nedladdningar som registrerade sig. Exkluderar testkonton.</p>';
 
         el.innerHTML = html;
+      }
+
+      function renderMessageReminderCampaign(raw) {
+        var container = document.getElementById('outMessageReminderCampaign');
+        if (!container) return;
+        var data = raw;
+        if (data && data.dashboard_message_reminder_campaign_effect) {
+          data = data.dashboard_message_reminder_campaign_effect;
+        }
+        if (!data || !data.summary) {
+          container.innerHTML = '<p class="help">Ingen kampanjdata (kör migration 107 mot Europa).</p>';
+          return;
+        }
+        var s = data.summary;
+        var sent = s.emails_sent || 0;
+        var opened = s.opened_app_after_email || 0;
+        var replied = s.replied_after_email || 0;
+        var noOpen = s.still_no_app_open || 0;
+        var notSent = s.not_sent_unanswered_recipients || 0;
+        var openPct = sent > 0 ? (opened / sent * 100) : 0;
+        var replyPct = sent > 0 ? (replied / sent * 100) : 0;
+        var reasonLabels = {
+          ej_aktivt_gratispremium: 'Ej aktivt gratispremium (6 mån)',
+          ingen_aktiv_hund: 'Ingen aktiv hund',
+          enbart_hundvakt_mottagare: 'Enbart hundvakt-mottagare',
+          avanmald_epost: 'Avanmäld e-post',
+          team_konto: 'Team/testkonto',
+          ovrigt: 'Övrigt'
+        };
+        var html = '';
+        if (data.sent_window && data.sent_window.first_sent_at) {
+          html += '<p class="copy-hint">Utskick: ' + new Date(data.sent_window.first_sent_at).toLocaleString('sv-SE') + ' – ' + new Date(data.sent_window.last_sent_at).toLocaleString('sv-SE') + '. Uppdaterad ' + new Date(data.generated_at || Date.now()).toLocaleString('sv-SE') + '.</p>';
+        }
+        html += '<div class="kpi-grid">';
+        html += '<div class="kpi-card"><div class="kpi-value">' + sent + '</div><div class="kpi-label">Mejl skickade</div></div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + opened + ' <span class="wow" style="font-size:0.85rem;">(' + openPct.toFixed(1).replace('.', ',') + '%)</span></div><div class="kpi-label">Öppnade appen efter mejl</div></div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + replied + ' <span class="wow" style="font-size:0.85rem;">(' + replyPct.toFixed(1).replace('.', ',') + '%)</span></div><div class="kpi-label">Svarade efter mejl</div></div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + noOpen + '</div><div class="kpi-label">Inte öppnat appen än</div></div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + notSent + '</div><div class="kpi-label">Fick meddelande, ej mejl</div></div>';
+        html += '</div>';
+
+        var recipients = Array.isArray(data.recipients) ? data.recipients : [];
+        var cameBack = recipients.filter(function(r) { return r.opened_app_after; });
+        html += '<h3 style="margin-top:1rem;">Kom tillbaka till appen (' + cameBack.length + ')</h3>';
+        if (cameBack.length === 0) {
+          html += '<p class="help">Ingen har öppnat appen efter mejlet ännu (eller data samlas in).</p>';
+        } else {
+          html += '<div class="table-wrap"><table><thead><tr><th>E-post</th><th>Namn</th><th>Hund</th><th>Första app-öppning</th><th>Timmar efter mejl</th><th>Svarade?</th></tr></thead><tbody>';
+          cameBack.forEach(function(r) {
+            html += '<tr><td>' + (r.email || '') + '</td><td>' + (r.first_name || '') + '</td><td>' + (r.dog_name || '') + '</td><td>' + (r.first_app_open_after ? new Date(r.first_app_open_after).toLocaleString('sv-SE') : '–') + '</td><td class="num">' + (r.hours_to_first_open != null ? r.hours_to_first_open : '–') + '</td><td>' + (r.replied_after_email ? '✅' : '–') + '</td></tr>';
+          });
+          html += '</tbody></table></div>';
+        }
+
+        html += '<h3 style="margin-top:1rem;">Fick mejl men inte öppnat appen (' + (recipients.length - cameBack.length) + ')</h3>';
+        html += '<details><summary>Visa lista</summary><div class="table-wrap"><table><thead><tr><th>E-post</th><th>Namn</th><th>Hund</th><th>Obesvarade konv.</th></tr></thead><tbody>';
+        recipients.filter(function(r) { return !r.opened_app_after; }).forEach(function(r) {
+          html += '<tr><td>' + (r.email || '') + '</td><td>' + (r.first_name || '') + '</td><td>' + (r.dog_name || '') + '</td><td class="num">' + (r.unanswered_count || 0) + '</td></tr>';
+        });
+        html += '</tbody></table></div></details>';
+
+        var notSentData = data.not_sent || {};
+        var byReason = (notSentData.summary && notSentData.summary.by_reason) ? notSentData.summary.by_reason : {};
+        html += '<h3 style="margin-top:1.25rem;">Fick meddelande men INTE mejlet (' + (notSentData.summary ? notSentData.summary.total : 0) + ')</h3>';
+        html += '<ul class="help">';
+        Object.keys(byReason).forEach(function(key) {
+          html += '<li><strong>' + (reasonLabels[key] || key) + ':</strong> ' + byReason[key] + '</li>';
+        });
+        html += '</ul>';
+        html += '<details><summary>Visa alla som inte fick mejl</summary><div class="table-wrap"><table><thead><tr><th>Orsak</th><th>E-post</th><th>Namn</th><th>Obesvarade</th></tr></thead><tbody>';
+        (Array.isArray(notSentData.recipients) ? notSentData.recipients : []).forEach(function(r) {
+          html += '<tr><td>' + (reasonLabels[r.exclusion_reason] || r.exclusion_reason || '') + '</td><td>' + (r.email || '') + '</td><td>' + (r.full_name || '') + '</td><td class="num">' + (r.unanswered_count || 0) + '</td></tr>';
+        });
+        html += '</tbody></table></div></details>';
+
+        container.innerHTML = html;
       }
 
       function renderHighlights(mainData, todayData) {
@@ -2321,14 +2403,16 @@
           var savedFunnel = localStorage.getItem('flocken_dashboard_funnel');
           if (savedFunnel) { lastFunnelData = JSON.parse(savedFunnel); }
           var savedRcTrials = localStorage.getItem('flocken_dashboard_rc_trials');
+          var savedCampaign = localStorage.getItem('flocken_dashboard_message_reminder');
           if (savedRcTrials) { lastRcTrialsData = JSON.parse(savedRcTrials); }
+          if (savedCampaign) { renderMessageReminderCampaign(JSON.parse(savedCampaign)); }
         } catch (e) {}
         renderAll(main, events);
 
         // Auto-fetch live data from Supabase
         if (statusEl) statusEl.textContent = 'Hämtar live-data...';
         // Använd allSettled så att en misslyckad RPC inte kraschar hela hämtningen
-        Promise.allSettled([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types'), rpc('dashboard_today_highlights'), rpc('dashboard_retention'), rpc('dashboard_subscription_bars'), rpc('dashboard_events_daily_current_week'), rpc('dashboard_subscription_summary'), rpc('dashboard_store_downloads_summary'), rpc('dashboard_funnel_history'), rpc('dashboard_rc_trials_summary'), rpc('dashboard_rc_trial_cohorts'), rpc('dashboard_rc_weekly_metrics')])
+        Promise.allSettled([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types'), rpc('dashboard_today_highlights'), rpc('dashboard_retention'), rpc('dashboard_subscription_bars'), rpc('dashboard_events_daily_current_week'), rpc('dashboard_subscription_summary'), rpc('dashboard_store_downloads_summary'), rpc('dashboard_funnel_history'), rpc('dashboard_rc_trials_summary'), rpc('dashboard_rc_trial_cohorts'), rpc('dashboard_rc_weekly_metrics'), rpc('dashboard_message_reminder_campaign_effect')])
           .then(function(settled) {
             var failed = settled.filter(function(s) { return s.status === 'rejected'; });
             if (failed.length > 0) {
@@ -2500,6 +2584,15 @@
               lastRcWeeklyMetrics = rcWeeklyObj;
               renderRcWeeklyCharts(rcWeeklyObj);
             }
+            var campaignRaw = results[15];
+            var campaignObj = campaignRaw;
+            if (Array.isArray(campaignRaw) && campaignRaw.length === 1 && campaignRaw[0] && campaignRaw[0].dashboard_message_reminder_campaign_effect) {
+              campaignObj = campaignRaw[0].dashboard_message_reminder_campaign_effect;
+            }
+            if (campaignObj) {
+              try { localStorage.setItem('flocken_dashboard_message_reminder', JSON.stringify(campaignObj)); } catch (e) {}
+              renderMessageReminderCampaign(campaignObj);
+            }
             renderAll(lastMainData, lastEventsData);
             if (!failed.length) {
               if (statusEl) { statusEl.textContent = 'Uppdaterad ' + new Date().toLocaleString('sv-SE'); statusEl.style.color = '#0d6832'; }
@@ -2563,6 +2656,7 @@
         localStorage.removeItem('flocken_dashboard_downloads');
         localStorage.removeItem('flocken_dashboard_funnel');
         localStorage.removeItem('flocken_dashboard_rc_trials');
+        localStorage.removeItem('flocken_dashboard_message_reminder');
         console.log('✅ Cache cleared. Reloading page...');
         location.reload();
       };
