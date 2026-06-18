@@ -495,11 +495,16 @@
         var container = document.getElementById('outMessageReminderCampaign');
         if (!container) return;
         var data = raw;
+        if (Array.isArray(data) && data.length === 1) data = data[0];
+        if (data && data.dashboard_message_reminder_campaign_effect) {
+          data = data.dashboard_message_reminder_campaign_effect;
+        }
+        if (typeof data === 'string') { try { data = JSON.parse(data); } catch (e) { data = null; } }
         if (data && data.dashboard_message_reminder_campaign_effect) {
           data = data.dashboard_message_reminder_campaign_effect;
         }
         if (!data || !data.summary) {
-          container.innerHTML = '<p class="help">Ingen kampanjdata (kör migration 107 mot Europa).</p>';
+          container.innerHTML = '<p class="help">Ingen kampanjdata (RPC returnerade inget — ladda om eller kolla Supabase-loggar).</p>';
           return;
         }
         var s = data.summary;
@@ -2586,10 +2591,15 @@
             }
             var campaignRaw = results[15];
             var campaignObj = campaignRaw;
-            if (Array.isArray(campaignRaw) && campaignRaw.length === 1 && campaignRaw[0] && campaignRaw[0].dashboard_message_reminder_campaign_effect) {
-              campaignObj = campaignRaw[0].dashboard_message_reminder_campaign_effect;
+            if (Array.isArray(campaignRaw) && campaignRaw.length === 1) campaignObj = campaignRaw[0];
+            if (campaignObj && campaignObj.dashboard_message_reminder_campaign_effect) {
+              campaignObj = campaignObj.dashboard_message_reminder_campaign_effect;
             }
-            if (campaignObj) {
+            if (typeof campaignObj === 'string') { try { campaignObj = JSON.parse(campaignObj); } catch (e) { campaignObj = null; } }
+            if (campaignObj && campaignObj.dashboard_message_reminder_campaign_effect) {
+              campaignObj = campaignObj.dashboard_message_reminder_campaign_effect;
+            }
+            if (campaignObj && campaignObj.summary) {
               try { localStorage.setItem('flocken_dashboard_message_reminder', JSON.stringify(campaignObj)); } catch (e) {}
               renderMessageReminderCampaign(campaignObj);
             }
