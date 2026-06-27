@@ -1358,13 +1358,15 @@
       var lastRetentionData = null;
       var lastSubscriptionData = null;
       var lastEventsDailyData = null;
+      // Reservvärden om RC-data saknas. Hålls i nivå med verkligheten så de inte chockar,
+      // men den verkliga KPI-visningen kommer alltid från RC-snapshoten (updateRcKpisFromSnapshot).
       var DEFAULT_RC_DATA = {
-        "updated": "2026-05-19",
-        "mrr_usd": 270,
-        "active_trials": 24,
-        "active_paying": 38,
-        "cancelled_paying": 4,
-        "cancelled_trials": 2,
+        "updated": "2026-06-27",
+        "mrr_usd": 534,
+        "active_trials": 62,
+        "active_paying": 119,
+        "cancelled_paying": 21,
+        "cancelled_trials": 22,
         "revenue_weekly": [],
         "trial_funnel": [],
         "churn_weekly": []
@@ -1585,6 +1587,11 @@
         if (bi && billing > 0) bi.style.color = '#e05252';
         var ct = document.getElementById('rcKpiCancelledTrials');
         if (ct && rc.trials_will_not_renew > 0) ct.style.color = '#ff9800';
+        // Konto-fördelningens "Betalande"-stapel ska visa RC-talet → rita om när snapshoten kommit
+        // (om stapeln redan ritats från cache med Supabase-talet).
+        if (typeof renderSubscriptionBars === 'function' && lastSubscriptionData) {
+          try { renderSubscriptionBars(lastSubscriptionData); } catch (e) {}
+        }
       }
 
       function renderRcTrials(d) {
@@ -1776,7 +1783,11 @@
         }
         var gratis = data.gratis_konto || 0;
         var gratisPremium = data.gratis_erbjudande_premium || 0;
-        var betalande = data.betalande || 0;
+        // Betalande: använd RC:s verifierade tal (rc_active_subs, t.ex. 119) — Supabase data.betalande
+        // ÖVERFLAGGAR (räknar profiler vars subscription_status ej stämts av mot RC, t.ex. 174).
+        // Fallback till Supabase-talet bara om RC-snapshoten ännu inte laddats.
+        var rcPaying = (lastRcSnapshot && lastRcSnapshot.rc_active_subs != null) ? lastRcSnapshot.rc_active_subs : null;
+        var betalande = rcPaying != null ? rcPaying : (data.betalande || 0);
         var total = gratis + gratisPremium + betalande;
         var pct = function(n) { return total > 0 ? (n / total * 100).toFixed(1).replace('.', ',') : '0'; };
 

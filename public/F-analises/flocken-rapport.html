@@ -564,9 +564,9 @@
 
     var eta = ctx.goalEta;
     if (eta) {
-      signals.push({ level: 'info', title: '100k ETA (multi-region ★)', message: 'Ca ' + eta.label + ' vid nuvarande antaganden (~' + fmtKr(eta.point.mrrNet) + '/mån).', action: 'Kräver stabil produkt + NO/DK + BR-volym.' });
+      signals.push({ level: 'info', title: '100k ETA — spekulativt scenario', message: 'Modellen når 100k tidigast ~' + eta.label + ' (~' + fmtKr(eta.point.mrrNet) + '/mån) OM alla antaganden håller. Bygger till stor del på Brasilien som ÄNNU INTE är lanserat → ett scenario, inte en prognos.', action: 'Validera mot faktiska EU-siffror, och BR först efter lansering, innan datumet litas på.' });
     } else {
-      signals.push({ level: 'warning', title: '100k inte inom modellhorisont', message: 'Nuvarande takt når inte 100k inom 48 mån i försiktigt scenario.', action: 'Öka trials/marknadsföring eller höj ARPU (kennel/dagis).' });
+      signals.push({ level: 'info', title: '100k ej inom modellhorisont', message: 'I försiktigt scenario nås inte 100k inom 48 mån (scenario, ej prognos).', action: 'Öka trials/marknadsföring eller höj ARPU (kennel/dagis).' });
     }
 
     var pct = Math.min(100, Math.round(netNow / GOAL_NET_SEK * 100));
@@ -757,8 +757,8 @@
     infoEl.innerHTML = '<strong>Bas (live RC):</strong> '
       + actives + ' betalande → ' + startSubs + ' committed subs. ARPU netto ≈ ' + Math.round(arpuNetSek) + ' kr/sub. '
       + (derivedNewPaid ? '~' + derivedNewPaid + ' nya betalande/mån (senaste bra cohorts). ' : '')
-      + '<strong>EU-only jun 2028:</strong> ~' + baseEnd.subs + ' subs, ' + fmtKr(baseEnd.mrrNet) + '/mån. '
-      + (goalHit ? '<strong>100k multi-region ★:</strong> ca ' + goalHit.label + '.' : '<strong>100k:</strong> kräver snabbare BR-ramp eller högre ARPU.');
+      + '<strong>EU-only jun 2028 (modell):</strong> ~' + baseEnd.subs + ' subs, ' + fmtKr(baseEnd.mrrNet) + '/mån. '
+      + (goalHit ? '<strong>100k (multi-region ★):</strong> tidigast ~' + goalHit.label + ' — <em>spekulativt, bygger på ej lanserad Brasilien</em>.' : '<strong>100k:</strong> kräver snabbare BR-ramp eller högre ARPU.');
     infoEl.style.display = 'block';
 
     return { netEurSek: netEurSek, goalEta: goalHit, arpuNetSek: arpuNetSek, derivedNewPaid: euNp };
@@ -978,9 +978,15 @@
       var wArrEarly = Array.isArray(weeklyMain) ? weeklyMain : [];
       buildLiveInsights(rcMetrics, rcHistory, latest, cohortArrEarly, wArrEarly, brMetrics);
     } else {
-      buildLiveInsights({ latest_mrr: 282, latest_actives: 64 }, [], { actives: 64, mrr_usd: 282, churn_pct: 6 }, [], [], null);
-      setText('kpiMrr', '$282');
-      setText('kpiNetto', '$240');
+      // RC-data saknas (synk-fel/nät). Visa senast kända nivå MEN flagga tydligt att det inte är live.
+      buildLiveInsights({ latest_mrr: 534, latest_actives: 119 }, [], { actives: 119, mrr_usd: 534, churn_pct: 1 }, [], [], null);
+      setText('kpiMrr', '$534');
+      setText('kpiNetto', '$454');
+      var warnEl = document.getElementById('liveSignals');
+      if (warnEl) {
+        warnEl.innerHTML = '<div class="callout callout-danger" style="font-weight:600;">⚠️ RC-data kunde inte hämtas — siffrorna är hårdkodade RESERVVÄRDEN (ej live). Ladda om eller kontrollera RC-synken (sync-rc-metrics).</div>' + warnEl.innerHTML;
+      }
+      ['kpiMrr','kpiNetto','kpiChurn','kpiActives'].forEach(function(id){ var e=document.getElementById(id); if(e){ e.style.opacity='0.45'; e.title='Reservvärde — ej live RC-data'; } });
     }
 
     // ── RC Cohorts ──────────────────────────────────────────────
