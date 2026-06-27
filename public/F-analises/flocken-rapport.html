@@ -521,7 +521,7 @@
     }
 
     if (ca.lastAny && (ca.lastAny.pending || 0) > 12) {
-      signals.push({ level: 'warning', title: 'Många pending trials', message: ca.lastAny.pending + ' trials i cohort ' + ca.lastAny.week_start + ' ej avgjorda.', action: 'Följ upp om 7–14 dagar — avgör om konvertering håller 50%+.' });
+      signals.push({ level: 'good', title: 'Stark trial-pipeline', message: ca.lastAny.pending + ' trials i flight (cohort ' + ca.lastAny.week_start + ') — ännu ej avgjorda.', action: 'Bra topp-på-tratten. Det som avgör värdet är konverteringen när de mognar, inte antalet i sig.' });
     }
 
     if (ca.convPct !== null) {
@@ -549,13 +549,12 @@
       }
     }
 
-    if (ctx.weeklyMain && ctx.weeklyMain.length >= 2 && ca.lastMature) {
-      var w = ctx.weeklyMain;
-      var accNow = w[w.length - 2].nya_konton || 0;
-      if (accNow > 80 && (ca.lastMature.trial_starts || 0) < 12) {
-        signals.push({ level: 'critical', title: 'Tratt-läcka: konton utan trials', message: accNow + ' nya konton men bara ' + ca.lastMature.trial_starts + ' trials.', action: 'Betalvägg/konto/IAP — samma typ av fel som maj 17.' });
-      }
-    }
+    // BORTTAGEN signal "Tratt-läcka: konton utan trials": den jämförde Supabase nya_konton
+    // (ALLA konton inkl. gratis) mot RC trial_starts och larmade KRITISK så fort >80 nya konton
+    // hade <12 trial-starter. Sedan gratiskonton öppnades är det NORMALLÄGET (de flesta nya
+    // konton är gratis och startar aldrig en RC-trial) → systematiskt falsklarm på ett friskt
+    // system. Ett genuint trial-/betalvägs-brott (à la 17 maj) fångas i stället av konverterings-
+    // signalen och cohort-tratten. Återinförs ev. som "RC-trial-starter mot egen historik".
 
     if (ctx.brMetrics && ctx.brMetrics.latest_actives > 0) {
       signals.push({ level: 'good', title: 'Brasilien-data kopplad', message: ctx.brMetrics.latest_actives + ' betalande i BR-DB.', action: 'Följ BR separat tills aggregering i denna vy är komplett.' });

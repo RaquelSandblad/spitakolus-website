@@ -185,23 +185,16 @@
     <div id="outHighlights"></div>
   </div>
 
-  <div class="card" id="cardMessageReminderCampaign">
-    <h2>📧 Mejlkampanj: väntande meddelanden <span class="badge">tillfällig</span></h2>
-    <p class="help">Uppföljning av utskicket <em>Du har ett nytt meddelande i Flocken</em> (18 jun 2026). Visar vem som <strong>öppnat appen</strong> eller <strong>svarat</strong> efter mejlet, samt vem som fick meddelande men <strong>inte</strong> fick mejlet.</p>
-    <div id="outMessageReminderCampaign"><p class="help">Laddar kampanjdata…</p></div>
-  </div>
-
   <div class="card">
     <h2>Prenumerationer &amp; Intäkter</h2>
-    <p class="help">All data uppdateras automatiskt. RC-data (MRR, aktiva, trials) synkas dagligen kl 07:00. Senast synkat RC: <strong id="rcDataUpdated">–</strong></p>
+    <p class="help">Aktiva <strong>betalande</strong> prenumerationer (exkl. trials) — exakt från RevenueCat, synkat dagligen kl 07:00. Senast synkat RC: <strong id="rcDataUpdated">–</strong>. Trials redovisas separat nedan.</p>
 
     <div class="kpi-grid" id="outRcKpis">
-      <div class="kpi-card"><div class="kpi-value" id="rcKpiPaying">–</div><div class="kpi-label">Aktiva betalande</div></div>
-      <div class="kpi-card"><div class="kpi-value" id="rcKpiRenewPaying">–</div><div class="kpi-label">På renew (betalande)<br><small style="font-size:0.75em;opacity:0.7;">aktiva som INTE avbrutit</small></div></div>
-      <div class="kpi-card"><div class="kpi-value" id="rcKpiTrials">–</div><div class="kpi-label">Aktiva RC-trials</div></div>
+      <div class="kpi-card"><div class="kpi-value" id="rcKpiPaying">–</div><div class="kpi-label">Aktiva betalande<br><small style="font-size:0.75em;opacity:0.7;">totalt (inkl. de som ska avslutas)</small></div></div>
+      <div class="kpi-card"><div class="kpi-value" id="rcKpiCancelledPaying">–</div><div class="kpi-label">— varav sett till cancel<br><small style="font-size:0.75em;opacity:0.7;">förnyas ej, aktiva till periodslut</small></div></div>
+      <div class="kpi-card"><div class="kpi-value" id="rcKpiRenewPaying">–</div><div class="kpi-label">På renew<br><small style="font-size:0.75em;opacity:0.7;">förnyas vid periodslut</small></div></div>
+      <div class="kpi-card"><div class="kpi-value" id="rcKpiBillingIssue">–</div><div class="kpi-label">Billing issue<br><small style="font-size:0.75em;opacity:0.7;">grace period, betalning misslyckades</small></div></div>
       <div class="kpi-card"><div class="kpi-value" id="rcKpiMrr">–</div><div class="kpi-label">MRR (USD)</div></div>
-      <div class="kpi-card"><div class="kpi-value" id="rcKpiCancelledPaying">–</div><div class="kpi-label">Cancelled betalande<br><small style="font-size:0.75em;opacity:0.7;">förnyas ej, aktiva till periodslut</small></div></div>
-      <div class="kpi-card"><div class="kpi-value" id="rcKpiCancelledTrials">–</div><div class="kpi-label">Cancelled trials<br><small style="font-size:0.75em;opacity:0.7;">förnyas ej, aktiva till slutdatum</small></div></div>
     </div>
 
     <div id="outRcTrials" style="margin-top:1rem;"></div>
@@ -536,7 +529,19 @@
         html += '</div>';
 
         var recipients = Array.isArray(data.recipients) ? data.recipients : [];
+        var repliedList = recipients.filter(function(r) { return r.replied_after_email; });
         var cameBack = recipients.filter(function(r) { return r.opened_app_after; });
+        html += '<h3 style="margin-top:1rem;">Svarade efter mejl (' + repliedList.length + ')</h3>';
+        if (repliedList.length === 0) {
+          html += '<p class="help">Ingen har skickat meddelande efter mejlet ännu.</p>';
+        } else {
+          html += '<div class="table-wrap"><table><thead><tr><th>E-post</th><th>Namn</th><th>Hund</th><th>Öppnade appen?</th></tr></thead><tbody>';
+          repliedList.forEach(function(r) {
+            html += '<tr><td>' + (r.email || '') + '</td><td>' + (r.first_name || '') + '</td><td>' + (r.dog_name || '') + '</td><td>' + (r.opened_app_after ? '✅' : '–') + '</td></tr>';
+          });
+          html += '</tbody></table></div>';
+        }
+
         html += '<h3 style="margin-top:1rem;">Kom tillbaka till appen (' + cameBack.length + ')</h3>';
         if (cameBack.length === 0) {
           html += '<p class="help">Ingen har öppnat appen efter mejlet ännu (eller data samlas in).</p>';
@@ -549,9 +554,9 @@
         }
 
         html += '<h3 style="margin-top:1rem;">Fick mejl men inte öppnat appen (' + (recipients.length - cameBack.length) + ')</h3>';
-        html += '<details><summary>Visa lista</summary><div class="table-wrap"><table><thead><tr><th>E-post</th><th>Namn</th><th>Hund</th><th>Obesvarade konv.</th></tr></thead><tbody>';
+        html += '<details><summary>Visa lista</summary><div class="table-wrap"><table><thead><tr><th>E-post</th><th>Namn</th><th>Hund</th><th>Svarade?</th><th>Obesvarade konv.</th></tr></thead><tbody>';
         recipients.filter(function(r) { return !r.opened_app_after; }).forEach(function(r) {
-          html += '<tr><td>' + (r.email || '') + '</td><td>' + (r.first_name || '') + '</td><td>' + (r.dog_name || '') + '</td><td class="num">' + (r.unanswered_count || 0) + '</td></tr>';
+          html += '<tr><td>' + (r.email || '') + '</td><td>' + (r.first_name || '') + '</td><td>' + (r.dog_name || '') + '</td><td>' + (r.replied_after_email ? '✅' : '–') + '</td><td class="num">' + (r.unanswered_count || 0) + '</td></tr>';
         });
         html += '</tbody></table></div></details>';
 
@@ -1559,15 +1564,25 @@
         if (!rc) return;
         lastRcSnapshot = rc;
         var set = function(id, val) { var el = document.getElementById(id); if (el && val != null) el.textContent = val; };
-        set('rcKpiPaying', rc.paid_active);
-        set('rcKpiRenewPaying', rc.paid_will_renew);
-        set('rcKpiCancelledPaying', rc.paid_will_not_renew);
+        // RC:s egna chart-tal (subscription_status) är sanning. Faller tillbaka på de
+        // gamla per-kund-fälten (kan underräkna) om RC-fälten saknas i snapshoten.
+        var pick = function(rcVal, fallbackVal) { return rcVal != null ? rcVal : fallbackVal; };
+        var paying    = pick(rc.rc_active_subs,   rc.paid_active);
+        var renew     = pick(rc.rc_set_to_renew,  rc.paid_will_renew);
+        var cancel    = pick(rc.rc_set_to_cancel, rc.paid_will_not_renew);
+        var billing   = rc.rc_billing_issue;
+        set('rcKpiPaying', paying);
+        set('rcKpiRenewPaying', renew);
+        set('rcKpiCancelledPaying', cancel);
+        set('rcKpiBillingIssue', billing);
         set('rcKpiCancelledTrials', rc.trials_will_not_renew);
         var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         var rp = document.getElementById('rcKpiRenewPaying');
-        if (rp && rc.paid_will_renew > 0) rp.style.color = isDark ? '#8fd38f' : '#2d5a27';
+        if (rp && renew > 0) rp.style.color = isDark ? '#8fd38f' : '#2d5a27';
         var cp = document.getElementById('rcKpiCancelledPaying');
-        if (cp && rc.paid_will_not_renew > 0) cp.style.color = '#e05252';
+        if (cp && cancel > 0) cp.style.color = '#e05252';
+        var bi = document.getElementById('rcKpiBillingIssue');
+        if (bi && billing > 0) bi.style.color = '#e05252';
         var ct = document.getElementById('rcKpiCancelledTrials');
         if (ct && rc.trials_will_not_renew > 0) ct.style.color = '#ff9800';
       }
@@ -1613,13 +1628,11 @@
           '<div style="border:2px solid var(--accent);border-radius:10px;padding:1rem;margin-bottom:0.5rem;">'
           + '<h3 style="margin:0 0 0.75rem;font-size:1rem;color:var(--accent);">⚡ RC Trials (max 7 dagars free trial)</h3>'
           + '<div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:0.75rem;">'
-          + '<div class="kpi-card"><div class="kpi-value" style="color:#e67e22;">' + total + '</div><div class="kpi-label">Aktiva RC-trials<br><small style="font-size:0.65em;opacity:0.7;">synkas kl 07:00</small></div></div>'
-          + '<div class="kpi-card"><div class="kpi-value" style="color:var(--accent);">' + paying + '</div><div class="kpi-label">Betalande monthly<br><small style="font-size:0.75rem;color:var(--muted);">Supabase, inkl. promo-konton</small></div></div>'
-          + '<div class="kpi-card"><div class="kpi-value">' + convRate + '</div><div class="kpi-label">Konversion<br><small style="font-size:0.75rem;color:var(--muted);">betalande / (trial+bet)</small></div></div>'
+          + '<div class="kpi-card"><div class="kpi-value" style="color:#e67e22;">' + total + '</div><div class="kpi-label">Aktiva trials<br><small style="font-size:0.65em;opacity:0.7;">totalt — synkas kl 07:00</small></div></div>'
+          + (d.trials_will_not_renew != null ? '<div class="kpi-card"><div class="kpi-value" style="color:#e05252;">' + d.trials_will_not_renew + '</div><div class="kpi-label">— varav sett till cancel<br><small style="font-size:0.75rem;color:var(--muted);">per-kund-avläsning – minst så många</small></div></div>' : '')
+          + (d.trials_will_renew != null ? '<div class="kpi-card"><div class="kpi-value" style="color:' + (isDark ? '#8fd38f' : '#2d5a27') + ';">' + d.trials_will_renew + '</div><div class="kpi-label">På renew</div></div>' : '')
           + '<div class="kpi-card" style="border-color:#dc3545;"><div class="kpi-value" style="color:#dc3545;">' + exp24h + '</div><div class="kpi-label">Löper ut &lt;24h</div></div>'
           + '<div class="kpi-card" style="border-color:#fd7e14;"><div class="kpi-value" style="color:#fd7e14;">' + exp7d + '</div><div class="kpi-label">Löper ut &lt;7 dagar</div></div>'
-          + (d.trials_will_renew != null ? '<div class="kpi-card"><div class="kpi-value" style="color:' + (isDark ? '#8fd38f' : '#2d5a27') + ';">' + d.trials_will_renew + '</div><div class="kpi-label">På renew</div></div>' : '')
-          + (d.trials_will_not_renew != null ? '<div class="kpi-card"><div class="kpi-value" style="color:#e05252;">' + d.trials_will_not_renew + '</div><div class="kpi-label">Avbrutna<br><small style="font-size:0.75rem;color:var(--muted);">aktiva till slutdatum</small></div></div>' : '')
           + '</div>'
           + '<div style="display:flex;flex-direction:column;gap:0.4rem;">' + urgencyHtml + '</div>'
           + '</div>';
