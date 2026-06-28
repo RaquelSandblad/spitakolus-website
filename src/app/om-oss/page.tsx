@@ -136,52 +136,6 @@ export default function OmOss() {
           </div>
         </section>
 
-        {/* Our Apps Section */}
-        <section className="mb-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Våra Produkter</h2>
-            <p className="text-xl text-gray-600">
-              Upptäck de appar vi utvecklar
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-gradient-to-br from-primary to-primary-dark rounded-xl p-8 text-white">
-              <h3 className="text-2xl font-bold mb-4">Nästa Hem</h3>
-              <p className="text-blue-100 mb-6">
-                Peer-to-peer fastighetsplattform som kopplar samman köpare och säljare 
-                direkt utan mellanhänder - demokratiserar bostadsmarknaden
-              </p>
-              <a
-                href="/produkter"
-                className="inline-flex items-center text-white font-semibold hover:underline"
-              >
-                Läs mer om Nästa Hem
-                <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </a>
-            </div>
-
-            <div className="bg-gradient-to-br from-secondary to-secondary-dark rounded-xl p-8 text-white">
-              <h3 className="text-2xl font-bold mb-4">Flocken</h3>
-              <p className="text-green-100 mb-6">
-                Kompletta plattformen för hundägare med parning, hundvakt, hundvänliga 
-                platser och GPS-promenadstråk - allt baserat på geografisk närhet
-              </p>
-              <a
-                href="/produkter"
-                className="inline-flex items-center text-white font-semibold hover:underline"
-              >
-                Läs mer om Flocken
-                <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </a>
-            </div>
-          </div>
-        </section>
-
         {/* CTA Section */}
         <section className="text-center">
           <div className="bg-blue-50 rounded-xl p-8 md:p-12">
