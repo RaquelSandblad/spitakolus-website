@@ -203,6 +203,13 @@
     <div id="outSubscriptionBars" style="margin-top:0.5rem;"></div>
     <div id="outSubSummary" style="margin-top:1rem;"></div>
 
+    <div id="outCancellationsDaily" style="margin-top:1.5rem;">
+      <h3 style="margin-bottom:0.25rem;">Uppsägningar per dag (30 dagar)</h3>
+      <p class="help">Komplett logg direkt från RevenueCat-webhooken — fångar även raderade konton, anonyma köpare och betalproblem (till skillnad från äldre mått). <strong style="color:#e05252;">Betalda</strong> = frivilliga uppsägningar av betald prenumeration (behåller access till periodslut — det är DEN siffran som räknas). <strong>Betalproblem</strong> = kortet nekade; Apple/Google gör automatiska omförsök. <strong>Trial</strong> = provanvändare som stängde av förnyelsen utan att någonsin betala (normalt brus, oftast samma dag som de registrerade sig). Historik före 8 juli 2026 är rekonstruerad och kan sakna enstaka raderade/anonyma.</p>
+      <div style="height:220px;position:relative;"><canvas id="cancellationsDailyChart"></canvas></div>
+      <div id="cancellationsDailySummary" style="margin-top:0.5rem;"></div>
+    </div>
+
     <div id="rcChartsSection" style="display:none;"></div>
     <!-- Intäkter & churn finns på Rapport-sidan → flocken-rapport.html -->
   </div>
@@ -1849,6 +1856,56 @@
       var rcChartRevenue = null;
       var rcChartChurn = null;
 
+      var cancellationsDailyChart = null;
+      function renderCancellationsDaily(data) {
+        if (!Array.isArray(data) || data.length === 0) return;
+        var canvas = document.getElementById('cancellationsDailyChart');
+        if (!canvas) return;
+        var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        var txt = isDark ? '#f0f2f5' : '#212529';
+        var labels = data.map(function(r) {
+          var p = String(r.dag).split('-');
+          return parseInt(p[2], 10) + '/' + parseInt(p[1], 10);
+        });
+        if (cancellationsDailyChart) { cancellationsDailyChart.destroy(); cancellationsDailyChart = null; }
+        cancellationsDailyChart = new Chart(canvas.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [
+              { label: 'Betalda (frivilliga)', data: data.map(function(r) { return r.betalda || 0; }), backgroundColor: '#e05252' },
+              { label: 'Betalproblem', data: data.map(function(r) { return r.billing || 0; }), backgroundColor: isDark ? '#ffb74d' : '#ff9800' },
+              { label: 'Trial (aldrig betalat)', data: data.map(function(r) { return r.trial || 0; }), backgroundColor: isDark ? '#5a6b7a' : '#b0bec5' }
+            ]
+          },
+          options: {
+            responsive: true, maintainAspectRatio: false,
+            scales: {
+              x: { stacked: true, ticks: { color: txt } },
+              y: { stacked: true, beginAtZero: true, ticks: { precision: 0, color: txt } }
+            },
+            plugins: {
+              legend: { labels: { color: txt } },
+              tooltip: { mode: 'index', intersect: false }
+            }
+          }
+        });
+        var el = document.getElementById('cancellationsDailySummary');
+        if (el) {
+          var last = data[data.length - 1];
+          var prev = data.length > 1 ? data[data.length - 2] : null;
+          var last7 = data.slice(-7);
+          var sum7 = 0;
+          last7.forEach(function(r) { sum7 += (r.betalda || 0); });
+          var avg7 = (sum7 / Math.max(last7.length, 1)).toFixed(1);
+          el.innerHTML = '<p class="help"><strong>Senaste dagen (' + last.dag + '):</strong> ' +
+            '<span style="color:#e05252;font-weight:bold;">' + (last.betalda || 0) + ' betalda</span>, ' +
+            (last.billing || 0) + ' betalproblem, ' + (last.trial || 0) + ' trial' +
+            (prev ? ' &nbsp;•&nbsp; dagen innan: ' + (prev.betalda || 0) + ' betalda' : '') +
+            ' &nbsp;•&nbsp; 7-dagarssnitt betalda: ' + avg7 + '/dag</p>';
+        }
+      }
+
       function renderRcSection(rc) {
         if (!rc) return;
         var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -2435,13 +2492,15 @@
           var savedCampaign = localStorage.getItem('flocken_dashboard_message_reminder');
           if (savedRcTrials) { lastRcTrialsData = JSON.parse(savedRcTrials); }
           if (savedCampaign) { renderMessageReminderCampaign(JSON.parse(savedCampaign)); }
+          var savedCanc = localStorage.getItem('flocken_dashboard_cancellations');
+          if (savedCanc) { renderCancellationsDaily(JSON.parse(savedCanc)); }
         } catch (e) {}
         renderAll(main, events);
 
         // Auto-fetch live data from Supabase
         if (statusEl) statusEl.textContent = 'Hämtar live-data...';
         // Använd allSettled så att en misslyckad RPC inte kraschar hela hämtningen
-        Promise.allSettled([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types'), rpc('dashboard_today_highlights'), rpc('dashboard_retention'), rpc('dashboard_subscription_bars'), rpc('dashboard_events_daily_current_week'), rpc('dashboard_subscription_summary'), rpc('dashboard_store_downloads_summary'), rpc('dashboard_funnel_history'), rpc('dashboard_rc_trials_summary'), rpc('dashboard_rc_trial_cohorts'), rpc('dashboard_rc_weekly_metrics'), rpc('dashboard_message_reminder_campaign_effect')])
+        Promise.allSettled([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types'), rpc('dashboard_today_highlights'), rpc('dashboard_retention'), rpc('dashboard_subscription_bars'), rpc('dashboard_events_daily_current_week'), rpc('dashboard_subscription_summary'), rpc('dashboard_store_downloads_summary'), rpc('dashboard_funnel_history'), rpc('dashboard_rc_trials_summary'), rpc('dashboard_rc_trial_cohorts'), rpc('dashboard_rc_weekly_metrics'), rpc('dashboard_message_reminder_campaign_effect'), rpc('dashboard_rc_cancellations_daily')])
           .then(function(settled) {
             var failed = settled.filter(function(s) { return s.status === 'rejected'; });
             if (failed.length > 0) {
@@ -2450,7 +2509,7 @@
             // Extrahera värden – null om misslyckad
             var results = settled.map(function(s) { return s.status === 'fulfilled' ? s.value : null; });
             if (failed.length > 0 && failed.length < settled.length) {
-              if (statusEl) { statusEl.textContent = 'Live-data (delvis, ' + failed.length + ' av 15 misslyckades)'; statusEl.style.color = '#e67e22'; }
+              if (statusEl) { statusEl.textContent = 'Live-data (delvis, ' + failed.length + ' av ' + settled.length + ' misslyckades)'; statusEl.style.color = '#e67e22'; }
             }
             var mainResult = results[0];
             var eventsResult = results[1];
@@ -2626,6 +2685,12 @@
             if (campaignObj && campaignObj.summary) {
               try { localStorage.setItem('flocken_dashboard_message_reminder', JSON.stringify(campaignObj)); } catch (e) {}
               renderMessageReminderCampaign(campaignObj);
+            }
+            // results[16] = dashboard_rc_cancellations_daily (uppsägningar/dag från rc_events)
+            var cancResult = results[16];
+            if (Array.isArray(cancResult) && cancResult.length > 0) {
+              try { localStorage.setItem('flocken_dashboard_cancellations', JSON.stringify(cancResult)); } catch (e) {}
+              renderCancellationsDaily(cancResult);
             }
             renderAll(lastMainData, lastEventsData);
             if (!failed.length) {
