@@ -264,6 +264,11 @@
     <strong>nya betalande/mån</strong> (inflöde), <strong>trial→paid</strong> (konvertering) och
     <strong>churn</strong> (andel betalande som lämnar per månad). Märket <em>NI ÄR HÄR</em> sätts
     automatiskt utifrån live-inflödet — men churn måste också hålla nivåns krav för att prognoslinjen ska hålla.
+    <br><br>
+    <strong>Så hänger rutorna ihop med graferna ovan:</strong> den gröna fyllda linjen
+    (<em>Er nuvarande takt ★</em>) är ert verkliga inflöde framskrivet — det är den bana ni följer idag.
+    De andra linjerna visar vad som händer om takten ökar (+35&nbsp;%/+65&nbsp;%) eller sjunker (−35&nbsp;%).
+    Rutorna nedan är branschens fasta jämförelsenivåer.
   </p>
   <div class="four-col" style="margin-top:1rem;">
     <div class="card" id="tier-bear" style="margin:0;border:1px solid var(--border);">
@@ -666,10 +671,10 @@
       '<div class="prog-row prog-header" style="grid-template-columns:110px 1fr 1fr 1.2fr"><div>Månad</div><div>EU subs</div><div>BR subs</div><div>Netto kr/mån</div></div>' + rows;
   }
 
-  function renderProjectionChart(canvasId, allSeries, goalLine) {
+  function renderProjectionChart(canvasId, allSeries, goalLine, defs) {
     var ctx = document.getElementById(canvasId).getContext('2d');
     var labels = allSeries[0].map(function(p) { return p.label; });
-    var datasets = SCENARIO_DEFS.map(function(def, i) {
+    var datasets = (defs || SCENARIO_DEFS).map(function(def, i) {
       return {
         label: def.label,
         data: allSeries[i].map(function(p) { return p.mrrNet; }),
@@ -711,13 +716,14 @@
     });
   }
 
-  function buildProjectionTable(containerId, allSeries, pickMonths) {
+  function buildProjectionTable(containerId, allSeries, pickMonths, defs) {
+    var d5 = defs || SCENARIO_DEFS;
     var header = '<div class="prog-row prog-header prog-row-5">'
       + '<div>Månad</div>'
-      + SCENARIO_DEFS.map(function(d) { return '<div>' + d.shortLabel + ' (subs)</div>'; }).join('')
-      + '<div>Typisk ★ netto/mån</div></div>';
+      + d5.map(function(d) { return '<div>' + d.shortLabel + ' (subs)</div>'; }).join('')
+      + '<div>' + d5[1].shortLabel + ' netto/mån</div></div>';
     var rows = pickMonths.map(function(mi) {
-      var cells = SCENARIO_DEFS.map(function(def, si) {
+      var cells = d5.map(function(def, si) {
         var p = allSeries[si][mi];
         return '<div>' + p.subs + '</div>';
       }).join('');
@@ -759,6 +765,17 @@
       defs[2].newPaidStart = Math.round(derivedNewPaid * 1.35);
       defs[0].newPaidStart = Math.round(derivedNewPaid * 0.65);
       defs[3].newPaidStart = Math.round(derivedNewPaid * 1.65);
+      // Omankrat läge: linjerna är multiplar av ERT verkliga inflöde, inte
+      // branschens fasta nivåer — döp om så graf/tabell säger vad de visar.
+      // Gröna fyllda linjen (isBase) = er faktiska takt framskriven.
+      defs[1].label = '2. Er nuvarande takt ★ (~' + derivedNewPaid + ' nya/mån)';
+      defs[1].shortLabel = 'Er takt ★';
+      defs[0].label = '1. Långsammare (−35 % takt)';
+      defs[0].shortLabel = '−35 %';
+      defs[2].label = '3. Snabbare (+35 % takt)';
+      defs[2].shortLabel = '+35 %';
+      defs[3].label = '4. Ännu snabbare (+65 % takt)';
+      defs[3].shortLabel = '+65 %';
     }
     markCurrentTier(derivedNewPaid);
 
@@ -780,10 +797,10 @@
       return full.map(function(s) { return indices.map(function(i) { return s[i]; }); });
     }
 
-    renderProjectionChart('projectionChartShort', shortSeries, false);
-    renderProjectionChart('projectionChartLong', pickSeries(longSeries, longPick), true);
-    buildProjectionTable('projectionTableShort', shortSeries, shortPick);
-    buildProjectionTable('projectionTableLong', longSeries, longPick);
+    renderProjectionChart('projectionChartShort', shortSeries, false, defs);
+    renderProjectionChart('projectionChartLong', pickSeries(longSeries, longPick), true, defs);
+    buildProjectionTable('projectionTableShort', shortSeries, shortPick, defs);
+    buildProjectionTable('projectionTableLong', longSeries, longPick, defs);
 
     var baseEnd = longSeries[1][24];
     var infoEl = document.getElementById('prognosisBaseMrr');
