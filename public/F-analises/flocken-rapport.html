@@ -259,22 +259,36 @@
   <div class="chart-wrap" style="height:260px;"><canvas id="projectionChartLong"></canvas></div>
   <div id="projectionTableLong"></div>
 
+  <p class="help" style="margin-top:1rem;">
+    Nivåerna bygger på RevenueCats branschdata för prenumerationsappar. Tre mätare avgör nivån:
+    <strong>nya betalande/mån</strong> (inflöde), <strong>trial→paid</strong> (konvertering) och
+    <strong>churn</strong> (andel betalande som lämnar per månad). Märket <em>NI ÄR HÄR</em> sätts
+    automatiskt utifrån live-inflödet — men churn måste också hålla nivåns krav för att prognoslinjen ska hålla.
+  </p>
   <div class="four-col" style="margin-top:1rem;">
-    <div class="card" style="margin:0;border:1px solid var(--border);">
+    <div class="card" id="tier-bear" style="margin:0;border:1px solid var(--border);">
       <h3 style="color:var(--muted);">1. Underpresterar</h3>
-      <p style="font-size:0.85rem;">Fler tekniska incidenter, svag marknadsföring. RC bottenkvartil (~−33&nbsp;% YoY). Churn 5,5–7&nbsp;%/mån.</p>
+      <p style="font-size:0.85rem;"><strong>&lt; ~22 nya betalande/mån.</strong> Inflödet täcker inte tappet:
+      churn 5,5–7&nbsp;%/mån äter upp tillväxten och basen krymper på sikt (RC bottenkvartil, ~−33&nbsp;% YoY).
+      Typiska orsaker: tekniska incidenter, svag marknadsföring, trial→paid under ~35&nbsp;%.</p>
     </div>
-    <div class="card" style="margin:0;border:2px solid var(--accent);">
+    <div class="card" id="tier-base" style="margin:0;border:2px solid var(--accent);">
       <h3 style="color:var(--accent);">2. Typisk nisch-app ★</h3>
-      <p style="font-size:0.85rem;">Stabil produkt, ~35 nya betalande/mån initialt. Median–snitt för prenumerationsappar. Churn sjunker mot 4&nbsp;%.</p>
+      <p style="font-size:0.85rem;"><strong>~35 nya betalande/mån</strong> och churn på väg ner mot 4&nbsp;%/mån.
+      Medianen för prenumerationsappar: stabil produkt, jämnt inflöde, trial→paid ~40–50&nbsp;%.
+      Basen växer, men långsamt — dubblering tar ~1,5–2 år.</p>
     </div>
-    <div class="card" style="margin:0;border:1px solid var(--border);">
+    <div class="card" id="tier-bull" style="margin:0;border:1px solid var(--border);">
       <h3 style="color:#2d5a27;">3. Stark execution</h3>
-      <p style="font-size:0.85rem;">Topp 25&nbsp;% (RC: ~80&nbsp;%+ YoY). Marknadsföring skalar, 55&nbsp;% trial→paid håller. Churn ~3,5&nbsp;%.</p>
+      <p style="font-size:0.85rem;"><strong>~48 nya betalande/mån</strong>, churn ~3,5&nbsp;%/mån och
+      trial→paid som håller ~55&nbsp;%. Topp 25&nbsp;% i branschen (~80&nbsp;%+ YoY-tillväxt).
+      Kräver att marknadsföringen skalar och att onboarding/aktivering håller ihop när volymen ökar.</p>
     </div>
-    <div class="card" style="margin:0;border:1px solid var(--border);">
+    <div class="card" id="tier-winner" style="margin:0;border:1px solid var(--border);">
       <h3 style="color:#c87d00;">4. Vinnare (sällsynt)</h3>
-      <p style="font-size:0.85rem;">Topp 10&nbsp;% + marketplace-likviditet. Kräver nästan inga driftstopp och stark word-of-mouth.</p>
+      <p style="font-size:0.85rem;"><strong>~58+ nya betalande/mån</strong> med churn nere på ~3&nbsp;%/mån.
+      Topp 10&nbsp;%: word-of-mouth driver gratis inflöde och marketplace-likviditeten är självförstärkande
+      (fler hundar → fler matchningar → fler stannar). Nästan inga driftstopp.</p>
     </div>
   </div>
   <div class="callout callout-warning" style="margin-top:1rem;">
@@ -714,6 +728,24 @@
     document.getElementById(containerId).innerHTML = header + rows;
   }
 
+  // Markera vilken nivå live-inflödet (nya betalande/mån) motsvarar.
+  // Trösklar = mittpunkter mellan scenariernas basvärden (22/35/48/58).
+  function markCurrentTier(newPaidPerMonth) {
+    if (!newPaidPerMonth) return;
+    var tierId = newPaidPerMonth < 29 ? 'tier-bear'
+               : newPaidPerMonth < 42 ? 'tier-base'
+               : newPaidPerMonth < 53 ? 'tier-bull'
+               : 'tier-winner';
+    var box = document.getElementById(tierId);
+    if (!box) return;
+    box.style.border = '2px solid #c87d00';
+    var chip = document.createElement('div');
+    chip.style.cssText = 'display:inline-block;background:#c87d00;color:#fff;font-size:0.72rem;font-weight:700;'
+      + 'padding:2px 10px;border-radius:10px;margin-bottom:6px;letter-spacing:0.5px;';
+    chip.textContent = 'NI ÄR HÄR — inflöde ~' + newPaidPerMonth + ' nya/mån';
+    box.insertBefore(chip, box.firstChild);
+  }
+
   function buildPrognosis(latestMrrUsd, latestActives, cohortArr, rcMetrics, weeklyMain, brMetrics) {
     var actives = latestActives || 64;
     var startSubs = Math.max(1, Math.round(actives * COMMITTED_RATIO));
@@ -728,6 +760,7 @@
       defs[0].newPaidStart = Math.round(derivedNewPaid * 0.65);
       defs[3].newPaidStart = Math.round(derivedNewPaid * 1.65);
     }
+    markCurrentTier(derivedNewPaid);
 
     var euNp = derivedNewPaid && derivedNewPaid >= 20 ? derivedNewPaid : 55;
     var multi = simulateMultiRegion(startSubs, arpuNetSek, euNp, Math.round(euNp * 0.8), 36);
