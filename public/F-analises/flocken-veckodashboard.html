@@ -186,6 +186,16 @@
   </div>
 
   <div class="card">
+    <h2>Win-back – gratis-trials 🎯</h2>
+    <p class="help">Automatiska rabatt-mejl (Apple offer codes) till 6-mån-gratiskohorten: 3 mejl/person — 4 dagar före periodslut, dagen före, och 3 dagar efter. Mejlen slutar direkt när personen tecknar prenumeration. Rullar dagligen aug–okt 2026.</p>
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-value" id="wbMejl">–</div><div class="kpi-label">Mejl skickade<br><small style="font-size:0.75em;opacity:0.7;" id="wbMejlDetalj">mejl 1 / 2 / 3</small></div></div>
+      <div class="kpi-card"><div class="kpi-value" style="color:#2e7d32;" id="wbPren">–</div><div class="kpi-label">Prenumerationer skapade<br><small style="font-size:0.75em;opacity:0.7;">mottagare som nu betalar</small></div></div>
+      <div class="kpi-card"><div class="kpi-value" id="wbSenaste">–</div><div class="kpi-label">Senaste mejl</div></div>
+    </div>
+  </div>
+
+  <div class="card">
     <h2>Prenumerationer &amp; Intäkter</h2>
     <p class="help">Aktiva <strong>betalande</strong> prenumerationer (exkl. trials) — exakt från RevenueCat, synkat dagligen kl 07:00. Senast synkat RC: <strong id="rcDataUpdated">–</strong>. Trials redovisas separat nedan.</p>
 
@@ -1856,6 +1866,18 @@
       var rcChartRevenue = null;
       var rcChartChurn = null;
 
+      function renderWinbackStats(d) {
+        if (!d) return;
+        var mejl = document.getElementById('wbMejl');
+        var detalj = document.getElementById('wbMejlDetalj');
+        var pren = document.getElementById('wbPren');
+        var senaste = document.getElementById('wbSenaste');
+        if (mejl) mejl.textContent = (d.mejl_totalt != null ? d.mejl_totalt : '–');
+        if (detalj) detalj.textContent = 'mejl 1: ' + (d.mejl_t1 || 0) + ' · mejl 2: ' + (d.mejl_t2 || 0) + ' · mejl 3: ' + (d.mejl_t3 || 0);
+        if (pren) pren.textContent = (d.prenumerationer != null ? d.prenumerationer : '–');
+        if (senaste) senaste.textContent = d.senaste_mejl ? d.senaste_mejl : 'inga än';
+      }
+
       var cancellationsDailyChart = null;
       function renderCancellationsDaily(data) {
         if (!Array.isArray(data) || data.length === 0) return;
@@ -2494,13 +2516,15 @@
           if (savedCampaign) { renderMessageReminderCampaign(JSON.parse(savedCampaign)); }
           var savedCanc = localStorage.getItem('flocken_dashboard_cancellations');
           if (savedCanc) { renderCancellationsDaily(JSON.parse(savedCanc)); }
+          var savedWinback = localStorage.getItem('flocken_dashboard_winback');
+          if (savedWinback) { renderWinbackStats(JSON.parse(savedWinback)); }
         } catch (e) {}
         renderAll(main, events);
 
         // Auto-fetch live data from Supabase
         if (statusEl) statusEl.textContent = 'Hämtar live-data...';
         // Använd allSettled så att en misslyckad RPC inte kraschar hela hämtningen
-        Promise.allSettled([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types'), rpc('dashboard_today_highlights'), rpc('dashboard_retention'), rpc('dashboard_subscription_bars'), rpc('dashboard_events_daily_current_week'), rpc('dashboard_subscription_summary'), rpc('dashboard_store_downloads_summary'), rpc('dashboard_funnel_history'), rpc('dashboard_rc_trials_summary'), rpc('dashboard_rc_trial_cohorts'), rpc('dashboard_rc_weekly_metrics'), rpc('dashboard_message_reminder_campaign_effect'), rpc('dashboard_rc_cancellations_daily')])
+        Promise.allSettled([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types'), rpc('dashboard_today_highlights'), rpc('dashboard_retention'), rpc('dashboard_subscription_bars'), rpc('dashboard_events_daily_current_week'), rpc('dashboard_subscription_summary'), rpc('dashboard_store_downloads_summary'), rpc('dashboard_funnel_history'), rpc('dashboard_rc_trials_summary'), rpc('dashboard_rc_trial_cohorts'), rpc('dashboard_rc_weekly_metrics'), rpc('dashboard_message_reminder_campaign_effect'), rpc('dashboard_rc_cancellations_daily'), rpc('dashboard_winback_stats')])
           .then(function(settled) {
             var failed = settled.filter(function(s) { return s.status === 'rejected'; });
             if (failed.length > 0) {
@@ -2691,6 +2715,12 @@
             if (Array.isArray(cancResult) && cancResult.length > 0) {
               try { localStorage.setItem('flocken_dashboard_cancellations', JSON.stringify(cancResult)); } catch (e) {}
               renderCancellationsDaily(cancResult);
+            }
+            // results[17] = dashboard_winback_stats (win-back-kampanjen: mejl + konverteringar)
+            var wbResult = results[17];
+            if (Array.isArray(wbResult) && wbResult.length > 0 && wbResult[0]) {
+              try { localStorage.setItem('flocken_dashboard_winback', JSON.stringify(wbResult[0])); } catch (e) {}
+              renderWinbackStats(wbResult[0]);
             }
             renderAll(lastMainData, lastEventsData);
             if (!failed.length) {
