@@ -179,6 +179,12 @@
   </div>
 
   <div class="card">
+    <h2>Nedladdningar i Brasilien – App Store &amp; Google Play</h2>
+    <p class="help">Dagliga nedladdningar i Brasilien (landsfiltrerat). Synkas automatiskt varje natt 06:10 UTC. Obs: butikerna rapporterar med fördröjning – Apple ~1 dygn, Google Play 1–2 dygn – så lanseringsdagens siffror syns här först nästa dag.</p>
+    <div id="outBrDownloads"><em>Väntar på data…</em></div>
+  </div>
+
+  <div class="card">
     <h2>Användare per prenumerationstyp</h2>
     <p class="help">Totalt antal användare: gratiskonto, gratis-premium (trial), betalande.</p>
     <div id="outSubscriptionBars"></div>
@@ -1619,12 +1625,47 @@
           if (savedRetention) { lastRetentionData = JSON.parse(savedRetention); }
           var savedSubscription = localStorage.getItem('flocken_dashboard_br_subscription');
           if (savedSubscription) { lastSubscriptionData = JSON.parse(savedSubscription); }
+          var savedDownloads = localStorage.getItem('flocken_dashboard_br_downloads');
+          if (savedDownloads) { try { renderBrDownloads(JSON.parse(savedDownloads)); } catch (eDl) {} }
         } catch (e) {}
         renderAll(main, events);
 
+        // Nedladdningar i Brasilien (dashboard_store_downloads_summary, landsfiltrerad synk)
+        var BR_LAUNCH_DATE = '2026-08-03';
+        function renderBrDownloads(dl) {
+          var el = document.getElementById('outBrDownloads');
+          if (!el || !dl || !Array.isArray(dl.history)) return;
+          var hist = dl.history;
+          var sum7 = 0, sumLaunch = 0;
+          var cutoff7 = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
+          for (var i = 0; i < hist.length; i++) {
+            var h = hist[i];
+            if (h.date >= cutoff7) sum7 += (h.total || 0);
+            if (h.date >= BR_LAUNCH_DATE) sumLaunch += (h.total || 0);
+          }
+          var html = '<div style="display:flex; gap:1.5rem; flex-wrap:wrap; margin-bottom:0.75rem;">';
+          html += '<div><p class="dau-value" style="margin:0;">' + sumLaunch + '</p><p class="dau-hint" style="margin:0.1rem 0 0;">Sedan lansering (' + BR_LAUNCH_DATE + ')</p></div>';
+          html += '<div><p class="dau-value" style="margin:0;">' + sum7 + '</p><p class="dau-hint" style="margin:0.1rem 0 0;">Senaste 7 dagarna</p></div>';
+          html += '<div><p class="dau-value" style="margin:0;">' + (dl.latest_ios != null ? dl.latest_ios : '–') + '</p><p class="dau-hint" style="margin:0.1rem 0 0;">iOS senast (' + (dl.latest_ios_date || '–') + ')</p></div>';
+          html += '<div><p class="dau-value" style="margin:0;">' + (dl.latest_android != null ? dl.latest_android : '–') + '</p><p class="dau-hint" style="margin:0.1rem 0 0;">Android senast (' + (dl.latest_android_date || '–') + ')</p></div>';
+          html += '</div>';
+          var recent = hist.slice(-14).reverse();
+          if (recent.length > 0) {
+            html += '<table><thead><tr><th>Datum</th><th>iOS</th><th>Android</th><th>Totalt</th></tr></thead><tbody>';
+            for (var j = 0; j < recent.length; j++) {
+              var r = recent[j];
+              html += '<tr><td>' + r.date + '</td><td>' + (r.ios || 0) + '</td><td>' + (r.android || 0) + '</td><td><strong>' + (r.total || 0) + '</strong></td></tr>';
+            }
+            html += '</tbody></table>';
+          } else {
+            html += '<p class="help">Ingen data ännu – första synken körs när store-nycklarna är på plats. Butikerna rapporterar med ~1 dygns fördröjning.</p>';
+          }
+          el.innerHTML = html;
+        }
+
         // Auto-fetch live data from Supabase
         if (statusEl) statusEl.textContent = 'Hämtar live-data...';
-        Promise.all([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types'), rpc('dashboard_today_highlights'), rpc('dashboard_retention'), rpc('dashboard_subscription_bars'), rpc('dashboard_events_daily_current_week')])
+        Promise.all([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types'), rpc('dashboard_today_highlights'), rpc('dashboard_retention'), rpc('dashboard_subscription_bars'), rpc('dashboard_events_daily_current_week'), rpc('dashboard_store_downloads_summary').catch(function(){ return null; })])
           .then(function(results) {
             var mainResult = results[0];
             var eventsResult = results[1];
@@ -1713,6 +1754,16 @@
             lastEventsDailyData = Array.isArray(results[8]) ? results[8] : [];
             if (Array.isArray(results[8]) && results[8].length === 1 && results[8][0] && results[8][0].dashboard_events_daily_current_week) {
               lastEventsDailyData = results[8][0].dashboard_events_daily_current_week;
+            }
+            // results[9] = dashboard_store_downloads_summary (landsfiltrerad BR; .catch → null vid fel)
+            var dlObj = results[9];
+            if (Array.isArray(dlObj) && dlObj.length === 1 && dlObj[0] && dlObj[0].dashboard_store_downloads_summary) {
+              dlObj = dlObj[0].dashboard_store_downloads_summary;
+            }
+            if (typeof dlObj === 'string') { try { dlObj = JSON.parse(dlObj); } catch (e) { dlObj = null; } }
+            if (dlObj && dlObj.history) {
+              try { localStorage.setItem('flocken_dashboard_br_downloads', JSON.stringify(dlObj)); } catch (e) {}
+              renderBrDownloads(dlObj);
             }
             renderAll(lastMainData, lastEventsData);
             if (statusEl) statusEl.textContent = 'Uppdaterad ' + new Date().toLocaleString('sv-SE');
