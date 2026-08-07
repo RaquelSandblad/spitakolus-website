@@ -240,8 +240,9 @@
 ════════════════════════════════════════════════════════════ -->
 <div class="card">
   <h2>Betalda konton per vecka</h2>
-  <p class="help">Källa: Supabase (subscription_upgrade_log). Räknar FÖRSTA övergången till betald
-    prenumeration per konto — ingen räknas dubbelt vid byte månad↔år eller återkomst.</p>
+  <p class="help">Källa: RevenueCat (analytics_rc_weekly_metrics, synkas dagligen). Nya betalande
+    härleds som <em>förändring i aktiva prenumerationer + churnade samma vecka</em> — dvs. faktiska
+    betalande, inte statusfält i profiltabellen. Sista stapeln är innevarande, ofullständiga vecka.</p>
   <div class="chart-wrap"><canvas id="newPaidChart"></canvas></div>
   <div id="newPaidKpis" class="kpi-grid"></div>
 </div>
