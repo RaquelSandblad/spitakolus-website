@@ -236,6 +236,19 @@
 <hr class="divider">
 
 <!-- ═══════════════════════════════════════════════════════════
+     Betalda konton per vecka
+════════════════════════════════════════════════════════════ -->
+<div class="card">
+  <h2>Betalda konton per vecka</h2>
+  <p class="help">Källa: Supabase (subscription_upgrade_log). Räknar FÖRSTA övergången till betald
+    prenumeration per konto — ingen räknas dubbelt vid byte månad↔år eller återkomst.</p>
+  <div class="chart-wrap"><canvas id="newPaidChart"></canvas></div>
+  <div id="newPaidKpis" class="kpi-grid"></div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════════════════════
      Prognos (branschbaserad, dynamisk)
 ════════════════════════════════════════════════════════════ -->
 <div class="card">
@@ -945,6 +958,32 @@
       kpiCard(last + '%', 'Senaste veckan', last > 5 ? 'danger' : 'success');
   }
 
+  function renderNewPaidChart(rows) {
+    if (!rows || !rows.length) return;
+    var labels = rows.map(function(r) { return r.label || ''; });
+    var data   = rows.map(function(r) { return r.nya_betalda || 0; });
+    var ctx = document.getElementById('newPaidChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: { labels: labels, datasets: [{ label: 'Nya betalda konton', data: data, backgroundColor: isDark ? 'rgba(122,178,243,0.6)' : 'rgba(29,90,160,0.55)' }] },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: TEXT_COLOR } } },
+        scales: {
+          x: { ticks: { color: TICK_COLOR, maxRotation: 45, minRotation: 45 }, grid: { color: GRID_COLOR } },
+          y: { beginAtZero: true, ticks: { color: TICK_COLOR, precision: 0 }, grid: { color: GRID_COLOR } }
+        }
+      }
+    });
+
+    var total = data.reduce(function(a,b){return a+b;},0);
+    var lastFour = data.slice(-4).reduce(function(a,b){return a+b;},0);
+    document.getElementById('newPaidKpis').innerHTML =
+      kpiCard(total, 'Totalt nya betalda (period)', '') +
+      kpiCard(Math.round(lastFour/4), 'Genomsnitt senaste 4 v', '') +
+      kpiCard(data[data.length-1], 'Senaste veckan', '');
+  }
+
   function renderAccountsChart(weekly) {
     if (!weekly || !weekly.length) return;
     // Use last 16 weeks, field is nya_konton
@@ -980,6 +1019,7 @@
     rpc('dashboard_subscription_bars'),
     rpc('dashboard_rc_trials_summary'),
     rpc('dashboard_rc_weekly_metrics', 'brazil').catch(function() { return null; }),
+    rpc('dashboard_new_paid_weekly').catch(function() { return null; }),
   ]).then(function(settled) {
     var failed = settled.filter(function(s) { return s.status === 'rejected'; });
     if (failed.length > 0) console.warn('Rapport: ' + failed.length + ' RPC(er) misslyckades:', failed.map(function(s) { return s.reason; }));
@@ -991,6 +1031,7 @@
     var subBars      = results[3];
     var trialsSumm   = results[4];
     var brMetricsRaw = results[5];
+    var newPaidWeekly = results[6];
 
     // Normalize RPC results (jsonb RPCs are wrapped as [{ rpc_name: [...] }])
     function unwrap(r, key) {
@@ -1053,6 +1094,9 @@
     } else {
       setText('kpiTrials', '—');
     }
+
+    // ── Betalda konton per vecka (dashboard_new_paid_weekly) ────
+    if (Array.isArray(newPaidWeekly) && newPaidWeekly.length) renderNewPaidChart(newPaidWeekly);
 
     // ── Weekly main: new accounts per week (field: nya_konton) ───
     var wArr = Array.isArray(weeklyMain) ? weeklyMain : [];
