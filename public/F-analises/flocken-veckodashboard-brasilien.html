@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="sv">
+<html lang="pt-BR">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>Flocken – Veckovis aktivitet (Brasilien)</title>
+  <title>Flocken – Atividade semanal (Brasil)</title>
   <!-- Version: 2026-05-14 – Kopia av EU-dashboard (2026-05-08b); data från Supabase Brasilien (vdpdehoreqjlenvqumho). localStorage-prefix: flocken_dashboard_br_* -->
   <style>
     :root {
@@ -137,7 +137,7 @@
 </head>
 <body>
   <script>
-    if(!sessionStorage.getItem('dashboard_ok')){location.replace('index.html');}
+    if(!sessionStorage.getItem('dashboard_br_ok')){location.replace('brasil.html');}
     (function(){
       var t = localStorage.getItem('dashboard_theme') || 'light';
       document.documentElement.setAttribute('data-theme', t);
@@ -145,14 +145,14 @@
   </script>
   <p style="margin:0 0 0.5rem 0; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
     <span></span>
-    <button type="button" id="themeToggle" style="margin:0;">Mörkt tema</button>
+    <button type="button" id="themeToggle" style="margin:0;">Tema escuro</button>
   </p>
   <script>
     (function(){
       var btn = document.getElementById('themeToggle');
       function updateBtn() {
         var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        btn.textContent = isDark ? 'Ljust tema' : 'Mörkt tema';
+        btn.textContent = isDark ? 'Tema claro' : 'Tema escuro';
       }
       btn.onclick = function() {
         var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -164,90 +164,90 @@
       updateBtn();
     })();
   </script>
-  <h1>Flocken – Veckovis aktivitet <span style="font-size:0.75rem;font-weight:600;color:var(--muted);vertical-align:middle;">(Brasilien)</span></h1>
-  <div id="textSummary" class="sr-only" role="region" aria-label="Textsammanfattning för skärmläsare och AI"></div>
+  <h1>Flocken – Atividade semanal <span style="font-size:0.75rem;font-weight:600;color:var(--muted);vertical-align:middle;">(Brasil)</span></h1>
+  <div id="textSummary" class="sr-only" role="region" aria-label="Resumo em texto para leitores de tela e IA"></div>
   <div class="card dau-card" id="dauCard" aria-live="polite">
     <div id="outDau"></div>
   </div>
-  <p class="help"><strong>Här nedan ser du:</strong> antal nya konton, hundar, hundvaktprofiler, konversationer, meddelanden, promenader och hundvänliga platser vecka för vecka – plus app-events (inloggningar, annonser skapade, kontakt med hundvakt). Alla siffror exkluderar Raquel, Torbjörn och tb.sandblad.</p>
-  <p class="help" style="margin-bottom:0;"><strong>Live-data</strong> <span id="fetchStatus" style="font-weight:600;"></span></p>
+  <p class="help"><strong>Abaixo é possível ver:</strong> número de novas contas, cães, perfis de cuidadores de cães, conversas, mensagens, passeios e locais que aceitam cães, semana a semana – além dos eventos do app (logins, anúncios criados, contato com cuidador). Todos os números excluem Raquel, Torbjörn e tb.sandblad.</p>
+  <p class="help" style="margin-bottom:0;"><strong>Dados ao vivo</strong> <span id="fetchStatus" style="font-weight:600;"></span></p>
 
   <div class="card">
-    <h2>Dagens höjdpunkter</h2>
-    <p class="help">Dagens nyckeltal</p>
+    <h2>Destaques de hoje</h2>
+    <p class="help">Indicadores-chave de hoje</p>
     <div id="outHighlights"></div>
   </div>
 
   <div class="card">
-    <h2>Nedladdningar i Brasilien – App Store &amp; Google Play</h2>
-    <p class="help">Dagliga nedladdningar i Brasilien (landsfiltrerat). Synkas automatiskt varje natt 06:10 UTC. Obs: butikerna rapporterar med fördröjning – Apple ~1 dygn, Google Play 1–2 dygn – så lanseringsdagens siffror syns här först nästa dag.</p>
-    <div id="outBrDownloads"><em>Väntar på data…</em></div>
+    <h2>Downloads no Brasil – App Store &amp; Google Play</h2>
+    <p class="help">Downloads diários no Brasil (filtrado por país). Sincronizado automaticamente todas as noites às 06:10 UTC. Obs.: as lojas reportam com atraso – Apple ~1 dia, Google Play 1–2 dias – portanto os números do dia do lançamento só aparecem aqui no dia seguinte.</p>
+    <div id="outBrDownloads"><em>Aguardando dados…</em></div>
   </div>
 
   <div class="card">
-    <h2>Användare per prenumerationstyp</h2>
-    <p class="help">Totalt antal användare: gratiskonto, gratis-premium (trial), betalande.</p>
+    <h2>Usuários por tipo de assinatura</h2>
+    <p class="help">Número total de usuários: conta gratuita, premium gratuito (trial), pagantes.</p>
     <div id="outSubscriptionBars"></div>
   </div>
 
   <div class="card">
-    <h2>KPI – senaste fulla veckan</h2>
+    <h2>KPI – última semana completa</h2>
     <div id="outKpi"></div>
   </div>
 
   <div class="card">
-    <h2>Kontotyper – fördelning och e-postbekräftelse</h2>
-    <p class="help">Totalt antal konton per typ, hur många som bekräftat sin e-post, och nya konton per vecka uppdelat på typ.</p>
+    <h2>Tipos de conta – distribuição e confirmação de e-mail</h2>
+    <p class="help">Número total de contas por tipo, quantas confirmaram o e-mail e novas contas por semana divididas por tipo.</p>
     <div id="outAccountTypes"></div>
     <div id="outAccountWeekly"></div>
   </div>
 
   <div class="card">
-    <h2>App-events veckovis (pivoterat – en rad per vecka)</h2>
-    <p class="help">Unika användare per event och vecka. Visar senaste tre fulla veckor.</p>
+    <h2>Eventos do app por semana (pivotado – uma linha por semana)</h2>
+    <p class="help">Usuários únicos por evento e semana. Mostra as últimas três semanas completas.</p>
     <div class="table-wrap"><div id="outEvents"></div></div>
-    <h3 style="margin-top:1.25rem; font-size:1rem;">App-events över tid (linjediagram)</h3>
-    <p class="help">Vecko-vy är exakt pivotens unika/anrop. Vid <strong>månader</strong> summeras händelsantal per månad; för <strong>unika</strong> per månad används högsta veckotal i månaden (konservativt grovuppskattning – sant månadsvärde kräver egen SQL).</p>
+    <h3 style="margin-top:1.25rem; font-size:1rem;">Eventos do app ao longo do tempo (gráfico de linhas)</h3>
+    <p class="help">A visão semanal corresponde exatamente aos únicos/chamadas do pivô. Em <strong>meses</strong>, o número de eventos é somado por mês; para <strong>únicos</strong> por mês usa-se o maior valor semanal do mês (estimativa aproximada conservadora – o valor mensal verdadeiro exige uma consulta SQL própria).</p>
     <div class="chart-toolbar" id="eventsTrendToolbar"></div>
     <div id="outEventsCharts"></div>
-    <h3 style="margin-top:1.5rem; font-size:1rem;">Pågående vecka (dag för dag)</h3>
+    <h3 style="margin-top:1.5rem; font-size:1rem;">Semana em curso (dia a dia)</h3>
     <div class="table-wrap"><div id="outEventsDaily"></div></div>
     <details style="margin-top:1rem;">
-      <summary style="cursor:pointer; color:var(--muted); font-size:0.9rem;">Uppdatera med ny data från Supabase</summary>
-      <textarea id="jsonEvents" placeholder='Klistra in JSON här...' style="min-height:80px;"></textarea>
-      <button type="button" id="btnEvents">Visa uppdaterade events</button>
+      <summary style="cursor:pointer; color:var(--muted); font-size:0.9rem;">Atualizar com novos dados do Supabase</summary>
+      <textarea id="jsonEvents" placeholder='Cole o JSON aqui...' style="min-height:80px;"></textarea>
+      <button type="button" id="btnEvents">Mostrar eventos atualizados</button>
       <div id="errEvents" class="error" style="display:none;"></div>
     </details>
   </div>
 
   <div class="card">
-    <h2>Daglig återkomst (retention per kohort)</h2>
-    <p class="help">Av de som skapade konto en given dag – hur många öppnade appen igen? Dag 0 = senare samma dag. ~Dag 14/21/30 räknar ±1–2 dagar runt exakt dag för att fånga upp folk som kom tillbaka strax innan/efter. Visar antal och % av kohorten.</p>
+    <h2>Retorno diário (retenção por coorte)</h2>
+    <p class="help">Dentre os que criaram conta em um determinado dia – quantos abriram o app novamente? Dia 0 = mais tarde no mesmo dia. ~Dia 14/21/30 considera ±1–2 dias em torno do dia exato para captar quem voltou pouco antes/depois. Mostra o número e a % da coorte.</p>
     <div id="outRetention"></div>
   </div>
 
   <div class="card">
-    <h2>Veckovis översikt (råtal + andelar)</h2>
+    <h2>Visão geral semanal (números brutos + proporções)</h2>
     <div class="table-wrap"><div id="outMain"></div></div>
     <div id="outPartial" style="margin-top:1rem;"></div>
-    <h3 style="margin-top:1.25rem;">Trendlinjer (samma mått som tabellen)</h3>
-    <p class="help">Linjediagram för längre uppföljning. Vid <strong>månad</strong> summeras rörelsetal (konton, hundar, meddelanden, …); procenttal (reply rate) vägs med antal konversationer; för notis-<em>unika</em> används max av veckorna i månaden.</p>
+    <h3 style="margin-top:1.25rem;">Linhas de tendência (mesmas métricas da tabela)</h3>
+    <p class="help">Gráfico de linhas para acompanhamento de prazo mais longo. Em <strong>mês</strong>, os valores de fluxo são somados (contas, cães, mensagens, …); os percentuais (reply rate) são ponderados pelo número de conversas; para <em>únicos</em> de notificação usa-se o máximo das semanas do mês.</p>
     <div class="chart-toolbar" id="mainTrendToolbar"></div>
     <div id="outCharts"></div>
     <p style="margin-top:0.75rem;">
-      <button type="button" id="btnExportCsv">Exportera huvudtabell som CSV</button>
-      <button type="button" id="btnClearCache" style="margin-left:0.5rem; background:#dc3545;">Rensa cache & ladda om</button>
+      <button type="button" id="btnExportCsv">Exportar tabela principal como CSV</button>
+      <button type="button" id="btnClearCache" style="margin-left:0.5rem; background:#dc3545;">Limpar cache & recarregar</button>
     </p>
     <details style="margin-top:1rem;">
-      <summary style="cursor:pointer; color:var(--muted); font-size:0.9rem;">Uppdatera med ny data från Supabase</summary>
-      <p class="help">Kör huvudfrågan i Supabase SQL Editor, kopiera resultatet som JSON och klistra in här, klicka sedan på knappen. Data sparas lokalt (localStorage) så du slipper klistra in nästa gång.</p>
-      <textarea id="jsonMain" placeholder='Klistra in JSON här...' style="min-height:80px;"></textarea>
-      <button type="button" id="btnMain">Visa uppdaterad huvudtabell</button>
+      <summary style="cursor:pointer; color:var(--muted); font-size:0.9rem;">Atualizar com novos dados do Supabase</summary>
+      <p class="help">Execute a consulta principal no SQL Editor do Supabase, copie o resultado como JSON e cole aqui; em seguida, clique no botão. Os dados são salvos localmente (localStorage), o que dispensa nova colagem na próxima vez.</p>
+      <textarea id="jsonMain" placeholder='Cole o JSON aqui...' style="min-height:80px;"></textarea>
+      <button type="button" id="btnMain">Exibir tabela principal atualizada</button>
       <div id="errMain" class="error" style="display:none;"></div>
     </details>
   </div>
 
-  <p class="disclaimer">Alla siffror exkluderar Raquel Sandblad, Torbjörn Sandblad och tb.sandblad-konton (analytics_excluded_users).</p>
+  <p class="disclaimer">Todos os números excluem Raquel Sandblad, Torbjörn Sandblad e contas tb.sandblad (analytics_excluded_users).</p>
 
   <script>
     (function() {
@@ -267,17 +267,17 @@
       }
 
       var mainLabels = {
-        label: 'Vecka',
-        nya_konton: 'Nya konton',
-        nya_hundar: 'Nya hundar',
-        nya_hundvakt_profiler: 'Nya hundvaktprofiler',
-        sitter_konversationer: 'Nya sitter-konversationer',
-        tindog_konversationer: 'Nya tindog-konversationer',
-        sitter_meddelanden: 'Meddelanden (sitter)',
-        tindog_meddelanden: 'Meddelanden (tindog)',
-        promenader: 'Promenader',
-        hundvanliga_platser: 'Hundvänliga platser',
-        bokningar: 'Bokningar'
+        label: 'Semana',
+        nya_konton: 'Novas contas',
+        nya_hundar: 'Novos cães',
+        nya_hundvakt_profiler: 'Novos perfis de cuidador',
+        sitter_konversationer: 'Novas conversas (cuidador)',
+        tindog_konversationer: 'Novas conversas (tindog)',
+        sitter_meddelanden: 'Mensagens (cuidador)',
+        tindog_meddelanden: 'Mensagens (tindog)',
+        promenader: 'Passeios',
+        hundvanliga_platser: 'Locais que aceitam cães',
+        bokningar: 'Reservas'
       };
 
       var DEFAULT_MAIN_DATA = [];
@@ -324,7 +324,7 @@
         var el = document.getElementById('outDau');
         if (!el) return;
         if (!todayData || !todayData.date) {
-          el.innerHTML = '<p class="dau-hint" style="margin:0;">DAU laddas när dagens data finns från Supabase.</p>';
+          el.innerHTML = '<p class="dau-hint" style="margin:0;">O DAU é carregado quando os dados de hoje estiverem disponíveis no Supabase.</p>';
           return;
         }
 
@@ -342,29 +342,29 @@
         html += '<div style="display:flex;align-items:baseline;gap:0.5rem;">';
         html += '<span class="dau-value">' + (dau != null ? dau : '—') + '</span>';
         html += '</div>';
-        html += '<p class="dau-title" style="margin:0.15rem 0 0;">DAU – inloggade</p>';
-        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Unika inloggade användare</p>';
+        html += '<p class="dau-title" style="margin:0.15rem 0 0;">DAU – logados</p>';
+        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Usuários logados únicos</p>';
         html += '</div>';
 
-        // Kolumn 2 – Nedladdningar (anonyma enheter)
+        // Kolumn 2 – Downloads (anonyma enheter)
         html += '<div>';
         html += '<div style="display:flex;align-items:baseline;gap:0.5rem;">';
         html += '<span class="dau-value" style="color:var(--muted);">' + (anonymousOpens != null ? anonymousOpens : '—') + '</span>';
         html += '</div>';
-        html += '<p class="dau-title" style="margin:0.15rem 0 0;">Nedladdningar</p>';
-        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Endast anonyma enheter</p>';
+        html += '<p class="dau-title" style="margin:0.15rem 0 0;">Downloads</p>';
+        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Apenas dispositivos anônimos</p>';
         html += '</div>';
 
-        // Kolumn 3 – Nya konton
+        // Kolumn 3 – Novas contas
         html += '<div>';
         html += '<div style="display:flex;align-items:baseline;gap:0.5rem;">';
         html += '<span class="dau-value" style="color:var(--accent);">' + (newAccountsTotal != null ? newAccountsTotal : '—') + '</span>';
         html += '</div>';
-        html += '<p class="dau-title" style="margin:0.15rem 0 0;">Nya konton</p>';
-        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Registreringar idag</p>';
+        html += '<p class="dau-title" style="margin:0.15rem 0 0;">Novas contas</p>';
+        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Cadastros de hoje</p>';
         html += '</div>';
 
-        // Kolumn 4 – Konversion
+        // Kolumn 4 – Conversão
         html += '<div>';
         html += '<div style="display:flex;align-items:baseline;gap:0.5rem;">';
         var convColor = convPct != null
@@ -372,12 +372,12 @@
           : 'var(--muted)';
         html += '<span class="dau-value" style="color:' + convColor + ';">' + (convPct != null ? convPct + '%' : '—') + '</span>';
         html += '</div>';
-        html += '<p class="dau-title" style="margin:0.15rem 0 0;">Konversion</p>';
-        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Nya konton / nedladdningar</p>';
+        html += '<p class="dau-title" style="margin:0.15rem 0 0;">Conversão</p>';
+        html += '<p class="dau-hint" style="margin:0.1rem 0 0;">Novas contas / downloads</p>';
         html += '</div>';
 
         html += '</div>';
-        html += '<p class="dau-hint" style="margin-top:0.6rem;">Händelse <code>app_opened</code> idag. Konversion = andel nedladdningar som registrerade sig. Exkluderar testkonton.</p>';
+        html += '<p class="dau-hint" style="margin-top:0.6rem;">Evento <code>app_opened</code> hoje. Conversão = parcela dos downloads que se cadastraram. Exclui contas de teste.</p>';
 
         el.innerHTML = html;
       }
@@ -387,7 +387,7 @@
         if (!container) return;
         
         if (!todayData || !todayData.date) {
-          container.innerHTML = '<p class="help">Ingen data för idag tillgänglig än.</p>';
+          container.innerHTML = '<p class="help">Ainda não há dados de hoje disponíveis.</p>';
           return;
         }
 
@@ -396,9 +396,9 @@
         
         var totalNewAccounts = todayData.new_accounts_total != null ? todayData.new_accounts_total : 0;
         
-        html += '<div class="kpi-card"><div class="kpi-value">' + totalNewAccounts + '</div><div class="kpi-label">Nya konton</div></div>';
-        html += '<div class="kpi-card"><div class="kpi-value">' + (todayData.new_dogs || 0) + '</div><div class="kpi-label">Nya hundar</div></div>';
-        html += '<div class="kpi-card"><div class="kpi-value">' + (todayData.new_sitters || 0) + '</div><div class="kpi-label">Nya hundvaktprofiler</div></div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + totalNewAccounts + '</div><div class="kpi-label">Novas contas</div></div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + (todayData.new_dogs || 0) + '</div><div class="kpi-label">Novos cães</div></div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + (todayData.new_sitters || 0) + '</div><div class="kpi-label">Novos perfis de cuidador</div></div>';
         html += '</div></div>';
         
         html += '<div><canvas id="highlightsChart" style="max-height:180px;"></canvas></div>';
@@ -413,7 +413,7 @@
         var kennelAcct = todayData.accounts.find(function(a) { return a.account_type === 'kennel'; });
         var daycareAcct = todayData.accounts.find(function(a) { return a.account_type === 'dog_daycare'; });
 
-        var labels = ['Hundägare', 'Hundvakt', 'Kennel', 'Hunddagis'];
+        var labels = ['Tutores', 'Cuidadores', 'Criador/Criador/Kennel', 'Creche para cães'];
         
         var ownerTotal = (ownerAcct && ownerAcct.new_accounts) || 0;
         var ownerWithProfile = (ownerAcct && ownerAcct.with_profile) || 0;
@@ -448,13 +448,13 @@
             labels: labels,
             datasets: [
               {
-                label: 'Med profil',
+                label: 'Com perfil',
                 data: solidData,
                 backgroundColor: colors,
                 borderWidth: 0
               },
               {
-                label: 'Utan profil',
+                label: 'Sem perfil',
                 data: hatchData,
                 backgroundColor: hatchPatterns,
                 borderColor: colors,
@@ -487,7 +487,7 @@
         mainData = mainData || [];
         eventsData = eventsData || [];
         var full = getFullWeeks(mainData);
-        if (full.length < 2) return '<p class="help">Minst 2 fulla veckor krävs för KPI och jämförelse med föregående vecka.</p>';
+        if (full.length < 2) return '<p class="help">São necessárias no mínimo 2 semanas completas para os KPIs e a comparação com a semana anterior.</p>';
         var curr = full[full.length - 1];
         var prev = full[full.length - 2];
         var dCurr = computeDerived(curr);
@@ -506,27 +506,27 @@
         }
         function fmtPpChange(currPct, prevPct) {
           var pp = currPct - prevPct;
-          return 'från ' + prevPct.toFixed(1).replace('.', ',') + '% → ' + currPct.toFixed(1).replace('.', ',') + '% (' + (pp >= 0 ? '+' : '') + pp.toFixed(1).replace('.', ',') + ' procentenheter)';
+          return 'de ' + prevPct.toFixed(1).replace('.', ',') + '% → ' + currPct.toFixed(1).replace('.', ',') + '% (' + (pp >= 0 ? '+' : '') + pp.toFixed(1).replace('.', ',') + ' pontos percentuais)';
         }
         var kontonChange = pctChange(curr.nya_konton, prev.nya_konton);
         var hundPp = ppChange(dCurr.hund_aktivering_pct, dPrev.hund_aktivering_pct);
         var vaktPp = ppChange(dCurr.vakt_aktivering_pct, dPrev.vakt_aktivering_pct);
         var html = '<div class="kpi-grid">';
-        html += '<div class="kpi-card"><div class="kpi-value">' + (curr.nya_konton || 0) + '</div><div class="kpi-label">Nya konton</div>' + (kontonChange != null ? '<div class="wow ' + (kontonChange >= 0 ? 'wow-up' : 'wow-down') + '">' + (kontonChange >= 0 ? '+' : '') + kontonChange.toFixed(1) + '% vs föregående vecka</div>' : '') + '</div>';
-        html += '<div class="kpi-card"><div class="kpi-value">' + dCurr.hund_aktivering_pct.toFixed(1).replace('.', ',') + '%</div><div class="kpi-label">Hund-aktivering (' + (curr.nya_hundar || 0) + ' av ' + (curr.nya_konton || 0) + ')</div>' + (hundPp != null ? '<div class="wow ' + (hundPp >= 0 ? 'wow-up' : 'wow-down') + '">Jämfört med förra veckan: ' + fmtPpChange(dCurr.hund_aktivering_pct, dPrev.hund_aktivering_pct) + '</div>' : '') + '</div>';
-        html += '<div class="kpi-card"><div class="kpi-value">' + dCurr.vakt_aktivering_pct.toFixed(1).replace('.', ',') + '%</div><div class="kpi-label">Vakt-aktivering</div>' + (vaktPp != null ? '<div class="wow ' + (vaktPp >= 0 ? 'wow-up' : 'wow-down') + '">Jämfört med förra veckan: ' + fmtPpChange(dCurr.vakt_aktivering_pct, dPrev.vakt_aktivering_pct) + '</div>' : '') + '</div>';
-        html += '<div class="kpi-card"><div class="kpi-value">' + dCurr.konv_per_100.toFixed(2) + '</div><div class="kpi-label">Konv per 100 konton</div></div>';
-        html += '<div class="kpi-card"><div class="kpi-value">' + (dCurr.medd_per_konv ? dCurr.medd_per_konv.toFixed(1) : '–') + '</div><div class="kpi-label">Medd per konv</div></div>';
-        html += '<div class="kpi-card"><div class="kpi-value">' + listingRate.toFixed(1) + '%</div><div class="kpi-label">Listing-rate (annons/konton)</div></div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + (curr.nya_konton || 0) + '</div><div class="kpi-label">Novas contas</div>' + (kontonChange != null ? '<div class="wow ' + (kontonChange >= 0 ? 'wow-up' : 'wow-down') + '">' + (kontonChange >= 0 ? '+' : '') + kontonChange.toFixed(1) + '% vs. semana anterior</div>' : '') + '</div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + dCurr.hund_aktivering_pct.toFixed(1).replace('.', ',') + '%</div><div class="kpi-label">Ativação de cães (' + (curr.nya_hundar || 0) + ' de ' + (curr.nya_konton || 0) + ')</div>' + (hundPp != null ? '<div class="wow ' + (hundPp >= 0 ? 'wow-up' : 'wow-down') + '">Comparado com a semana anterior: ' + fmtPpChange(dCurr.hund_aktivering_pct, dPrev.hund_aktivering_pct) + '</div>' : '') + '</div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + dCurr.vakt_aktivering_pct.toFixed(1).replace('.', ',') + '%</div><div class="kpi-label">Ativação de cuidadores</div>' + (vaktPp != null ? '<div class="wow ' + (vaktPp >= 0 ? 'wow-up' : 'wow-down') + '">Comparado com a semana anterior: ' + fmtPpChange(dCurr.vakt_aktivering_pct, dPrev.vakt_aktivering_pct) + '</div>' : '') + '</div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + dCurr.konv_per_100.toFixed(2) + '</div><div class="kpi-label">Conversas por 100 contas</div></div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + (dCurr.medd_per_konv ? dCurr.medd_per_konv.toFixed(1) : '–') + '</div><div class="kpi-label">Msgs por conversa</div></div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + listingRate.toFixed(1) + '%</div><div class="kpi-label">Taxa de anúncios (anúncio/contas)</div></div>';
         var aktiva = (currPivot.app_opened_unika != null) ? currPivot.app_opened_unika : (currPivot.login_unika != null ? currPivot.login_unika : null);
-        html += '<div class="kpi-card"><div class="kpi-value">' + (aktiva != null ? aktiva : '–') + '</div><div class="kpi-label">Aktiva användare (unika)</div><div class="copy-hint">Mätt som unika app-öppningar (fallback: unika login)</div></div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + (aktiva != null ? aktiva : '–') + '</div><div class="kpi-label">Usuários ativos (únicos)</div><div class="copy-hint">Medido como aberturas únicas do app (fallback: logins únicos)</div></div>';
         var sitterU = currPivot.sitter_contacted_unika != null ? currPivot.sitter_contacted_unika : null;
         if (aktiva != null && sitterU != null) {
           var contactRate = (sitterU / aktiva) * 100;
-          html += '<div class="kpi-card"><div class="kpi-value">' + contactRate.toFixed(1) + '%</div><div class="kpi-label">Kontakt med hundvakt</div><div class="copy-hint">' + sitterU + ' av ' + aktiva + ' aktiva (endast sitter_contacted)</div></div>';
+          html += '<div class="kpi-card"><div class="kpi-value">' + contactRate.toFixed(1) + '%</div><div class="kpi-label">Contato com cuidador(a) de cães</div><div class="copy-hint">' + sitterU + ' de ' + aktiva + ' ativos (apenas sitter_contacted)</div></div>';
         }
         var bokningar = curr.bokningar != null ? curr.bokningar : 0;
-        html += '<div class="kpi-card"><div class="kpi-value">' + (bokningar === 0 ? '⚠️ 0' : bokningar) + '</div><div class="kpi-label">Bokningar</div></div>';
+        html += '<div class="kpi-card"><div class="kpi-value">' + (bokningar === 0 ? '⚠️ 0' : bokningar) + '</div><div class="kpi-label">Reservas</div></div>';
         html += '</div>';
         return html;
       }
@@ -544,15 +544,16 @@
       }
 
       function renderMainTable(data) {
-        if (!Array.isArray(data) || data.length === 0) return '<p>Inga rader att visa.</p>';
+        if (!Array.isArray(data) || data.length === 0) return '<p>Nenhuma linha para exibir.</p>';
         var full = getFullWeeks(data);
         var keys = ['nya_konton','nya_hundar','nya_hundvakt_profiler','sitter_konversationer','tindog_konversationer','sitter_meddelanden','tindog_meddelanden','promenader','hundvanliga_platser','bokningar'];
-        var keyLabels = { nya_konton: 'Nya konton', nya_hundar: 'Nya hundar', nya_hundvakt_profiler: 'Nya vaktprofiler', sitter_konversationer: 'Sitter-konv', tindog_konversationer: 'Tindog-konv', sitter_meddelanden: 'Sitter-medd', tindog_meddelanden: 'Tindog-medd', promenader: 'Promenader', hundvanliga_platser: 'Platser', bokningar: 'Bokningar', medd_per_konv: 'Medd/konv' };
-        if (full.length === 0) return '<p>Inga fulla veckor.</p>';
+        var keyLabels = { nya_konton: 'Novas contas', nya_hundar: 'Novos cães', nya_hundvakt_profiler: 'Novos perfis de cuidador', sitter_konversationer: 'Conv. cuidador', tindog_konversationer: 'Conv. Tindog', sitter_meddelanden: 'Msg. cuidador', tindog_meddelanden: 'Msg. Tindog', promenader: 'Passeios', hundvanliga_platser: 'Locais', bokningar: 'Reservas', medd_per_konv: 'Msg/conv' };
+        if (full.length === 0) return '<p>Nenhuma semana completa.</p>';
         full.sort(function(a,b) { return (a.week_num != null && b.week_num != null) ? a.week_num - b.week_num : 0; });
-        var html = '<table><thead><tr><th>Vecka</th>';
+        full = full.slice(-3); // visa bara de tre senaste fulla veckorna
+        var html = '<table><thead><tr><th>Semana</th>';
         keys.forEach(function(k) { html += '<th class="num">' + (mainLabels[k] || k) + '</th>'; });
-        html += '<th class="num">Hund-akt %</th><th class="num">Vakt-akt %</th><th class="num">Konv/100</th><th class="num">Medd/konv</th><th class="num">Push-notiser</th><th class="num">Unika mottagare</th></tr></thead><tbody>';
+        html += '<th class="num">Ativação cães %</th><th class="num">Ativação cuid. %</th><th class="num">Conversas/100</th><th class="num">Msgs/conversa</th><th class="num">Notificações push</th><th class="num">Destinatários únicos</th></tr></thead><tbody>';
         full.forEach(function(row) {
           var d = computeDerived(row);
           html += '<tr><td>' + (row.label || '') + '</td>';
@@ -572,8 +573,8 @@
         if (!row) return '';
         var d = computeDerived(row);
         var dayCount = row.days_in_week || 1;
-        var html = '<p class="help"><strong>Pågående vecka</strong> <span class="badge">' + dayCount + ' dag' + (dayCount > 1 ? 'ar' : '') + '</span> – jämför inte rakt av med 7-dagarsveckor.</p>';
-        html += '<table><thead><tr><th>Vecka</th><th class="num">Nya konton</th><th class="num">Nya hundar</th><th class="num">Hund-akt %</th><th class="num">Sitter-konv</th><th class="num">Tindog-konv</th><th class="num">Medd</th></tr></thead><tbody>';
+        var html = '<p class="help"><strong>Semana em andamento</strong> <span class="badge">' + dayCount + ' dia' + (dayCount > 1 ? 's' : '') + '</span> – não compare diretamente com semanas de 7 dias.</p>';
+        html += '<table><thead><tr><th>Semana</th><th class="num">Novas contas</th><th class="num">Novos cães</th><th class="num">Ativação cães %</th><th class="num">Conv. cuidador</th><th class="num">Conv. Tindog</th><th class="num">Msgs</th></tr></thead><tbody>';
         html += '<tr><td>' + (row.label || '') + '</td><td class="num">' + (row.nya_konton ?? '–') + '</td><td class="num">' + (row.nya_hundar ?? '–') + '</td><td class="num">' + (d.hund_aktivering_pct ? d.hund_aktivering_pct.toFixed(1) + '%' : '–') + '</td><td class="num">' + (row.sitter_konversationer ?? '–') + '</td><td class="num">' + (row.tindog_konversationer ?? '–') + '</td><td class="num">' + ((row.sitter_meddelanden || 0) + (row.tindog_meddelanden || 0)) + '</td></tr>';
         html += '</tbody></table>';
         return html;
@@ -590,8 +591,8 @@
         var fullOnly = pivot.filter(function(r) { return !isPartialEventWeek(r.label); });
         var threeWeeks = fullOnly.slice(-3);
         var cols = ['app_opened_unika','login_unika','listing_created_unika','sitter_contacted_unika'];
-        var colLabels = { app_opened_unika: 'App öppnad (unika)', login_unika: 'Login (unika)', listing_created_unika: 'Listing skapad (unika)', sitter_contacted_unika: 'Sitter kontaktad (unika)' };
-        var html = '<p class="help">Senaste tre fulla veckor.</p><table><thead><tr><th>Vecka</th>';
+        var colLabels = { app_opened_unika: 'App aberto (únicos)', login_unika: 'Login (únicos)', listing_created_unika: 'Anúncio criado (únicos)', sitter_contacted_unika: 'Cuidador contatado (únicos)' };
+        var html = '<p class="help">Últimas três semanas completas.</p><table><thead><tr><th>Semana</th>';
         cols.forEach(function(c) { html += '<th class="num">' + (colLabels[c] || c) + '</th>'; });
         html += '</tr></thead><tbody>';
         (threeWeeks.length ? threeWeeks : pivot).forEach(function(row) {
@@ -604,10 +605,10 @@
       }
 
       function renderEventsDailyTable(data) {
-        if (!data || data.length === 0) return '<p class="help">Ingen dagvis data för pågående vecka.</p>';
+        if (!data || data.length === 0) return '<p class="help">Sem dados diários para a semana em andamento.</p>';
         var cols = ['app_opened_unika','login_unika','listing_created_unika','sitter_contacted_unika'];
-        var colLabels = { app_opened_unika: 'App öppnad (unika)', login_unika: 'Login (unika)', listing_created_unika: 'Listing skapad (unika)', sitter_contacted_unika: 'Sitter kontaktad (unika)' };
-        var html = '<p class="help">Pågående vecka, dag för dag.</p><table><thead><tr><th>Dag</th>';
+        var colLabels = { app_opened_unika: 'App aberto (únicos)', login_unika: 'Login (únicos)', listing_created_unika: 'Anúncio criado (únicos)', sitter_contacted_unika: 'Cuidador contatado (únicos)' };
+        var html = '<p class="help">Semana em andamento, dia a dia.</p><table><thead><tr><th>Dia</th>';
         cols.forEach(function(c) { html += '<th class="num">' + (colLabels[c] || c) + '</th>'; });
         html += '</tr></thead><tbody>';
         data.forEach(function(row) {
@@ -621,7 +622,7 @@
 
       function buildRuleBasedAnalysis(mainData, eventsData) {
         var full = getFullWeeks(mainData || []);
-        if (full.length < 2) return '<p class="copy-hint">Minst 2 fulla veckor krävs.</p>';
+        if (full.length < 2) return '<p class="copy-hint">São necessárias no mínimo 2 semanas completas.</p>';
 
         var curr = full[full.length - 1];
         var prev = full[full.length - 2];
@@ -643,7 +644,7 @@
         function pct(a, b) { return (b ? ((a - b) / b) * 100 : null); }
         function fmtPp(currPct, prevPct) {
           var pp = currPct - prevPct;
-          return 'från ' + prevPct.toFixed(1).replace('.', ',') + '% → ' + currPct.toFixed(1).replace('.', ',') + '% (' + (pp >= 0 ? '+' : '') + pp.toFixed(1).replace('.', ',') + ' procentenheter)';
+          return 'de ' + prevPct.toFixed(1).replace('.', ',') + '% → ' + currPct.toFixed(1).replace('.', ',') + '% (' + (pp >= 0 ? '+' : '') + pp.toFixed(1).replace('.', ',') + ' pontos percentuais)';
         }
 
         var hundPp = pp(dCurr.hund_aktivering_pct, dPrev.hund_aktivering_pct);
@@ -651,41 +652,41 @@
         var kontonPct = pct(curr.nya_konton || 0, prev.nya_konton || 0);
 
         var bottleneck = null;
-        if (dCurr.hund_aktivering_pct < 15) bottleneck = 'Aktivering: för få nya konton lägger upp hund (mål: ≥15–25%).';
-        else if (dCurr.konv_per_100 < 3) bottleneck = 'Matchning: för få startar kontakt (mål: ≥3–10 konv per 100 konton).';
-        else if (dCurr.medd_per_konv < 2) bottleneck = 'Dialog: chats startas men dör (mål: ≥2 medd/konv eller mät reply rate).';
+        if (dCurr.hund_aktivering_pct < 15) bottleneck = 'Ativação: poucas contas novas cadastram um cão (meta: ≥15–25%).';
+        else if (dCurr.konv_per_100 < 3) bottleneck = 'Correspondência: poucos iniciam contato (meta: ≥3–10 conversas por 100 contas).';
+        else if (dCurr.medd_per_konv < 2) bottleneck = 'Diálogo: conversas são iniciadas mas morrem (meta: ≥2 msgs/conversa ou medir a reply rate).';
 
         var replyRatePct = (curr.reply_rate_pct != null && !isNaN(curr.reply_rate_pct)) ? curr.reply_rate_pct : null;
 
         var html = '';
 
-        html += '<h3>Veckans läge (' + (curr.label || 'senaste veckan') + ')</h3><ul class="good">';
-        html += '<li><strong>Nya konton:</strong> ' + (curr.nya_konton || 0) + (kontonPct != null ? ' (' + (kontonPct >= 0 ? '+' : '') + kontonPct.toFixed(1) + '% vs föregående vecka)' : '') + '</li>';
-        html += '<li><strong>Hund-aktivering:</strong> ' + dCurr.hund_aktivering_pct.toFixed(1).replace('.', ',') + '% (' + (curr.nya_hundar || 0) + ' av ' + (curr.nya_konton || 0) + ') – ' + (hundPp != null ? fmtPp(dCurr.hund_aktivering_pct, dPrev.hund_aktivering_pct) : '') + '</li>';
-        html += '<li><strong>Vakt-aktivering:</strong> ' + dCurr.vakt_aktivering_pct.toFixed(1).replace('.', ',') + '% – ' + (vaktPp != null ? fmtPp(dCurr.vakt_aktivering_pct, dPrev.vakt_aktivering_pct) : '') + '</li>';
-        html += '<li><strong>Nya konversationer:</strong> ' + konvCurr + ' (Sitter+Tindog) • <strong>' + dCurr.konv_per_100.toFixed(2) + '</strong> per 100 konton</li>';
-        html += '<li><strong>Dialogdjup:</strong> ' + (dCurr.medd_per_konv ? dCurr.medd_per_konv.toFixed(1) : '–') + ' medd/konv (tot ' + meddCurr + ' medd)</li>';
-        if (aktiva != null) html += '<li><strong>Aktiva användare (unika):</strong> ' + aktiva + (contactRate != null ? ' • <strong>Kontakt med hundvakt:</strong> ' + sitterContacted + ' av ' + aktiva + ' (' + contactRate.toFixed(1).replace('.', ',') + '%, endast sitter_contacted)</li>' : '</li>');
-        if (replyRatePct != null) html += '<li><strong>Reply rate:</strong> ' + replyRatePct.toFixed(1).replace('.', ',') + '% (' + (curr.reply_with || 0) + ' av ' + (curr.reply_total || 0) + ' konversationer fick svar inom 24h)</li>';
-        else html += '<li><strong>Reply rate:</strong> – (data hämtas automatiskt om RPC är skapad)</li>';
+        html += '<h3>Situação da semana (' + (curr.label || 'última semana') + ')</h3><ul class="good">';
+        html += '<li><strong>Novas contas:</strong> ' + (curr.nya_konton || 0) + (kontonPct != null ? ' (' + (kontonPct >= 0 ? '+' : '') + kontonPct.toFixed(1) + '% vs. semana anterior)' : '') + '</li>';
+        html += '<li><strong>Ativação de cães:</strong> ' + dCurr.hund_aktivering_pct.toFixed(1).replace('.', ',') + '% (' + (curr.nya_hundar || 0) + ' de ' + (curr.nya_konton || 0) + ') – ' + (hundPp != null ? fmtPp(dCurr.hund_aktivering_pct, dPrev.hund_aktivering_pct) : '') + '</li>';
+        html += '<li><strong>Ativação de cuidadores:</strong> ' + dCurr.vakt_aktivering_pct.toFixed(1).replace('.', ',') + '% – ' + (vaktPp != null ? fmtPp(dCurr.vakt_aktivering_pct, dPrev.vakt_aktivering_pct) : '') + '</li>';
+        html += '<li><strong>Novas conversas:</strong> ' + konvCurr + ' (Sitter+Tindog) • <strong>' + dCurr.konv_per_100.toFixed(2) + '</strong> por 100 contas</li>';
+        html += '<li><strong>Profundidade do diálogo:</strong> ' + (dCurr.medd_per_konv ? dCurr.medd_per_konv.toFixed(1) : '–') + ' msgs/conversa (total ' + meddCurr + ' msgs)</li>';
+        if (aktiva != null) html += '<li><strong>Usuários ativos (únicos):</strong> ' + aktiva + (contactRate != null ? ' • <strong>Contato com cuidador(a) de cães:</strong> ' + sitterContacted + ' de ' + aktiva + ' (' + contactRate.toFixed(1).replace('.', ',') + '%, apenas sitter_contacted)</li>' : '</li>');
+        if (replyRatePct != null) html += '<li><strong>Reply rate:</strong> ' + replyRatePct.toFixed(1).replace('.', ',') + '% (' + (curr.reply_with || 0) + ' de ' + (curr.reply_total || 0) + ' conversas receberam resposta em 24h)</li>';
+        else html += '<li><strong>Reply rate:</strong> – (os dados são obtidos automaticamente se a RPC estiver criada)</li>';
         html += '</ul>';
 
-        html += '<h3>Tre tolkningar</h3><ul class="attention">';
-        if (hundPp >= 8) html += '<li>✅ <strong>Aktivering förbättras kraftigt.</strong> Det ni ändrade i hundprofil-flödet verkar ha effekt.</li>';
-        if (dCurr.konv_per_100 > dPrev.konv_per_100) html += '<li>✅ <strong>Kontakt ökar.</strong> Fler tar första steget att skriva.</li>';
-        if (dCurr.medd_per_konv < 2 && konvCurr > 0) html += '<li>⚠️ <strong>Chats dör tidigt.</strong> Nästa steg är reply rate / "få svar".</li>';
+        html += '<h3>Três interpretações</h3><ul class="attention">';
+        if (hundPp >= 8) html += '<li>✅ <strong>A ativação está melhorando fortemente.</strong> As alterações no fluxo de perfil do cão parecem estar surtindo efeito.</li>';
+        if (dCurr.konv_per_100 > dPrev.konv_per_100) html += '<li>✅ <strong>O contato está aumentando.</strong> Mais pessoas dão o primeiro passo e escrevem.</li>';
+        if (dCurr.medd_per_konv < 2 && konvCurr > 0) html += '<li>⚠️ <strong>As conversas morrem cedo.</strong> O próximo passo é a reply rate / "receber resposta".</li>';
         html += '</ul>';
 
-        html += '<h3>Veckans fokus</h3><ul class="bad">';
-        html += '<li><strong>Flaskhals:</strong> ' + (bottleneck || 'Ingen tydlig flaskhals – följ trenden 1–2 veckor till.') + '</li>';
-        html += '<li><strong>Gör nästa steg lätt:</strong> förifyllt första meddelande + tydlig CTA "Ställ en fråga" efter match/kontakt.</li>';
-        if (replyRatePct != null && replyRatePct < 50) html += '<li><strong>Reply rate:</strong> Bara ' + replyRatePct.toFixed(0) + '% får svar inom 24h – överväg push-notis / påminnelser för snabbare svar.</li>';
-        else if (replyRatePct != null) html += '<li><strong>Reply rate:</strong> ' + replyRatePct.toFixed(0) + '% – bra nivå! Fortsätt följa.</li>';
-        else html += '<li><strong>Reply rate:</strong> Visas automatiskt när RPC dashboard_reply_rate är skapad i Supabase.</li>';
+        html += '<h3>Foco da semana</h3><ul class="bad">';
+        html += '<li><strong>Gargalo:</strong> ' + (bottleneck || 'Nenhum gargalo evidente – acompanhar a tendência por mais 1–2 semanas.') + '</li>';
+        html += '<li><strong>Facilitar o próximo passo:</strong> primeira mensagem pré-preenchida + CTA claro "Faça uma pergunta" após match/contato.</li>';
+        if (replyRatePct != null && replyRatePct < 50) html += '<li><strong>Reply rate:</strong> Apenas ' + replyRatePct.toFixed(0) + '% recebem resposta em 24h – considerar notificação push / lembretes para respostas mais rápidas.</li>';
+        else if (replyRatePct != null) html += '<li><strong>Reply rate:</strong> ' + replyRatePct.toFixed(0) + '% – bom nível! Continuar acompanhando.</li>';
+        else html += '<li><strong>Reply rate:</strong> Exibida automaticamente quando a RPC dashboard_reply_rate for criada no Supabase.</li>';
         html += '</ul>';
 
         if (getPartialWeek(mainData || [])) {
-          html += '<p class="copy-hint">Obs: pågående vecka är ofullständig – jämför inte rakt av med 7 dagar.</p>';
+          html += '<p class="copy-hint">Obs.: a semana em andamento está incompleta – não compare diretamente com 7 dias.</p>';
         }
         return html;
       }
@@ -702,10 +703,10 @@
           var medd = (row.sitter_meddelanden || 0) + (row.tindog_meddelanden || 0);
 
           if (medd > 0 && konv === 0 && everHadConversations) {
-            alerts.push('Info ' + (row.label || '') + ': meddelanden skickades, men inga *nya* konversationer startades denna vecka (troligen aktivitet i äldre trådar).');
+            alerts.push('Info ' + (row.label || '') + ': mensagens foram enviadas, mas nenhuma conversa *nova* foi iniciada nesta semana (provavelmente atividade em conversas mais antigas).');
           }
           if (medd > 0 && konv === 0 && !everHadConversations) {
-            alerts.push('⚠️ Datamismatch ' + (row.label || '') + ': meddelanden finns men konversationer är alltid 0. Kolla event/SQL.');
+            alerts.push('⚠️ Inconsistência de dados ' + (row.label || '') + ': há mensagens, mas as conversas são sempre 0. Verificar evento/SQL.');
           }
         });
         return alerts;
@@ -735,7 +736,7 @@
           if (!isNaN(d.getTime())) {
             var y = d.getFullYear();
             var m = d.getMonth() + 1;
-            return { key: y + '-' + pad2(m), label: d.toLocaleString('sv-SE', { month: 'short', year: 'numeric' }) };
+            return { key: y + '-' + pad2(m), label: d.toLocaleString('pt-BR', { month: 'short', year: 'numeric' }) };
           }
         }
         var lab = row.label || '';
@@ -831,13 +832,13 @@
         if (!el || el.dataset.ready === '1') return;
         el.dataset.ready = '1';
         el.innerHTML =
-          '<label>Intervall <select id="mainChartGranularity"><option value="week">Veckor</option><option value="month">Månader</option></select></label>' +
-          '<span id="mainWeeksControl"><label>Antal veckor <select id="mainChartWeeksLimit">' +
+          '<label>Intervalo <select id="mainChartGranularity"><option value="week">Semanas</option><option value="month">Meses</option></select></label>' +
+          '<span id="mainWeeksControl"><label>Número de semanas <select id="mainChartWeeksLimit">' +
           '<option value="8">8</option><option value="12" selected>12</option><option value="24">24</option>' +
-          '<option value="52">52</option><option value="999">Alla</option></select></label></span>' +
-          '<span id="mainMonthsControl" style="display:none;"><label>Antal månader <select id="mainChartMonthsLimit">' +
+          '<option value="52">52</option><option value="999">Tudo</option></select></label></span>' +
+          '<span id="mainMonthsControl" style="display:none;"><label>Número de meses <select id="mainChartMonthsLimit">' +
           '<option value="3">3</option><option value="6" selected>6</option><option value="12">12</option>' +
-          '<option value="24">24</option><option value="999">Alla</option></select></label></span>';
+          '<option value="24">24</option><option value="999">Tudo</option></select></label></span>';
         document.getElementById('mainChartGranularity').addEventListener('change', function(ev) {
           var m = ev.target.value === 'month';
           document.getElementById('mainWeeksControl').style.display = m ? 'none' : '';
@@ -853,13 +854,13 @@
         if (!el || el.dataset.ready === '1') return;
         el.dataset.ready = '1';
         el.innerHTML =
-          '<label>Intervall <select id="evtChartGranularity"><option value="week">Veckor</option><option value="month">Månader</option></select></label>' +
-          '<span id="evtWeeksControl"><label>Antal veckor <select id="evtChartWeeksLimit">' +
+          '<label>Intervalo <select id="evtChartGranularity"><option value="week">Semanas</option><option value="month">Meses</option></select></label>' +
+          '<span id="evtWeeksControl"><label>Número de semanas <select id="evtChartWeeksLimit">' +
           '<option value="8">8</option><option value="12" selected>12</option><option value="24">24</option>' +
-          '<option value="52">52</option><option value="999">Alla</option></select></label></span>' +
-          '<span id="evtMonthsControl" style="display:none;"><label>Antal månader <select id="evtChartMonthsLimit">' +
+          '<option value="52">52</option><option value="999">Tudo</option></select></label></span>' +
+          '<span id="evtMonthsControl" style="display:none;"><label>Número de meses <select id="evtChartMonthsLimit">' +
           '<option value="3">3</option><option value="6" selected>6</option><option value="12">12</option>' +
-          '<option value="24">24</option><option value="999">Alla</option></select></label></span>';
+          '<option value="24">24</option><option value="999">Tudo</option></select></label></span>';
         document.getElementById('evtChartGranularity').addEventListener('change', function(ev) {
           var m = ev.target.value === 'month';
           document.getElementById('evtWeeksControl').style.display = m ? 'none' : '';
@@ -871,23 +872,23 @@
       }
 
       var CHART_METRICS = [
-        { key: 'nya_konton', label: 'Nya konton', derived: false, förklaring: 'Antal nya användarkonton registrerade per vecka: ' },
-        { key: 'nya_hundar', label: 'Nya hundar', derived: false, förklaring: 'Antal nya hundar tillagda i appen per vecka: ' },
-        { key: 'nya_hundvakt_profiler', label: 'Nya hundvaktprofiler', derived: false, förklaring: 'Antal nya hundvaktprofiler skapade per vecka: ' },
-        { key: 'sitter_konversationer', label: 'Sitter-konversationer', derived: false, förklaring: 'Antal nya konversationer mellan användare och hundvakter per vecka: ' },
-        { key: 'tindog_konversationer', label: 'Tindog-konversationer', derived: false, förklaring: 'Antal nya Tindog-matchningar/konversationer per vecka: ' },
-        { key: 'sitter_meddelanden', label: 'Sitter-meddelanden', derived: false, förklaring: 'Antal meddelanden skickade i hundvakt-konversationer per vecka: ' },
-        { key: 'tindog_meddelanden', label: 'Tindog-meddelanden', derived: false, förklaring: 'Antal meddelanden skickade i Tindog-konversationer per vecka: ' },
-        { key: 'promenader', label: 'Promenader', derived: false, förklaring: 'Antal promenader loggade i appen per vecka: ' },
-        { key: 'hundvanliga_platser', label: 'Hundvänliga platser', derived: false, förklaring: 'Antal hundvänliga platser tillagda eller besökta per vecka: ' },
-        { key: 'bokningar', label: 'Bokningar', derived: false, förklaring: 'Antal bokningar av hundvakt genom appen per vecka: ' },
-        { key: 'hund_aktivering_pct', label: 'Hund-aktivering (procent)', derived: true, förklaring: 'Andel nya konton som lade till minst en hund (procent): ' },
-        { key: 'vakt_aktivering_pct', label: 'Vakt-aktivering (procent)', derived: true, förklaring: 'Andel nya konton som skapade hundvaktprofil (procent): ' },
-        { key: 'konv_per_100', label: 'Konversationer per 100 konton', derived: true, förklaring: 'Konversationer (Sitter + Tindog) per 100 nya konton: ' },
-        { key: 'medd_per_konv', label: 'Meddelanden per konversation', derived: true, förklaring: 'Genomsnitt antal meddelanden per konversation per vecka: ' },
-        { key: 'reply_rate_pct', label: 'Reply rate (procent)', derived: false, förklaring: 'Andel konversationer som fick svar inom 24 timmar: ' },
-        { key: 'notiser_skickade', label: 'Push-notiser skickade', derived: false, förklaring: 'Antal push-notiser skickade till användare per vecka: ' },
-        { key: 'unika_mottagare', label: 'Unika notis-mottagare', derived: false, förklaring: 'Antal unika användare som fick en push-notis per vecka: ' }
+        { key: 'nya_konton', label: 'Novas contas', derived: false, förklaring: 'Número de novas contas de usuário registradas por semana: ' },
+        { key: 'nya_hundar', label: 'Novos cães', derived: false, förklaring: 'Número de novos cães adicionados no aplicativo por semana: ' },
+        { key: 'nya_hundvakt_profiler', label: 'Novos perfis de cuidador', derived: false, förklaring: 'Número de novos perfis de cuidador criados por semana: ' },
+        { key: 'sitter_konversationer', label: 'Conversas de cuidador', derived: false, förklaring: 'Número de novas conversas entre usuários e cuidadores de cães por semana: ' },
+        { key: 'tindog_konversationer', label: 'Conversas Tindog', derived: false, förklaring: 'Número de novos matches/conversas do Tindog por semana: ' },
+        { key: 'sitter_meddelanden', label: 'Mensagens de cuidador', derived: false, förklaring: 'Número de mensagens enviadas em conversas de cuidador por semana: ' },
+        { key: 'tindog_meddelanden', label: 'Mensagens Tindog', derived: false, förklaring: 'Número de mensagens enviadas em conversas do Tindog por semana: ' },
+        { key: 'promenader', label: 'Passeios', derived: false, förklaring: 'Número de passeios registrados no aplicativo por semana: ' },
+        { key: 'hundvanliga_platser', label: 'Locais que aceitam cães', derived: false, förklaring: 'Número de locais que aceitam cães adicionados ou visitados por semana: ' },
+        { key: 'bokningar', label: 'Reservas', derived: false, förklaring: 'Número de reservas de cuidador de cães pelo aplicativo por semana: ' },
+        { key: 'hund_aktivering_pct', label: 'Ativação de cão (porcentagem)', derived: true, förklaring: 'Percentual de novas contas que adicionaram pelo menos um cão (porcentagem): ' },
+        { key: 'vakt_aktivering_pct', label: 'Ativação de cuidador (porcentagem)', derived: true, förklaring: 'Percentual de novas contas que criaram perfil de cuidador (porcentagem): ' },
+        { key: 'konv_per_100', label: 'Conversas por 100 contas', derived: true, förklaring: 'Conversas (Cuidador + Tindog) por 100 novas contas: ' },
+        { key: 'medd_per_konv', label: 'Mensagens por conversa', derived: true, förklaring: 'Média de mensagens por conversa por semana: ' },
+        { key: 'reply_rate_pct', label: 'Taxa de resposta (porcentagem)', derived: false, förklaring: 'Percentual de conversas que receberam resposta em 24 horas: ' },
+        { key: 'notiser_skickade', label: 'Notificações push enviadas', derived: false, förklaring: 'Número de notificações push enviadas aos usuários por semana: ' },
+        { key: 'unika_mottagare', label: 'Destinatários únicos de notificações', derived: false, förklaring: 'Número de usuários únicos que receberam uma notificação push por semana: ' }
       ];
 
       function getChartValue(row, metric) {
@@ -944,12 +945,12 @@
         }
 
         if (granularity === 'month' && seriesRows.length === 0 && sortedFull.length > 0) {
-          container.innerHTML = '<p class="help">Månadsvy kräver att veckorna går att placera i kalender (lägg till <code>week_start</code> i data eller månad i veckoetikett).</p>';
+          container.innerHTML = '<p class="help">A visão mensal exige que as semanas possam ser posicionadas no calendário (adicionar <code>week_start</code> nos dados ou o mês no rótulo da semana).</p>';
           return;
         }
 
         if (seriesRows.length === 0) {
-          container.innerHTML = '<p class="help">Inga datapunkter – grafer visas när det finns helveckor.</p>';
+          container.innerHTML = '<p class="help">Sem pontos de dados – os gráficos aparecem quando houver semanas completas.</p>';
           return;
         }
 
@@ -1014,7 +1015,7 @@
                     label: function(ct) {
                       var v = ct.parsed.y;
                       var i = ct.dataIndex;
-                      var suff = partialFlags[i] ? ' (pågående/ofull vecka)' : '';
+                      var suff = partialFlags[i] ? ' (semana em andamento/incompleta)' : '';
                       if (v == null || isNaN(v)) return '';
                       var dec =
                         metric.key === 'reply_rate_pct' || String(metric.key).indexOf('_pct') >= 0
@@ -1038,10 +1039,10 @@
       }
 
       var EVENT_LINE_METRICS = [
-        { pivotKey: 'app_opened_unika', label: 'App öppnad (unika)' },
-        { pivotKey: 'login_unika', label: 'Login (unika)' },
-        { pivotKey: 'listing_created_unika', label: 'Listing skapad (unika)' },
-        { pivotKey: 'sitter_contacted_unika', label: 'Sitter kontaktad (unika)' }
+        { pivotKey: 'app_opened_unika', label: 'App aberto (únicos)' },
+        { pivotKey: 'login_unika', label: 'Login (únicos)' },
+        { pivotKey: 'listing_created_unika', label: 'Anúncio criado (únicos)' },
+        { pivotKey: 'sitter_contacted_unika', label: 'Cuidador contatado (únicos)' }
       ];
 
       function aggregatePivotByMonthKeys(sortedPivotRows, keys) {
@@ -1091,7 +1092,7 @@
         }
 
         if (!seriesRows || seriesRows.length === 0) {
-          container.innerHTML = '<p class="help">Ingen historik för events än (eller inga helveckor).</p>';
+          container.innerHTML = '<p class="help">Ainda não há histórico de eventos (ou não há semanas completas).</p>';
           return;
         }
 
@@ -1162,7 +1163,7 @@
         var container = document.getElementById('outSubscriptionBars');
         if (!container) return;
         if (!data || (data.gratis_konto == null && data.gratis_erbjudande_premium == null && data.betalande == null)) {
-          container.innerHTML = '<p class="help">Ingen data tillgänglig än.</p>';
+          container.innerHTML = '<p class="help">Nenhum dado disponível ainda.</p>';
           return;
         }
         var gratis = data.gratis_konto || 0;
@@ -1171,9 +1172,9 @@
         var total = gratis + trial + betalande;
         var pct = function(n) { return total > 0 ? (n / total * 100).toFixed(1).replace('.', ',') : '0'; };
         var labels = [
-          'Gratiskonto (' + pct(gratis) + ' %)',
-          'Gratis-premium (' + pct(trial) + ' %)',
-          'Betalande (' + pct(betalande) + ' %)'
+          'Conta gratuita (' + pct(gratis) + ' %)',
+          'Premium gratuito (' + pct(trial) + ' %)',
+          'Pagantes (' + pct(betalande) + ' %)'
         ];
         var values = [gratis, trial, betalande];
         var colors = ['rgba(100, 100, 100, 0.6)', 'rgba(255, 152, 0, 0.6)', 'rgba(45, 90, 39, 0.6)'];
@@ -1185,7 +1186,7 @@
           data: {
             labels: labels,
             datasets: [{
-              label: 'Antal användare',
+              label: 'Número de usuários',
               data: values,
               backgroundColor: colors,
               borderColor: borderColors,
@@ -1202,7 +1203,7 @@
                   label: function(ctx) {
                     var v = ctx.parsed.y;
                     var p = total > 0 ? (v / total * 100).toFixed(1).replace('.', ',') : '0';
-                    return v + ' st (' + p + ' %)';
+                    return v + ' usuários (' + p + ' %)';
                   }
                 }
               }
@@ -1216,16 +1217,16 @@
         var container = document.getElementById('outRetention');
         if (!container) return;
         if (!data || data.length === 0) {
-          container.innerHTML = '<p class="help">Ingen retentionsdata tillgänglig än.</p>';
+          container.innerHTML = '<p class="help">Nenhum dado de retenção disponível ainda.</p>';
           return;
         }
 
         var days = [];
         for (var i = 0; i <= 30; i++) {
-          days.push({ key: 'day_' + i, label: 'Dag ' + i, offset: i });
+          days.push({ key: 'day_' + i, label: 'Dia ' + i, offset: i });
         }
         var html = '<div class="table-wrap"><table><thead><tr>';
-        html += '<th>Datum</th><th class="num">Nya konton</th><th class="num" title="Unika anonyma app_opened (device_id), samma kalenderdag som registrering — samma sätt som Nedladdningar i sidhuvudet. Kräver uppdaterad RPC (nedladdningar_dag).">Nedladdningar</th>';
+        html += '<th>Data</th><th class="num">Novas contas</th><th class="num" title="Aberturas anônimas únicas de app_opened (device_id), no mesmo dia de calendário do cadastro — mesmo método que Downloads no cabeçalho. Requer RPC atualizada (nedladdningar_dag).">Downloads</th>';
         days.forEach(function(d) { html += '<th class="num">' + d.label + '</th>'; });
         html += '</tr></thead><tbody>';
 
@@ -1234,7 +1235,13 @@
           d.setDate(d.getDate() + n);
           return d.toISOString().slice(0, 10);
         }
-        var todayStr = new Date().toLocaleDateString('sv-SE');
+        // ISO-datum (åååå-mm-dd) i lokal tid – MÅSTE vara språkoberoende eftersom
+        // det jämförs med addDays() som returnerar ISO. pt-BR/sv-SE-formatering här
+        // skulle göra hela retention-tabellen tom.
+        var todayStr = (function () {
+          var d = new Date();
+          return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        })();
 
         function nedladdningarValue(row) {
           if (row.nedladdningar_dag != null) return row.nedladdningar_dag;
@@ -1253,7 +1260,7 @@
         });
         var nedlAvgStr = nedlAvgN ? (nedlAvgSum / nedlAvgN).toFixed(1).replace('.', ',') : '–';
 
-        var avgRow = '<tr style="font-weight:600; background:var(--accent-light);"><td>Genomsnitt</td><td class="num">–</td><td class="num">' + nedlAvgStr + '</td>';
+        var avgRow = '<tr style="font-weight:600; background:var(--accent-light);"><td>Média</td><td class="num">–</td><td class="num">' + nedlAvgStr + '</td>';
         days.forEach(function(d) {
           var totalPct = 0;
           var validCount = 0;
@@ -1309,11 +1316,11 @@
       }
 
       var ACCOUNT_TYPE_LABELS = {
-        dog_owner: 'Hundägare',
-        dog_sitter: 'Hundvakt',
-        kennel: 'Kennel',
-        dog_daycare: 'Hunddagis',
-        okand: 'Okänd'
+        dog_owner: 'Tutor',
+        dog_sitter: 'Cuidador(a) de cães',
+        kennel: 'Criador/Kennel',
+        dog_daycare: 'Creche para cães',
+        okand: 'Desconhecido'
       };
       var ACCOUNT_TYPE_COLORS = {
         dog_owner: 'rgba(45, 90, 39, 0.7)',
@@ -1347,7 +1354,7 @@
         var byType = data.by_type || [];
         var byWeek = data.by_week || [];
 
-        var html = '<h3>Totalt per kontotyp</h3><table><thead><tr><th>Kontotyp</th><th class="num">Totalt</th><th class="num">Bekräftad e-post</th><th class="num">Inte bekräftad</th><th class="num">Obekräftade %</th></tr></thead><tbody>';
+        var html = '<h3>Total por tipo de conta</h3><table><thead><tr><th>Tipo de conta</th><th class="num">Total</th><th class="num">E-mail confirmado</th><th class="num">Não confirmado</th><th class="num">Não confirmadas %</th></tr></thead><tbody>';
         byType.forEach(function(t) {
           var pct = t.total > 0 ? ((t.unconfirmed / t.total) * 100).toFixed(1) : '0';
           html += '<tr><td>' + (ACCOUNT_TYPE_LABELS[t.account_type] || t.account_type) + '</td>';
@@ -1360,7 +1367,7 @@
         container.innerHTML = html;
 
         if (!weeklyContainer || byWeek.length === 0) return;
-        weeklyContainer.innerHTML = '<h3>Nya konton per vecka och kontotyp</h3><p class="help">Solidfärg = bekräftad e-post, skrafferad = ej bekräftad</p><div class="chart-wrap" style="height:320px;"><canvas id="accountTypeChart"></canvas></div>';
+        weeklyContainer.innerHTML = '<h3>Novas contas por semana e tipo de conta</h3><p class="help">Cor sólida = e-mail confirmado, hachurado = não confirmado</p><div class="chart-wrap" style="height:320px;"><canvas id="accountTypeChart"></canvas></div>';
 
         var labels = byWeek.map(function(w) { return w.label; });
         var allTypes = {};
@@ -1376,7 +1383,7 @@
           var lbl = ACCOUNT_TYPE_LABELS[type] || type;
 
           datasets.push({
-            label: lbl + ' (bekräftad)',
+            label: lbl + ' (confirmado)',
             stack: 'main',
             data: byWeek.map(function(w) {
               var found = (w.breakdown || []).find(function(b) { return b.account_type === type; });
@@ -1389,7 +1396,7 @@
           });
 
           datasets.push({
-            label: lbl + ' (ej bekräftad)',
+            label: lbl + ' (não confirmado)',
             stack: 'main',
             data: byWeek.map(function(w) {
               var found = (w.breakdown || []).find(function(b) { return b.account_type === type; });
@@ -1412,14 +1419,14 @@
                 position: 'top',
                 labels: {
                   filter: function(item) {
-                    return item.text.indexOf('(bekräftad)') > -1;
+                    return item.text.indexOf('(confirmado)') > -1;
                   },
                   generateLabels: function(chart) {
                     var orig = Chart.defaults.plugins.legend.labels.generateLabels(chart);
                     return orig.filter(function(l) {
-                      return l.text.indexOf('(bekräftad)') > -1;
+                      return l.text.indexOf('(confirmado)') > -1;
                     }).map(function(l) {
-                      l.text = l.text.replace(' (bekräftad)', '');
+                      l.text = l.text.replace(' (confirmado)', '');
                       return l;
                     });
                   }
@@ -1441,13 +1448,13 @@
       function buildChatGPTPrompt(mainData, eventsData) {
         mainData = safeMainForRender(mainData);
         eventsData = safeEventsForRender(eventsData);
-        var t = 'Jag har veckovis statistik från en hund-app (Flocken). Analysera siffrorna och ge mig:\n';
-        t += '1) Bra indikatorer (vad som ser starkt ut)\n2) Vad jag ska vara uppmärksam på\n3) Dåliga indikatorer / risker\n4) Korta, konkreta råd.\n\n';
-        t += '--- Veckovis översikt (vecka, nya konton, nya hundar, nya hundvaktprofiler, sitter-konv, tindog-konv, sitter-medd, tindog-medd, promenader, hundvänliga platser, bokningar) ---\n';
+        var t = 'Tenho estatísticas semanais de um app para cães (Flocken). Analise os números e forneça:\n';
+        t += '1) Bons indicadores (o que parece forte)\n2) Pontos de atenção\n3) Indicadores ruins / riscos\n4) Recomendações curtas e concretas.\n\n';
+        t += '--- Visão geral semanal (semana, novas contas, novos cães, novos perfis de cuidador, conv. cuidador, conv. Tindog, msg cuidador, msg Tindog, passeios, locais que aceitam cães, reservas) ---\n';
         t += JSON.stringify(mainData, null, 2) + '\n\n';
-        t += '--- App-events veckovis (vecka, event_name, antal_events, unika_anvandare) ---\n';
+        t += '--- Eventos do app por semana (semana, event_name, antal_events, unika_anvandare) ---\n';
         t += JSON.stringify(eventsData, null, 2) + '\n\n';
-        t += 'Svara på svenska.';
+        t += 'Responda em português.';
         return t;
       }
 
@@ -1498,7 +1505,7 @@
         if (!container) return;
         var full = getFullWeeks(mainData || []);
         if (full.length < 2) {
-          container.textContent = 'Minst 2 fulla veckor krävs för textsammanfattning.';
+          container.textContent = 'São necessárias pelo menos 2 semanas completas para o resumo em texto.';
           return;
         }
         var curr = full[full.length - 1];
@@ -1507,48 +1514,48 @@
         var pivot = pivotEvents(eventsData || []);
         var currPivot = pivot.find(function(p) { return p.label === curr.label; }) || {};
         
-        var text = 'Flocken Dashboard Textsammanfattning (för AI/screen readers):\n\n';
-        text += 'SENASTE FULLA VECKAN (' + curr.label + '):\n';
-        text += '- Nya konton: ' + (curr.nya_konton || 0) + '\n';
-        text += '- Nya hundar: ' + (curr.nya_hundar || 0) + ' (aktivering: ' + dCurr.hund_aktivering_pct.toFixed(1) + '%)\n';
-        text += '- Nya hundvaktprofiler: ' + (curr.nya_hundvakt_profiler || 0) + ' (aktivering: ' + dCurr.vakt_aktivering_pct.toFixed(1) + '%)\n';
-        text += '- Sitter-konversationer: ' + (curr.sitter_konversationer || 0) + '\n';
-        text += '- Tindog-konversationer: ' + (curr.tindog_konversationer || 0) + '\n';
-        text += '- Sitter-meddelanden: ' + (curr.sitter_meddelanden || 0) + '\n';
-        text += '- Tindog-meddelanden: ' + (curr.tindog_meddelanden || 0) + '\n';
-        text += '- Promenader: ' + (curr.promenader || 0) + '\n';
-        text += '- Hundvänliga platser: ' + (curr.hundvanliga_platser || 0) + '\n';
-        text += '- Bokningar: ' + (curr.bokningar || 0) + '\n';
-        text += '- Push-notiser skickade: ' + (curr.notiser_skickade || 0) + '\n';
-        text += '- Unika notis-mottagare: ' + (curr.unika_mottagare || 0) + '\n';
-        text += '- Konversationer per 100 konton: ' + dCurr.konv_per_100.toFixed(2) + '\n';
-        text += '- Meddelanden per konversation: ' + (dCurr.medd_per_konv ? dCurr.medd_per_konv.toFixed(1) : 'N/A') + '\n\n';
+        var text = 'Resumo em texto do Flocken Dashboard (para IA/leitores de tela):\n\n';
+        text += 'ÚLTIMA SEMANA COMPLETA (' + curr.label + '):\n';
+        text += '- Novas contas: ' + (curr.nya_konton || 0) + '\n';
+        text += '- Novos cães: ' + (curr.nya_hundar || 0) + ' (ativação: ' + dCurr.hund_aktivering_pct.toFixed(1) + '%)\n';
+        text += '- Novos perfis de cuidador: ' + (curr.nya_hundvakt_profiler || 0) + ' (ativação: ' + dCurr.vakt_aktivering_pct.toFixed(1) + '%)\n';
+        text += '- Conversas de cuidador: ' + (curr.sitter_konversationer || 0) + '\n';
+        text += '- Conversas Tindog: ' + (curr.tindog_konversationer || 0) + '\n';
+        text += '- Mensagens de cuidador: ' + (curr.sitter_meddelanden || 0) + '\n';
+        text += '- Mensagens Tindog: ' + (curr.tindog_meddelanden || 0) + '\n';
+        text += '- Passeios: ' + (curr.promenader || 0) + '\n';
+        text += '- Locais que aceitam cães: ' + (curr.hundvanliga_platser || 0) + '\n';
+        text += '- Reservas: ' + (curr.bokningar || 0) + '\n';
+        text += '- Notificações push enviadas: ' + (curr.notiser_skickade || 0) + '\n';
+        text += '- Destinatários únicos de notificação: ' + (curr.unika_mottagare || 0) + '\n';
+        text += '- Conversas por 100 contas: ' + dCurr.konv_per_100.toFixed(2) + '\n';
+        text += '- Mensagens por conversa: ' + (dCurr.medd_per_konv ? dCurr.medd_per_konv.toFixed(1) : 'N/A') + '\n\n';
         
-        text += 'APP-EVENTS (senaste fulla veckan):\n';
-        text += '- App öppnad (unika): ' + (currPivot.app_opened_unika || 0) + '\n';
-        text += '- Login (unika): ' + (currPivot.login_unika || 0) + '\n';
-        text += '- Listing skapad (unika): ' + (currPivot.listing_created_unika || 0) + '\n';
-        text += '- Sitter kontaktad (unika): ' + (currPivot.sitter_contacted_unika || 0) + '\n\n';
+        text += 'EVENTOS DO APP (última semana completa):\n';
+        text += '- App aberto (únicos): ' + (currPivot.app_opened_unika || 0) + '\n';
+        text += '- Login (únicos): ' + (currPivot.login_unika || 0) + '\n';
+        text += '- Anúncio criado (únicos): ' + (currPivot.listing_created_unika || 0) + '\n';
+        text += '- Cuidador contatado (únicos): ' + (currPivot.sitter_contacted_unika || 0) + '\n\n';
         
         if (lastTodayData && lastTodayData.date) {
-          text += 'DAGENS HÖJDPUNKTER (' + lastTodayData.date + '):\n';
+          text += 'DESTAQUES DE HOJE (' + lastTodayData.date + '):\n';
           var anonymousOpens = lastTodayData.anonymous_opens;
           var dauToday = lastTodayData.dau;
           var newAccountsTotal = lastTodayData.new_accounts_total;
-          if (anonymousOpens != null) text += '- Nedladdningar (endast anonyma enheter): ' + anonymousOpens + '\n';
-          if (newAccountsTotal != null) text += '- Nya konton idag (registreringar): ' + newAccountsTotal + '\n';
+          if (anonymousOpens != null) text += '- Downloads (apenas dispositivos anônimos): ' + anonymousOpens + '\n';
+          if (newAccountsTotal != null) text += '- Novas contas hoje (cadastros): ' + newAccountsTotal + '\n';
           if (newAccountsTotal != null && anonymousOpens != null && anonymousOpens > 0) {
-            text += '- Konversion (nya konton / nedladdningar): ' + (newAccountsTotal / anonymousOpens * 100).toFixed(1) + '%\n';
+            text += '- Conversão (novas contas / downloads): ' + (newAccountsTotal / anonymousOpens * 100).toFixed(1) + '%\n';
           }
-          if (dauToday != null) text += '- DAU inloggade (folk som redan har konto): ' + dauToday + '\n';
-          text += '- Nya hundar idag: ' + (lastTodayData.new_dogs || 0) + '\n';
-          text += '- Nya hundvaktprofiler idag: ' + (lastTodayData.new_sitters || 0) + '\n\n';
+          if (dauToday != null) text += '- DAU logados (pessoas que já têm conta): ' + dauToday + '\n';
+          text += '- Novos cães hoje: ' + (lastTodayData.new_dogs || 0) + '\n';
+          text += '- Novos perfis de cuidador hoje: ' + (lastTodayData.new_sitters || 0) + '\n\n';
         }
         
-        text += 'HISTORIK (alla fulla veckor):\n';
+        text += 'HISTÓRICO (todas as semanas completas):\n';
         full.forEach(function(row) {
           var d = computeDerived(row);
-          text += row.label + ': ' + (row.nya_konton || 0) + ' konton, ' + (row.nya_hundar || 0) + ' hundar, ' + (row.nya_hundvakt_profiler || 0) + ' vaktprofiler, hund-akt ' + d.hund_aktivering_pct.toFixed(1) + '%, vakt-akt ' + d.vakt_aktivering_pct.toFixed(1) + '%\n';
+          text += row.label + ': ' + (row.nya_konton || 0) + ' contas, ' + (row.nya_hundar || 0) + ' cães, ' + (row.nya_hundvakt_profiler || 0) + ' perfis de cuidador, ativ. cão ' + d.hund_aktivering_pct.toFixed(1) + '%, ativ. cuidador ' + d.vakt_aktivering_pct.toFixed(1) + '%\n';
         });
         
         container.textContent = text;
@@ -1630,7 +1637,7 @@
         } catch (e) {}
         renderAll(main, events);
 
-        // Nedladdningar i Brasilien (dashboard_store_downloads_summary, landsfiltrerad synk)
+        // Downloads i Brasilien (dashboard_store_downloads_summary, landsfiltrerad synk)
         var BR_LAUNCH_DATE = '2026-08-03';
         function renderBrDownloads(dl) {
           var el = document.getElementById('outBrDownloads');
@@ -1644,27 +1651,27 @@
             if (h.date >= BR_LAUNCH_DATE) sumLaunch += (h.total || 0);
           }
           var html = '<div style="display:flex; gap:1.5rem; flex-wrap:wrap; margin-bottom:0.75rem;">';
-          html += '<div><p class="dau-value" style="margin:0;">' + sumLaunch + '</p><p class="dau-hint" style="margin:0.1rem 0 0;">Sedan lansering (' + BR_LAUNCH_DATE + ')</p></div>';
-          html += '<div><p class="dau-value" style="margin:0;">' + sum7 + '</p><p class="dau-hint" style="margin:0.1rem 0 0;">Senaste 7 dagarna</p></div>';
-          html += '<div><p class="dau-value" style="margin:0;">' + (dl.latest_ios != null ? dl.latest_ios : '–') + '</p><p class="dau-hint" style="margin:0.1rem 0 0;">iOS senast (' + (dl.latest_ios_date || '–') + ')</p></div>';
-          html += '<div><p class="dau-value" style="margin:0;">' + (dl.latest_android != null ? dl.latest_android : '–') + '</p><p class="dau-hint" style="margin:0.1rem 0 0;">Android senast (' + (dl.latest_android_date || '–') + ')</p></div>';
+          html += '<div><p class="dau-value" style="margin:0;">' + sumLaunch + '</p><p class="dau-hint" style="margin:0.1rem 0 0;">Desde o lançamento (' + BR_LAUNCH_DATE + ')</p></div>';
+          html += '<div><p class="dau-value" style="margin:0;">' + sum7 + '</p><p class="dau-hint" style="margin:0.1rem 0 0;">Últimos 7 dias</p></div>';
+          html += '<div><p class="dau-value" style="margin:0;">' + (dl.latest_ios != null ? dl.latest_ios : '–') + '</p><p class="dau-hint" style="margin:0.1rem 0 0;">iOS mais recente (' + (dl.latest_ios_date || '–') + ')</p></div>';
+          html += '<div><p class="dau-value" style="margin:0;">' + (dl.latest_android != null ? dl.latest_android : '–') + '</p><p class="dau-hint" style="margin:0.1rem 0 0;">Android mais recente (' + (dl.latest_android_date || '–') + ')</p></div>';
           html += '</div>';
-          var recent = hist.slice(-14).reverse();
+          var recent = hist.slice(-3).reverse();
           if (recent.length > 0) {
-            html += '<table><thead><tr><th>Datum</th><th>iOS</th><th>Android</th><th>Totalt</th></tr></thead><tbody>';
+            html += '<table><thead><tr><th>Data</th><th>iOS</th><th>Android</th><th>Total</th></tr></thead><tbody>';
             for (var j = 0; j < recent.length; j++) {
               var r = recent[j];
               html += '<tr><td>' + r.date + '</td><td>' + (r.ios || 0) + '</td><td>' + (r.android || 0) + '</td><td><strong>' + (r.total || 0) + '</strong></td></tr>';
             }
             html += '</tbody></table>';
           } else {
-            html += '<p class="help">Ingen data ännu – första synken körs när store-nycklarna är på plats. Butikerna rapporterar med ~1 dygns fördröjning.</p>';
+            html += '<p class="help">Ainda não há dados – a primeira sincronização é executada quando as chaves das lojas estiverem configuradas. As lojas reportam com aproximadamente 1 dia de atraso.</p>';
           }
           el.innerHTML = html;
         }
 
         // Auto-fetch live data from Supabase
-        if (statusEl) statusEl.textContent = 'Hämtar live-data...';
+        if (statusEl) statusEl.textContent = 'Buscando dados ao vivo...';
         Promise.all([rpc('dashboard_weekly_main'), rpc('dashboard_weekly_events'), rpc('dashboard_reply_rate'), rpc('dashboard_notification_stats'), rpc('dashboard_account_types'), rpc('dashboard_today_highlights'), rpc('dashboard_retention'), rpc('dashboard_subscription_bars'), rpc('dashboard_events_daily_current_week'), rpc('dashboard_store_downloads_summary').catch(function(){ return null; })])
           .then(function(results) {
             var mainResult = results[0];
@@ -1766,12 +1773,12 @@
               renderBrDownloads(dlObj);
             }
             renderAll(lastMainData, lastEventsData);
-            if (statusEl) statusEl.textContent = 'Uppdaterad ' + new Date().toLocaleString('sv-SE');
+            if (statusEl) statusEl.textContent = 'Atualizado ' + new Date().toLocaleString('pt-BR');
             if (statusEl) statusEl.style.color = '#0d6832';
           })
           .catch(function(err) {
             console.error('Dashboard fetch error:', err);
-            if (statusEl) statusEl.textContent = 'Kunde inte hämta live-data (visar cachad)';
+            if (statusEl) statusEl.textContent = 'Não foi possível buscar dados ao vivo (exibindo cache)';
             if (statusEl) statusEl.style.color = '#b02a37';
           });
       });
@@ -1780,7 +1787,7 @@
         var data = safeMainForRender(lastMainData);
         var full = getFullWeeks(data);
         if (full.length === 0) return;
-        var headers = ['Vecka','Nya konton','Nya hundar','Nya vaktprofiler','Sitter-konv','Tindog-konv','Sitter-medd','Tindog-medd','Promenader','Platser','Bokningar','Hund-akt %','Vakt-akt %','Konv/100','Medd/konv','Push-notiser','Unika mottagare'];
+        var headers = ['Semana','Novas contas','Novos cães','Novos perfis de cuidador','Conv. cuidador','Conv. Tindog','Msg. cuidador','Msg. Tindog','Passeios','Locais','Reservas','Ativação cães %','Ativação cuidadores %','Conv/100','Msg/conv','Notificações push','Destinatários únicos'];
         var rows = [headers.join(';')];
         full.forEach(function(row) {
           var d = computeDerived(row);
@@ -1814,7 +1821,7 @@
       };
 
       document.getElementById('btnClearCache').onclick = function() {
-        if (!confirm('Detta raderar all cachad dashboard-data och laddar om från Supabase. Fortsätt?')) return;
+        if (!confirm('Isso apaga todos os dados do dashboard em cache e recarrega a partir do Supabase. Continuar?')) return;
         console.log('🗑️ Clearing localStorage cache...');
         localStorage.removeItem('flocken_dashboard_br_main');
         localStorage.removeItem('flocken_dashboard_br_events');
@@ -1831,7 +1838,7 @@
       document.getElementById('btnMain').onclick = function() {
         var raw = document.getElementById('jsonMain').value.trim();
         showErr('errMain', '');
-        if (!raw) { showErr('errMain', 'Klistra in JSON först.'); return; }
+        if (!raw) { showErr('errMain', 'Cole o JSON primeiro.'); return; }
         try {
           var parsed = JSON.parse(raw);
           var data = Array.isArray(parsed) ? parsed : (parsed.data || parsed.result || [parsed]);
@@ -1840,14 +1847,14 @@
           try { localStorage.setItem('flocken_dashboard_br_main', JSON.stringify(data)); } catch (e) {}
           renderAll(lastMainData, lastEventsData);
         } catch (e) {
-          showErr('errMain', 'Ogiltig JSON: ' + e.message);
+          showErr('errMain', 'JSON inválido: ' + e.message);
         }
       };
 
       document.getElementById('btnEvents').onclick = function() {
         var raw = document.getElementById('jsonEvents').value.trim();
         showErr('errEvents', '');
-        if (!raw) { showErr('errEvents', 'Klistra in JSON först.'); return; }
+        if (!raw) { showErr('errEvents', 'Cole o JSON primeiro.'); return; }
         try {
           var parsed = JSON.parse(raw);
           var data = Array.isArray(parsed) ? parsed : (parsed.data || parsed.result || [parsed]);
@@ -1856,7 +1863,7 @@
           try { localStorage.setItem('flocken_dashboard_br_events', JSON.stringify(data)); } catch (e) {}
           renderAll(lastMainData, lastEventsData);
         } catch (e) {
-          showErr('errEvents', 'Ogiltig JSON: ' + e.message);
+          showErr('errEvents', 'JSON inválido: ' + e.message);
         }
       };
     })();
