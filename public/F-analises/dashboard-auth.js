@@ -42,18 +42,28 @@
   }
   function target(url) {
     for (var i = 0; i < targets.length; i++) if (targets[i].url === url) return targets[i];
-    return targets[0];
+    return targets[0] || null;
   }
 
-  /** Headers för RPC-anrop mot ett visst projekt. */
-  function headers(url) {
-    var t = target(url);
-    var s = ladda(t.url);
+  /**
+   * Headers för ett projekt som anges EXPLICIT.
+   * Viktigt: slå aldrig upp nyckeln i `targets` här — växlaren frågar om
+   * regioner som sidan sjalv inte har i sin lista, och da skulle fel nyckel
+   * anvandas (Europa-kontrollen gjord med Brasiliens nyckel = alltid nekad).
+   */
+  function headersFor(p) {
+    var s = ladda(p.url);
     return {
-      'apikey': t.anonKey,
-      'Authorization': 'Bearer ' + (s && s.access_token ? s.access_token : t.anonKey),
+      'apikey': p.anonKey,
+      'Authorization': 'Bearer ' + (s && s.access_token ? s.access_token : p.anonKey),
       'Content-Type': 'application/json'
     };
+  }
+
+  /** Publikt: headers för ett av sidans egna projekt (används av rpc()). */
+  function headers(url) {
+    var t = target(url);
+    return t ? headersFor(t) : { 'Content-Type': 'application/json' };
   }
 
   function loggaIn(t, epost, losenord) {
@@ -88,7 +98,6 @@
       .catch(function () { return false; });
   }
 
-  /** Är den sparade sessionen giltig OCH admin i det projektet? */
   // ─── Google/Apple ────────────────────────────────────────────────────────
   // Flera konton (Torbjorn, Patricia) ar skapade med Google eller Apple och har
   // DARFOR INGET LOSENORD — utan de har knapparna kan de inte logga in alls.
@@ -123,9 +132,10 @@
     return true;
   }
 
+  /** Är den sparade sessionen giltig OCH står kontot på dashboard_admins? */
   function arAdmin(t) {
     return fetch(t.url + '/rest/v1/rpc/is_dashboard_admin', {
-      method: 'POST', headers: headers(t.url), body: '{}'
+      method: 'POST', headers: headersFor(t), body: '{}'
     }).then(function (r) { return r.ok ? r.json() : false; })
       .then(function (v) { return v === true; })
       .catch(function () { return false; });
@@ -240,31 +250,59 @@
    * darfor kravs ingen ny inloggning vid byte (utom rapporten, som aven vill
    * ha Brasilien).
    */
+  var PROJEKT = {
+    eu: { url: 'https://jzbdxcsocwdxwzjjlnrw.supabase.co', anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6YmR4Y3NvY3dkeHd6ampsbnJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyMjY4NTEsImV4cCI6MjA3NjgwMjg1MX0.eWpRvtv_2dClpwRYnLsD8yvNWz75jd1J42KLstVGpd4' },
+    br: { url: 'https://vdpdehoreqjlenvqumho.supabase.co', anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkcGRlaG9yZXFqbGVudnF1bWhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0OTY0NDQsImV4cCI6MjA5NDA3MjQ0NH0.kVj5K22XGa5caJtSvzQwWYSB57C4nEY3-gapI-v_PSU' }
+  };
+
+  // Vilken region varje vy laser. Rapporten vager ihop bada -> kraver bada.
   var SIDOR = [
-    { fil: 'flocken-veckodashboard.html', namn: 'Europa' },
-    { fil: 'flocken-veckodashboard-brasilien.html', namn: 'Brasilien' },
-    { fil: 'flocken-rapport.html', namn: 'Rapport' }
+    { fil: 'flocken-veckodashboard.html', namn: 'Europa', kraver: ['eu'] },
+    { fil: 'flocken-veckodashboard-brasilien.html', namn: 'Brasilien', kraver: ['br'] },
+    { fil: 'flocken-rapport.html', namn: 'Rapport', kraver: ['eu', 'br'] }
   ];
+
+  /**
+   * Har anvandaren bevisad behorighet till en region?
+   * Ingen sparad session = vi VET inte = doljs. Hellre en dold lank for den
+   * behoriga (som loggar in en gang) an en synlig for den obehoriga.
+   */
+  function harTillgang(nyckel) {
+    var p = PROJEKT[nyckel];
+    var s = ladda(p.url);
+    if (!s || !s.access_token) return Promise.resolve(false);
+    return arAdmin({ url: p.url, anonKey: p.anonKey });
+  }
 
   function visaVaxlare() {
     if (document.getElementById('dash-vaxlare')) return;
     var harFil = location.pathname.split('/').pop() || '';
-    var n = document.createElement('nav');
-    n.id = 'dash-vaxlare';
-    n.style.cssText = 'position:fixed;top:.6rem;right:.6rem;z-index:9998;display:flex;gap:.3rem;' +
-      'align-items:center;background:rgba(28,26,21,.94);border:1px solid #3d3a33;border-radius:999px;' +
-      'padding:.3rem;font-family:system-ui,-apple-system,sans-serif;font-size:.82rem;box-shadow:0 4px 14px rgba(0,0,0,.3)';
-    var html = '';
-    SIDOR.forEach(function (s) {
-      var aktiv = harFil === s.fil;
-      html += '<a href="' + s.fil + '" style="text-decoration:none;padding:.35rem .75rem;border-radius:999px;' +
-        (aktiv ? 'background:#8BA45D;color:#12100c;font-weight:700;pointer-events:none' : 'color:#c9c3b6') + '">' + s.namn + '</a>';
+
+    Promise.all(['eu', 'br'].map(harTillgang)).then(function (res) {
+      var tillgang = { eu: res[0], br: res[1] };
+      var synliga = SIDOR.filter(function (sida) {
+        if (sida.fil === harFil) return true;          // sidan man star pa visas alltid
+        return sida.kraver.every(function (k) { return tillgang[k]; });
+      });
+      if (synliga.length < 2) return;                  // ensam lank = ingen meny behovs
+
+      var n = document.createElement('nav');
+      n.id = 'dash-vaxlare';
+      n.style.cssText = 'position:fixed;top:.6rem;right:.6rem;z-index:9998;display:flex;gap:.3rem;' +
+        'align-items:center;background:rgba(28,26,21,.94);border:1px solid #3d3a33;border-radius:999px;' +
+        'padding:.3rem;font-family:system-ui,-apple-system,sans-serif;font-size:.82rem;box-shadow:0 4px 14px rgba(0,0,0,.3)';
+      var html = '';
+      synliga.forEach(function (sida) {
+        var aktiv = harFil === sida.fil;
+        html += '<a href="' + sida.fil + '" style="text-decoration:none;padding:.35rem .75rem;border-radius:999px;' +
+          (aktiv ? 'background:#8BA45D;color:#12100c;font-weight:700;pointer-events:none' : 'color:#c9c3b6') + '">' + sida.namn + '</a>';
+      });
+      html += '<button id="dash-ut" title="Logga ut" style="margin-left:.15rem;padding:.35rem .7rem;border:0;border-radius:999px;' +
+        'background:transparent;color:#79736a;cursor:pointer;font-size:.82rem">Logga ut</button>';
+      n.innerHTML = html;
+      document.body.appendChild(n);
+      n.querySelector('#dash-ut').addEventListener('click', loggaUt);
     });
-    html += '<button id="dash-ut" title="Logga ut" style="margin-left:.15rem;padding:.35rem .7rem;border:0;border-radius:999px;' +
-      'background:transparent;color:#79736a;cursor:pointer;font-size:.82rem">Logga ut</button>';
-    n.innerHTML = html;
-    document.body.appendChild(n);
-    n.querySelector('#dash-ut').addEventListener('click', loggaUt);
   }
 
   global.DashAuth = { init: init, headers: headers, loggaUt: loggaUt };
