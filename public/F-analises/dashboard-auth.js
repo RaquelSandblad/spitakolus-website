@@ -206,7 +206,7 @@
       });
 
       kedja.then(function () {
-        if (kvarEfter.length === 0) { d.remove(); onReady(); return; }
+        if (kvarEfter.length === 0) { d.remove(); visaVaxlare(); onReady(); return; }
         if (kvarEfter.length < kvar.length) { visaRuta(kvarEfter, 'Kvar att logga in på: ' + kvarEfter.map(function (t) { return t.namn; }).join(', ')); return; }
         btn.disabled = false; btn.textContent = 'Logga in';
         fel.textContent = sistaFel || 'Inloggningen misslyckades';
@@ -224,7 +224,7 @@
       return sakraTarget(t).then(function (ok) { return ok ? null : t; });
     })).then(function (res) {
       var kvar = res.filter(Boolean);
-      if (kvar.length === 0) onReady();
+      if (kvar.length === 0) { visaVaxlare(); onReady(); }
       else visaRuta(kvar);
     });
   }
@@ -232,6 +232,39 @@
   function loggaUt() {
     targets.forEach(function (t) { rensa(t.url); });
     location.reload();
+  }
+
+  /**
+   * Vaxlare mellan de tre vyerna + utloggning. Visas forst NAR man ar inloppad,
+   * sa den avslojar inget for obehoriga. Sessionen ligger kvar i webblasaren,
+   * darfor kravs ingen ny inloggning vid byte (utom rapporten, som aven vill
+   * ha Brasilien).
+   */
+  var SIDOR = [
+    { fil: 'flocken-veckodashboard.html', namn: 'Europa' },
+    { fil: 'flocken-veckodashboard-brasilien.html', namn: 'Brasilien' },
+    { fil: 'flocken-rapport.html', namn: 'Rapport' }
+  ];
+
+  function visaVaxlare() {
+    if (document.getElementById('dash-vaxlare')) return;
+    var harFil = location.pathname.split('/').pop() || '';
+    var n = document.createElement('nav');
+    n.id = 'dash-vaxlare';
+    n.style.cssText = 'position:fixed;top:.6rem;right:.6rem;z-index:9998;display:flex;gap:.3rem;' +
+      'align-items:center;background:rgba(28,26,21,.94);border:1px solid #3d3a33;border-radius:999px;' +
+      'padding:.3rem;font-family:system-ui,-apple-system,sans-serif;font-size:.82rem;box-shadow:0 4px 14px rgba(0,0,0,.3)';
+    var html = '';
+    SIDOR.forEach(function (s) {
+      var aktiv = harFil === s.fil;
+      html += '<a href="' + s.fil + '" style="text-decoration:none;padding:.35rem .75rem;border-radius:999px;' +
+        (aktiv ? 'background:#8BA45D;color:#12100c;font-weight:700;pointer-events:none' : 'color:#c9c3b6') + '">' + s.namn + '</a>';
+    });
+    html += '<button id="dash-ut" title="Logga ut" style="margin-left:.15rem;padding:.35rem .7rem;border:0;border-radius:999px;' +
+      'background:transparent;color:#79736a;cursor:pointer;font-size:.82rem">Logga ut</button>';
+    n.innerHTML = html;
+    document.body.appendChild(n);
+    n.querySelector('#dash-ut').addEventListener('click', loggaUt);
   }
 
   global.DashAuth = { init: init, headers: headers, loggaUt: loggaUt };
