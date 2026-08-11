@@ -6,6 +6,7 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>Flocken – Rapport &amp; Prognos</title>
   <!-- Version: 2026-06-04 – Branschbaserad prognos, 100k-spårning, live-signaler -->
+  <script src="dashboard-auth.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     :root {
@@ -375,14 +376,10 @@
 
   function rpc(fnName, region) {
     var url = region === 'brazil' ? SUPABASE_BR_URL : SUPABASE_URL;
-    var key = region === 'brazil' ? SUPABASE_BR_KEY : SUPABASE_ANON_KEY;
+    // 2026-08-11: inloggad anvandares token i stallet for anon-nyckeln (migr 156).
     return fetch(url + '/rest/v1/rpc/' + fnName, {
       method: 'POST',
-      headers: {
-        'apikey': key,
-        'Authorization': 'Bearer ' + key,
-        'Content-Type': 'application/json'
-      },
+      headers: DashAuth.headers(url),
       body: '{}'
     }).then(function(r) {
       if (!r.ok) throw new Error(fnName + ' ' + r.status);
@@ -1013,6 +1010,8 @@
   // ──────────────────────────────────────────────────────────────
   // Main data fetch
   // ──────────────────────────────────────────────────────────────
+  // 2026-08-11: hamtningen startar forst efter inloggning (migr 156).
+  function startaRapporten() {
   Promise.allSettled([
     rpc('dashboard_rc_weekly_metrics'),
     rpc('dashboard_rc_trial_cohorts'),
@@ -1118,6 +1117,15 @@
     if (failed.length > 0) statusMsg += ' (' + failed.length + ' RPC misslyckades)';
     document.getElementById('statusBar').textContent = statusMsg;
 
+  });
+  }
+
+  DashAuth.init({
+    targets: [
+      { url: SUPABASE_URL, anonKey: SUPABASE_ANON_KEY, namn: 'Europa' },
+      { url: SUPABASE_BR_URL, anonKey: SUPABASE_BR_KEY, namn: 'Brasilien' }
+    ],
+    onReady: startaRapporten
   });
 
 })();
