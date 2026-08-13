@@ -1905,7 +1905,11 @@
             datasets: [
               { label: 'Betalda (frivilliga)', data: data.map(function(r) { return r.betalda || 0; }), backgroundColor: '#e05252' },
               { label: 'Betalproblem', data: data.map(function(r) { return r.billing || 0; }), backgroundColor: isDark ? '#ffb74d' : '#ff9800' },
-              { label: 'Trial (aldrig betalat)', data: data.map(function(r) { return r.trial || 0; }), backgroundColor: isDark ? '#5a6b7a' : '#b0bec5' }
+              { label: 'Trial (aldrig betalat)', data: data.map(function(r) { return r.trial || 0; }), backgroundColor: isDark ? '#5a6b7a' : '#b0bec5' },
+              // Familjedelning = medgäster på NÅGON ANNANS prenumeration (0 kr). Apple
+              // skickar ett event per familjemedlem när köparen säger upp, så en enda
+              // uppsägning kunde tidigare se ut som fem. Egen stapel = ingen churn.
+              { label: 'Familjedelning (0 kr)', data: data.map(function(r) { return r.familjedelning || 0; }), backgroundColor: isDark ? '#a48bd4' : '#b39ddb' }
             ]
           },
           options: {
@@ -1931,8 +1935,15 @@
           el.innerHTML = '<p class="help"><strong>Senaste dagen (' + last.dag + '):</strong> ' +
             '<span style="color:#e05252;font-weight:bold;">' + (last.betalda || 0) + ' betalda</span>, ' +
             (last.billing || 0) + ' betalproblem, ' + (last.trial || 0) + ' trial' +
+            ((last.familjedelning || 0) > 0 ? ', ' + last.familjedelning + ' familjedelning' : '') +
             (prev ? ' &nbsp;•&nbsp; dagen innan: ' + (prev.betalda || 0) + ' betalda' : '') +
-            ' &nbsp;•&nbsp; 7-dagarssnitt betalda: ' + avg7 + '/dag</p>';
+            ' &nbsp;•&nbsp; 7-dagarssnitt betalda: ' + avg7 + '/dag</p>' +
+            ((last.familjedelning || 0) > 0
+              ? '<p class="help" style="margin-top:4px;">Familjedelning = medgäster på någon annans prenumeration. ' +
+                'Apple skickar ett event per familjemedlem när köparen säger upp, så ' + last.familjedelning +
+                ' av raderna denna dag hör till en prenumeration som redan är räknad under "betalda". ' +
+                'De betalar 0 kr och är alltså varken churn eller förlorad intäkt.</p>'
+              : '');
         }
       }
 
