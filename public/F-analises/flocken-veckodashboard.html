@@ -190,7 +190,7 @@
     <h2>Win-back – gratis-trials 🎯</h2>
     <p class="help">Automatiska rabatt-mejl (Apple offer codes) till 6-mån-gratiskohorten: 3 mejl/person — 4 dagar före periodslut, dagen före, och 3 dagar efter. Mejlen slutar direkt när personen tecknar prenumeration. Rullar dagligen aug–okt 2026.</p>
     <div class="kpi-grid">
-      <div class="kpi-card"><div class="kpi-value" id="wbMejl">–</div><div class="kpi-label">Mejl skickade<br><small style="font-size:0.75em;opacity:0.7;" id="wbMejlDetalj">mejl 1 / 2 / 3 / ikapp</small></div></div>
+      <div class="kpi-card"><div class="kpi-value" id="wbMejl">–</div><div class="kpi-label">Personer som nåtts<br><small style="font-size:0.75em;opacity:0.7;" id="wbMejlDetalj">mejl 1 / 2 / 3 / ikapp</small></div></div>
       <div class="kpi-card"><div class="kpi-value" style="color:#2e7d32;" id="wbPren">–</div><div class="kpi-label">Prenumerationer skapade<br><small style="font-size:0.75em;opacity:0.7;">mottagare som nu betalar</small></div></div>
       <div class="kpi-card"><div class="kpi-value" id="wbSenaste">–</div><div class="kpi-label">Senaste mejl</div></div>
     </div>
@@ -1871,10 +1871,15 @@
         var detalj = document.getElementById('wbMejlDetalj');
         var pren = document.getElementById('wbPren');
         var senaste = document.getElementById('wbSenaste');
-        if (mejl) mejl.textContent = (d.mejl_totalt != null ? d.mejl_totalt : '–');
+        // Rubriksiffran = unika PERSONER (personer_totalt), inte antal mejl:
+        // varje person får upp till 3 påminnelser + ev. ikapp-mejl, så
+        // mejl_totalt dubbelräknade mottagarna. Fallback till mejl_totalt om
+        // RPC:n ännu är den gamla versionen (cachead deploy).
+        if (mejl) mejl.textContent = (d.personer_totalt != null ? d.personer_totalt : (d.mejl_totalt != null ? d.mejl_totalt : '–'));
         if (detalj) {
           var rader = 'mejl 1: ' + (d.mejl_t1 || 0) + ' · mejl 2: ' + (d.mejl_t2 || 0) + ' · mejl 3: ' + (d.mejl_t3 || 0);
           if (d.mejl_catchup) rader += ' · ikapp: ' + d.mejl_catchup;
+          if (d.mejl_totalt != null) rader += ' · totalt ' + d.mejl_totalt + ' mejl';
           detalj.textContent = rader;
         }
         if (pren) pren.textContent = (d.prenumerationer != null ? d.prenumerationer : '–');
