@@ -7,6 +7,8 @@
   --primary-dark: #2563EB;
   --secondary: #10B981;
   --secondary-dark: #059669;
+  --accent: #A95871;
+  --accent-dark: #8E4A5F;
 }
 
 @theme inline {
@@ -16,6 +18,8 @@
   --color-primary-dark: var(--primary-dark);
   --color-secondary: var(--secondary);
   --color-secondary-dark: var(--secondary-dark);
+  --color-accent: var(--accent);
+  --color-accent-dark: var(--accent-dark);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

@@ -4,6 +4,11 @@ const APP_LINKS = {
     ios: 'https://apps.apple.com/se/app/n%C3%A4sta-hem/id6749783267',
     android: 'https://play.google.com/store/apps/details?id=com.nastahem.app&hl=sv',
   },
+  nara: {
+    website: 'https://nara.spitakolus.com',
+    ios: 'https://apps.apple.com/se/app/n%C3%A4ra-v%C3%A4nskap-p%C3%A5-riktigt/id6801097642',
+    android: 'https://play.google.com/store/apps/details?id=com.spitakolus.nara&hl=sv',
+  },
   flocken: {
     website: 'https://flocken.info',
     ios: 'https://apps.apple.com/se/app/flocken/id6755424578',
@@ -11,10 +16,13 @@ const APP_LINKS = {
   },
 };
 
-function StoreBadges({ ios, android, color }: { ios: string; android: string; color: 'primary' | 'secondary' }) {
-  const bgClass = color === 'primary'
-    ? 'bg-primary hover:bg-primary-dark'
-    : 'bg-secondary hover:bg-secondary-dark';
+function StoreBadges({ ios, android, color }: { ios: string; android: string; color: 'primary' | 'secondary' | 'accent' }) {
+  const bgClass =
+    color === 'primary'
+      ? 'bg-primary hover:bg-primary-dark'
+      : color === 'secondary'
+        ? 'bg-secondary hover:bg-secondary-dark'
+        : 'bg-accent hover:bg-accent-dark';
 
   return (
     <div className="flex flex-wrap gap-3">
@@ -53,7 +61,7 @@ export default function Produkter() {
             Våra Produkter
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Båda våra appar är lanserade och tillgängliga på iOS och Android.
+            Alla tre apparna är lanserade och tillgängliga på iOS och Android.
             Ladda ner dem idag!
           </p>
         </div>
@@ -181,6 +189,74 @@ export default function Produkter() {
               </div>
             </div>
           </div>
+
+          {/* Nära */}
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div className="md:flex">
+              <div className="md:flex-shrink-0 bg-gradient-to-br from-accent to-accent-dark md:w-1/3 flex items-center justify-center p-12">
+                <div className="text-white text-center">
+                  <svg className="w-24 h-24 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                  <h2 className="text-3xl font-bold">Nära</h2>
+                  <a
+                    href={APP_LINKS.nara.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block mt-2 text-rose-200 hover:text-white transition-colors text-sm underline underline-offset-2"
+                  >
+                    nara.spitakolus.com
+                  </a>
+                </div>
+              </div>
+              <div className="p-8 md:w-2/3">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  Vänskap på riktigt — för kvinnor
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Nära är appen för dig som vill hitta nya vänner på riktigt, inte bara på
+                  skärmen. Appen hjälper dig att upptäcka kvinnor i din närhet som också
+                  söker vänskap, gemenskap och någon att göra saker med.
+                </p>
+
+                <div className="mb-6">
+                  <h4 className="font-semibold text-gray-900 mb-2">Målgrupp:</h4>
+                  <p className="text-gray-600">
+                    Kvinnor från 18 år. Nära är en gemenskap enbart för kvinnor — transkvinnor
+                    och alla som identifierar sig som kvinna är lika självklara här. Helt gratis:
+                    inga prenumerationer och inga låsta funktioner.
+                  </p>
+                </div>
+
+                <div className="mb-6">
+                  <h4 className="font-semibold text-gray-900 mb-2">Trygghet:</h4>
+                  <p className="text-gray-600">
+                    Din exakta position lämnar aldrig telefonen. Koordinaterna avrundas redan
+                    på din enhet till ett rutnät om cirka två kilometer, och på kartan visas du
+                    dessutom som en förskjuten punkt. Du kan när som helst dölja din profil,
+                    blockera någon eller rapportera olämpligt beteende.
+                  </p>
+                </div>
+
+                <div className="mb-8">
+                  <h4 className="font-semibold text-gray-900 mb-2">Hur appen fungerar:</h4>
+                  <ul className="list-disc list-inside text-gray-600 space-y-2">
+                    <li>Skapa en profil och berätta vad du gillar och vad du söker</li>
+                    <li>Upptäck kvinnor nära dig — i lista eller på kartan</li>
+                    <li>Följ med på aktiviteter: fika, promenader, träning, kultur och natur</li>
+                    <li>Skapa en egen träff och se vem som vill haka på</li>
+                    <li>Chatta tryggt i appen och bestäm en träff när det känns rätt</li>
+                    <li>Rapportering och moderering med svar inom 24 timmar</li>
+                  </ul>
+                </div>
+
+                <div className="pt-6 border-t border-gray-100">
+                  <p className="text-sm font-medium text-gray-900 mb-3">Ladda ner Nära:</p>
+                  <StoreBadges ios={APP_LINKS.nara.ios} android={APP_LINKS.nara.android} color="accent" />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Info Section */}
@@ -193,7 +269,7 @@ export default function Produkter() {
               Vill du veta mer om våra appar? Besök deras dedikerade hemsidor för mer information,
               guider och nyheter.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-center">
               <a
                 href={APP_LINKS.nastahem.website}
                 target="_blank"
@@ -215,6 +291,17 @@ export default function Produkter() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 Flocken — flocken.info
+              </a>
+              <a
+                href={APP_LINKS.nara.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 bg-accent text-white px-6 py-3 rounded-lg font-semibold hover:bg-accent-dark transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+                Nära — nara.spitakolus.com
               </a>
             </div>
           </div>

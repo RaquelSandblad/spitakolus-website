@@ -17,17 +17,6 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  // Produktsidan vilande tills vidare (företaget tonas ner). Slå på igen
-  // genom att ta bort denna redirect.
-  async redirects() {
-    return [
-      {
-        source: '/produkter',
-        destination: '/',
-        permanent: false,
-      },
-    ];
-  },
 };
 
 export default nextConfig;

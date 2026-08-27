@@ -20,6 +20,9 @@ export default function Header() {
             <Link href="/" className="text-gray-700 hover:text-primary transition-colors">
               Hem
             </Link>
+            <Link href="/produkter" className="text-gray-700 hover:text-primary transition-colors">
+              Produkter
+            </Link>
             <Link href="/om-oss" className="text-gray-700 hover:text-primary transition-colors">
               Om oss
             </Link>
@@ -69,6 +72,13 @@ export default function Header() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Hem
+              </Link>
+              <Link
+                href="/produkter"
+                className="px-3 py-2 text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Produkter
               </Link>
               <Link
                 href="/om-oss"

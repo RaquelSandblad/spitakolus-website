@@ -50,6 +50,20 @@ export default function Footer() {
                   </a>
                 </div>
               </li>
+              <li>
+                <span className="text-gray-300 font-medium block text-sm">Nära</span>
+                <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1">
+                  <a href="https://nara.spitakolus.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors text-xs">
+                    Hemsida
+                  </a>
+                  <a href="https://apps.apple.com/se/app/n%C3%A4ra-v%C3%A4nskap-p%C3%A5-riktigt/id6801097642" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors text-xs">
+                    App Store
+                  </a>
+                  <a href="https://play.google.com/store/apps/details?id=com.spitakolus.nara&hl=sv" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors text-xs">
+                    Google Play
+                  </a>
+                </div>
+              </li>
             </ul>
           </div>
 
@@ -60,6 +74,11 @@ export default function Footer() {
               <li>
                 <Link href="/" className="text-gray-400 hover:text-white transition-colors">
                   Hem
+                </Link>
+              </li>
+              <li>
+                <Link href="/produkter" className="text-gray-400 hover:text-white transition-colors">
+                  Produkter
                 </Link>
               </li>
               <li>
