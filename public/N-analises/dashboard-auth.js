@@ -102,12 +102,25 @@
           'Logga in med ditt Nära-konto. Bara administratörer kan se siffrorna.</p>' +
         '<input id="dl-e" type="email" placeholder="E-post" autocomplete="username" required ' +
           'style="width:100%;padding:.7rem;margin-bottom:.6rem;border-radius:.5rem;border:1px solid #55464e;background:#2b2126;color:#F7EFEA;box-sizing:border-box">' +
-        '<input id="dl-p" type="password" placeholder="Lösenord" autocomplete="current-password" required ' +
-          'style="width:100%;padding:.7rem;margin-bottom:.9rem;border-radius:.5rem;border:1px solid #55464e;background:#2b2126;color:#F7EFEA;box-sizing:border-box">' +
+        '<div style="position:relative;margin-bottom:.9rem">' +
+          '<input id="dl-p" type="password" placeholder="Lösenord" autocomplete="current-password" required ' +
+            'style="width:100%;padding:.7rem 3.4rem .7rem .7rem;border-radius:.5rem;border:1px solid #55464e;background:#2b2126;color:#F7EFEA;box-sizing:border-box">' +
+          '<button type="button" id="dl-visa" aria-label="Visa lösenordet" style="position:absolute;right:.45rem;top:50%;transform:translateY(-50%);' +
+            'padding:.25rem .55rem;border:0;border-radius:.4rem;background:transparent;color:#c5b3ba;font-size:.8rem;cursor:pointer">Visa</button>' +
+        '</div>' +
         '<button type="submit" id="dl-btn" style="width:100%;padding:.75rem;border:0;border-radius:999px;background:#B05E78;color:#fff;font-weight:700;cursor:pointer">Logga in</button>' +
         '<p id="dl-fel" style="color:#e8a87c;font-size:.85rem;margin:.9rem 0 0;min-height:1.2em">' + (felmeddelande || '') + '</p>' +
       '</form>';
     document.body.appendChild(d);
+
+    d.querySelector('#dl-visa').addEventListener('click', function () {
+      var p = d.querySelector('#dl-p');
+      var visas = p.type === 'text';
+      p.type = visas ? 'password' : 'text';
+      this.textContent = visas ? 'Visa' : 'Dölj';
+      this.setAttribute('aria-label', visas ? 'Visa lösenordet' : 'Dölj lösenordet');
+      p.focus();
+    });
 
     d.querySelector('#dl-form').addEventListener('submit', function (ev) {
       ev.preventDefault();
