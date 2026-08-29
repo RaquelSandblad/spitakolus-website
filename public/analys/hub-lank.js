@@ -23,7 +23,9 @@
         if (document.getElementById('hub-lank')) return;
         var a = document.createElement('a');
         a.id = 'hub-lank';
-        a.href = '/analys/';
+        /* Utan avslutande snedstreck: Next.js svarar 308 på "/analys/" och
+           skickar vidare hit ändå — den här vägen hoppar över omdirigeringen. */
+        a.href = '/analys';
         a.textContent = '← Alla dashboards';
         a.style.cssText =
           /* Över dashboardernas egna inloggningsrutor (z-index 99999): landar
