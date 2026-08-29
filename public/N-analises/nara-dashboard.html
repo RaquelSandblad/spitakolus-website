@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="sv" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Nära — Översikt</title>
+<style>
+  :root[data-theme="light"] {
+    --bg:#FBF5F1; --panel:#ffffff; --panel-2:#F7EFEA; --line:#EAD9D0;
+    --text:#3A2F36; --muted:#7A6B72; --dim:#A5959C;
+    --accent:#B05E78; --accent-2:#E8A87C; --pos:#5E8C6A; --neg:#C5503E; --warn:#E0A458;
+  }
+  :root[data-theme="dark"] {
+    --bg:#241d21; --panel:#2f262b; --panel-2:#382d33; --line:#463a41;
+    --text:#F1E8EC; --muted:#B8A6AE; --dim:#83737b;
+    --accent:#D488A2; --accent-2:#E8A87C; --pos:#7fb98d; --neg:#e0796c; --warn:#d9a441;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body {
+    background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+    font-size:14px; line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  .num { font-variant-numeric:tabular-nums; font-feature-settings:"tnum"; }
+  .wrap { max-width:1240px; margin:0 auto; padding:28px 24px 72px; }
+
+  .head { display:flex; align-items:baseline; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-bottom:6px; }
+  .head h1 { font-size:20px; font-weight:600; letter-spacing:-.01em; color:var(--accent); }
+  .head h1 em { font-style:normal; color:var(--muted); font-weight:400; }
+  .head-right { display:flex; align-items:center; gap:12px; }
+  .stamp { color:var(--dim); font-size:12px; }
+  .btn {
+    background:var(--panel); color:var(--text); border:1px solid var(--line);
+    border-radius:6px; padding:6px 13px; font-size:13px; font-family:inherit;
+    cursor:pointer; transition:border-color .15s;
+  }
+  .btn:hover { border-color:var(--accent); }
+  .btn:disabled { opacity:.5; cursor:default; }
+  .btn.on { border-color:var(--accent); color:var(--accent); font-weight:600; }
+  .lede { color:var(--muted); font-size:13px; margin-bottom:26px; max-width:80ch; }
+
+  section { margin-bottom:34px; }
+  .sec-head { display:flex; align-items:baseline; gap:12px; margin-bottom:14px; }
+  .sec-head h2 {
+    font-size:11px; font-weight:600; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--muted); white-space:nowrap;
+  }
+  .sec-head .rule { flex:1; height:1px; background:var(--line); }
+  .sec-head .aside { font-size:12px; color:var(--dim); white-space:nowrap; }
+
+  .grid { display:grid; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  .g3 { grid-template-columns:repeat(3,1fr); }
+  .g4 { grid-template-columns:repeat(4,1fr); }
+  .g5 { grid-template-columns:repeat(5,1fr); }
+  .g6 { grid-template-columns:repeat(6,1fr); }
+  @media (max-width:1000px) { .g5,.g6 { grid-template-columns:repeat(3,1fr); } }
+  @media (max-width:880px) { .g3,.g4,.g5,.g6 { grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:520px) { .g3,.g4,.g5,.g6 { grid-template-columns:1fr; } }
+  .metric { background:var(--panel); padding:15px 17px 16px; min-height:94px; }
+  .metric .label { font-size:12px; color:var(--muted); margin-bottom:7px; }
+  .metric .value { font-size:27px; font-weight:600; line-height:1.05; letter-spacing:-.02em; }
+  .metric .value.zero { color:var(--dim); font-weight:500; }
+  .metric .note { font-size:12px; color:var(--dim); margin-top:6px; }
+  .metric .note .pos { color:var(--pos); }
+  .metric .note .neg { color:var(--neg); }
+  .metric.flag .value { color:var(--warn); }
+  .metric.bad .value { color:var(--neg); }
+  .metric.good .value { color:var(--pos); }
+
+  .trend { display:flex; align-items:flex-end; gap:4px; height:64px; margin-bottom:7px; }
+  .trend .bar { flex:1; background:var(--accent); border-radius:2px 2px 0 0; min-height:2px; opacity:.85; position:relative; }
+  .trend .bar .b2 { position:absolute; left:0; right:0; bottom:0; background:var(--accent-2); border-radius:2px 2px 0 0; }
+  .trend .bar.cur { opacity:.5; }
+  .trend-labels { display:flex; gap:4px; font-size:10px; color:var(--dim); }
+  .trend-labels span { flex:1; text-align:center; overflow:hidden; white-space:nowrap; }
+  .legend { display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--muted); margin-top:8px; }
+  .legend span { display:flex; align-items:center; gap:6px; }
+  .dot { width:8px; height:8px; border-radius:2px; display:inline-block; }
+
+  .note-box { color:var(--dim); font-size:12px; margin-top:10px; line-height:1.6; max-width:90ch; }
+  .err { background:color-mix(in srgb, var(--neg) 12%, var(--panel));
+         border:1px solid color-mix(in srgb, var(--neg) 40%, transparent);
+         color:var(--text); padding:12px 15px; border-radius:7px; font-size:13px; margin-bottom:20px; }
+  .info { background:color-mix(in srgb, var(--warn) 12%, var(--panel));
+          border:1px solid color-mix(in srgb, var(--warn) 40%, transparent);
+          color:var(--text); padding:12px 15px; border-radius:7px; font-size:13px; margin-top:12px; line-height:1.6; }
+  .hide { display:none !important; }
+  a { color:var(--accent); }
+  footer { margin-top:44px; padding-top:18px; border-top:1px solid var(--line); color:var(--dim); font-size:12px; line-height:1.7; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <h1>Nära <em>— Översikt</em></h1>
+    <div class="head-right">
+      <span class="stamp" id="stamp">Väntar på inloggning…</span>
+      <button class="btn" id="btn-refresh" onclick="load()" disabled>Uppdatera</button>
+      <button class="btn" onclick="toggleTheme()">Tema</button>
+    </div>
+  </div>
+  <p class="lede">Live-data från Näras databas plus nedladdningssiffror från App Store Connect och Google Play
+     (synkas automatiskt varje natt). Granskarkontot Demo och andra interna konton är borträknade ur kontosiffrorna.</p>
+
+  <div id="error" class="err hide"></div>
+
+  <div id="dash" class="hide">
+
+    <section>
+      <div class="sec-head"><h2>Nedladdningar — App Store &amp; Google Play</h2><div class="rule"></div><span class="aside" id="dl-aside"></span></div>
+      <div class="grid g4" id="dl-kpis"></div>
+      <div style="margin-top:14px">
+        <div style="display:flex; gap:6px; margin-bottom:8px;">
+          <button class="btn on" id="fdl-all" onclick="setDlFilter('all')">Totalt</button>
+          <button class="btn" id="fdl-ios" onclick="setDlFilter('ios')">iOS</button>
+          <button class="btn" id="fdl-android" onclick="setDlFilter('android')">Android</button>
+        </div>
+        <div class="trend" id="tr-dl" style="height:90px"></div>
+        <div class="trend-labels" id="tl-dl"></div>
+        <div class="legend" id="lg-dl"></div>
+      </div>
+      <div id="dl-empty" class="info hide"></div>
+    </section>
+
+    <section>
+      <div class="sec-head"><h2>I appen</h2><div class="rule"></div><span class="aside" id="today-date"></span></div>
+      <div class="grid g3" id="inapp"></div>
+      <div class="grid g3" style="margin-top:14px">
+        <div class="metric" style="min-height:0;grid-column:1 / -1">
+          <div class="label">Aktiva användare per dag — senaste 14 dagarna</div>
+          <div class="trend" id="tr-dau"></div><div class="trend-labels" id="tl-dau"></div>
+        </div>
+      </div>
+      <p class="note-box">Aktiv = öppnade appen den dagen (inloggning eller att appen togs fram igen, loggas som mest en gång i timmen).
+         Daglig historik byggs från och med 29 aug 2026 — dagarna innan visar bara varje användares senast kända aktivitetsdag.</p>
+    </section>
+
+    <section>
+      <div class="sec-head"><h2>Nytt idag</h2><div class="rule"></div></div>
+      <div class="grid g4" id="today"></div>
+      <div class="grid g3" style="margin-top:14px">
+        <div class="metric" style="min-height:0;grid-column:1 / -1">
+          <div class="label">Nya konton per dag — senaste 14 dagarna</div>
+          <div class="trend" id="tr-konton"></div><div class="trend-labels" id="tl-konton"></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head"><h2>Denna vecka</h2><div class="rule"></div><span class="aside" id="week-aside"></span></div>
+      <div class="grid g4" id="week"></div>
+    </section>
+
+    <section>
+      <div class="sec-head"><h2>Utveckling per vecka</h2><div class="rule"></div><span class="aside">senaste 8 veckorna, sista stapeln är pågående vecka</span></div>
+      <div class="grid g3">
+        <div class="metric" style="min-height:0">
+          <div class="label">Nya konton</div>
+          <div class="trend" id="tr1"></div><div class="trend-labels" id="tl1"></div>
+        </div>
+        <div class="metric" style="min-height:0">
+          <div class="label">Meddelanden (1:1 + aktivitetschatt)</div>
+          <div class="trend" id="tr2"></div><div class="trend-labels" id="tl2"></div>
+        </div>
+        <div class="metric" style="min-height:0">
+          <div class="label">Nya aktiviteter</div>
+          <div class="trend" id="tr3"></div><div class="trend-labels" id="tl3"></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head"><h2>Totalt sedan start</h2><div class="rule"></div></div>
+      <div class="grid g6" id="totals"></div>
+    </section>
+
+    <section>
+      <div class="sec-head"><h2>Trygghet</h2><div class="rule"></div><span class="aside">rapporter har 24-timmars svarslöfte</span></div>
+      <div class="grid g4" id="safety"></div>
+      <p class="note-box">Rapporter hanteras i <a href="https://nara.spitakolus.com/admin.html" target="_blank" rel="noopener">adminvyn</a>.</p>
+    </section>
+
+  </div>
+
+  <footer>
+    Nära · Supabase-projekt <span class="num">uodsosiuyjjfxmvgttjm</span> ·
+    siffrorna hämtas via <span class="num">dashboard_overview</span> och <span class="num">dashboard_store_downloads</span>
+    (kräver admin-inloggning; migration 042) · nedladdningar synkas nattligt av edge-funktionen
+    <span class="num">sync-store-downloads</span> från App Store Connect och Google Plays statistikexport.
+    <span id="fetched"></span>
+  </footer>
+</div>
+
+<script src="dashboard-auth.js"></script>
+<script>
+'use strict';
+
+const SUPABASE_URL = 'https://uodsosiuyjjfxmvgttjm.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_37CPpF5PreAEvzfKSmAxLg_MXliX6IO';
+const THEME_STORE = 'nara_dash_theme';
+
+function toggleTheme() {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem(THEME_STORE, next); } catch (e) {}
+}
+try { const t = localStorage.getItem(THEME_STORE); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) {}
+
+const nf = new Intl.NumberFormat('sv-SE');
+const n = v => nf.format(Number(v) || 0);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+function metric(label, value, note, cls) {
+  const num = Number(value) || 0;
+  return `<div class="metric ${cls || ''}">
+    <div class="label">${label}</div>
+    <div class="value num ${num === 0 && typeof value !== 'string' ? 'zero' : ''}">${typeof value === 'string' ? value : n(num)}</div>
+    ${note ? `<div class="note">${note}</div>` : ''}
+  </div>`;
+}
+
+function delta(cur, prev) {
+  cur = Number(cur) || 0; prev = Number(prev) || 0;
+  if (!cur && !prev) return '<span class="dim">inget föregående vecka</span>';
+  if (!prev) return `<span class="pos">+${n(cur)}</span> mot noll föregående`;
+  const d = cur - prev;
+  if (!d) return 'oförändrat mot föregående';
+  const pct = Math.round(Math.abs(d) / prev * 100);
+  return `<span class="${d > 0 ? 'pos' : 'neg'}">${d > 0 ? '+' : '−'}${n(Math.abs(d))}</span> (${pct}%) mot föregående`;
+}
+
+async function rpc(name, body) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+    method: 'POST',
+    headers: DashAuth.headers(),
+    body: JSON.stringify(body || {}),
+  });
+  if (!res.ok) {
+    let msg = `${name} → HTTP ${res.status}`;
+    try { const j = await res.json(); if (j.message) msg = j.message; } catch (e) {}
+    throw new Error(msg);
+  }
+  return res.json();
+}
+
+function drawBars(barsId, labsId, rows, valueOf, labelOf, titleOf) {
+  const vals = rows.map(valueOf);
+  const max = Math.max(...vals, 1);
+  document.getElementById(barsId).innerHTML = rows.map((r, i) =>
+    `<div class="bar ${i === rows.length - 1 ? 'cur' : ''}" style="height:${Math.max(2, vals[i] / max * 100)}%" title="${esc(titleOf(r, i))}"></div>`
+  ).join('');
+  document.getElementById(labsId).innerHTML = rows.map((r, i) =>
+    `<span>${i % 2 === 0 ? esc(labelOf(r, i)) : ''}</span>`).join('');
+}
+
+/* ---------- Nedladdningar ---------- */
+let dlData = null;
+let dlFilter = 'all';
+
+function setDlFilter(f) {
+  dlFilter = f;
+  ['all', 'ios', 'android'].forEach(k =>
+    document.getElementById('fdl-' + k).classList.toggle('on', k === f));
+  if (dlData) renderDlChart(dlData);
+}
+
+function renderDlChart(dl) {
+  const hist = dl.history || [];
+  const rows = hist.length ? hist : [];
+  const val = r => dlFilter === 'ios' ? (Number(r.ios) || 0)
+              : dlFilter === 'android' ? (Number(r.android) || 0)
+              : (Number(r.ios) || 0) + (Number(r.android) || 0);
+  const bars = document.getElementById('tr-dl');
+  const labs = document.getElementById('tl-dl');
+  if (!rows.length) { bars.innerHTML = ''; labs.innerHTML = ''; document.getElementById('lg-dl').innerHTML = ''; return; }
+
+  const vals = rows.map(val);
+  const max = Math.max(...vals, 1);
+  bars.innerHTML = rows.map((r, i) => {
+    const total = vals[i];
+    const h = Math.max(2, total / max * 100);
+    let inner = '';
+    if (dlFilter === 'all' && total > 0) {
+      const andShare = (Number(r.android) || 0) / total;
+      inner = `<i class="b2" style="height:${(andShare * 100).toFixed(1)}%"></i>`;
+    }
+    return `<div class="bar" style="height:${h}%" title="${esc(r.date)}: ${n(total)} (iOS ${n(r.ios)}, Android ${n(r.android)})">${inner}</div>`;
+  }).join('');
+  const step = Math.max(1, Math.ceil(rows.length / 15));
+  labs.innerHTML = rows.map((r, i) =>
+    `<span>${i % step === 0 ? esc(String(r.date).slice(5)) : ''}</span>`).join('');
+  document.getElementById('lg-dl').innerHTML = dlFilter === 'all'
+    ? `<span><i class="dot" style="background:var(--accent)"></i>iOS</span>
+       <span><i class="dot" style="background:var(--accent-2)"></i>Android</span>`
+    : '';
+}
+
+function renderDownloads(dl) {
+  dlData = dl;
+  const hist = dl.history || [];
+  const totIos = Number(dl.total_ios) || 0;
+  const totAnd = Number(dl.total_android) || 0;
+  const last = hist.length ? hist[hist.length - 1] : null;
+
+  document.getElementById('dl-aside').textContent = dl.last_synced_at
+    ? 'senast synkad ' + new Date(dl.last_synced_at).toLocaleString('sv-SE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+    : 'ingen synk har körts ännu';
+
+  document.getElementById('dl-kpis').innerHTML =
+    metric('Nedladdningar totalt', totIos + totAnd, 'sedan datainsamlingen började', (totIos + totAnd) ? 'good' : '') +
+    metric('iOS (App Store)', totIos, dl.latest_ios_date ? 'senaste data ' + esc(dl.latest_ios_date) : 'ingen data ännu') +
+    metric('Android (Google Play)', totAnd, dl.latest_android_date ? 'senaste data ' + esc(dl.latest_android_date) : 'ingen data ännu') +
+    metric('Senaste dygnet med data', last ? (Number(last.ios) || 0) + (Number(last.android) || 0) : '—',
+      last ? esc(last.date) + ` · iOS ${n(last.ios)} · Android ${n(last.android)}` : '');
+
+  const empty = document.getElementById('dl-empty');
+  if (!hist.length) {
+    empty.classList.remove('hide');
+    empty.innerHTML = '<strong>Ingen butiksdata ännu.</strong> Synken körs varje natt men behöver API-nycklar: ' +
+      'App Store Connect-nyckel (issuer/key/.p8/vendor number) och ett Google-servicekonto med läsrätt till Play Consoles ' +
+      'statistikexport. Hur man lägger in dem står i <span class="num">docs/DASHBOARD.md</span> i friend-app-repot. ' +
+      'Butikssiffror har 1–2 dagars fördröjning hos både Apple och Google.';
+  } else {
+    empty.classList.add('hide');
+  }
+  renderDlChart(dl);
+}
+
+/* ---------- Huvudrendering ---------- */
+function render(o, dl) {
+  const idag = o.idag || {}, aktiva = o.aktiva || {}, tot = o.totalt || {}, rap = o.rapporter || {};
+
+  renderDownloads(dl || {});
+
+  document.getElementById('today-date').textContent = o.datum
+    ? new Date(o.datum + 'T12:00:00').toLocaleDateString('sv-SE', { weekday: 'long', day: 'numeric', month: 'long' })
+    : '';
+
+  document.getElementById('inapp').innerHTML =
+    metric('Aktiva i appen i dag', idag.aktiva, 'unika användare') +
+    metric('Aktiva senaste 7 dagarna', aktiva.d7, 'unika användare') +
+    metric('Aktiva senaste 30 dagarna', aktiva.d30, 'unika användare');
+
+  const dau = o.dau_14d || [];
+  drawBars('tr-dau', 'tl-dau', dau,
+    r => Number(r.aktiva) || 0,
+    r => String(r.dag).slice(5),
+    r => `${r.dag}: ${r.aktiva} aktiva`);
+
+  document.getElementById('today').innerHTML =
+    metric('Nya konton', idag.nya_konton, 'registrerade i dag') +
+    metric('Meddelanden', idag.meddelanden, '1:1 + aktivitetschatt') +
+    metric('Nya aktiviteter', idag.nya_aktiviteter) +
+    metric('Nya sparningar', idag.nya_sparningar, 'sparade profiler');
+
+  const konton14 = o.nya_konton_14d || [];
+  drawBars('tr-konton', 'tl-konton', konton14,
+    r => Number(r.antal) || 0,
+    r => String(r.dag).slice(5),
+    r => `${r.dag}: ${r.antal} nya konton`);
+
+  const veckor = [...(o.veckor || [])];
+  const cur = veckor[veckor.length - 1] || {}, prev = veckor[veckor.length - 2] || {};
+  document.getElementById('week-aside').textContent = (cur.vecka || '') + ' — jämfört med föregående vecka';
+  document.getElementById('week').innerHTML =
+    metric('Nya konton', cur.nya_konton, delta(cur.nya_konton, prev.nya_konton)) +
+    metric('Meddelanden', cur.meddelanden, delta(cur.meddelanden, prev.meddelanden)) +
+    metric('Nya aktiviteter', cur.nya_aktiviteter, delta(cur.nya_aktiviteter, prev.nya_aktiviteter)) +
+    metric('Nya sparningar', cur.nya_sparningar, delta(cur.nya_sparningar, prev.nya_sparningar));
+
+  const wLabel = w => String(w.vecka || '').replace(/^\d{4}-/, '');
+  drawBars('tr1', 'tl1', veckor, w => Number(w.nya_konton) || 0, wLabel, w => `${w.vecka}: ${w.nya_konton} nya konton`);
+  drawBars('tr2', 'tl2', veckor, w => Number(w.meddelanden) || 0, wLabel, w => `${w.vecka}: ${w.meddelanden} meddelanden`);
+  drawBars('tr3', 'tl3', veckor, w => Number(w.nya_aktiviteter) || 0, wLabel, w => `${w.vecka}: ${w.nya_aktiviteter} aktiviteter`);
+
+  document.getElementById('totals').innerHTML =
+    metric('Konton', tot.konton, `${n(tot.synliga)} synliga · ${n(tot.med_postnummer)} med postnummer`) +
+    metric('Push-enheter', (Number(tot.push_ios) || 0) + (Number(tot.push_android) || 0),
+      `${n(tot.push_ios)} iOS · ${n(tot.push_android)} Android`) +
+    metric('Meddelanden', (Number(tot.meddelanden) || 0) + (Number(tot.aktivitetsmeddelanden) || 0),
+      `${n(tot.meddelanden)} i 1:1 · ${n(tot.aktivitetsmeddelanden)} i aktivitetschatt`) +
+    metric('Konversationer', tot.konversationer, '1:1-trådar') +
+    metric('Aktiviteter', tot.aktiviteter,
+      Number(tot.kommande_aktiviteter) ? `varav <strong>${n(tot.kommande_aktiviteter)}</strong> kommande` : 'inga kommande just nu') +
+    metric('Sparade profiler', tot.sparningar, `konton på engelska: ${n(tot.engelska)}`);
+
+  const oppna = Number(rap.oppna) || 0;
+  const aldsta = rap.aldsta_oppna_timmar;
+  document.getElementById('safety').innerHTML =
+    metric('Öppna rapporter', oppna, oppna ? 'väntar på hantering' : 'allt hanterat', oppna ? (Number(aldsta) >= 20 ? 'bad' : 'flag') : 'good') +
+    metric('Äldsta öppna', oppna && aldsta != null ? `${n(aldsta)} h` : '—',
+      oppna ? (Number(aldsta) >= 20 ? '<span class="neg">nära 24h-gränsen!</span>' : 'inom 24h-fönstret') : '') +
+    metric('Rapporter totalt', rap.totalt, 'sedan start') +
+    metric('Blockeringar', tot.blockeringar, 'användare som blockerat någon');
+}
+
+async function load() {
+  const btn = document.getElementById('btn-refresh');
+  btn.disabled = true;
+  document.getElementById('stamp').textContent = 'Hämtar…';
+  document.getElementById('error').classList.add('hide');
+
+  try {
+    const [overview, downloads] = await Promise.all([
+      rpc('dashboard_overview'),
+      rpc('dashboard_store_downloads', { p_days: 60 }).catch(() => ({})),
+    ]);
+    render(overview, downloads);
+    document.getElementById('dash').classList.remove('hide');
+    document.getElementById('stamp').textContent =
+      'Uppdaterad ' + new Date().toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('fetched').textContent =
+      overview.fetched_at ? '· data beräknad ' + new Date(overview.fetched_at).toLocaleString('sv-SE') : '';
+  } catch (e) {
+    const el = document.getElementById('error');
+    el.textContent = 'Kunde inte hämta data: ' + e.message;
+    el.classList.remove('hide');
+    document.getElementById('stamp').textContent = 'Fel vid hämtning';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+DashAuth.init({
+  url: SUPABASE_URL,
+  anonKey: SUPABASE_KEY,
+  onReady: load,
+});
+</script>
+</body>
+</html>
