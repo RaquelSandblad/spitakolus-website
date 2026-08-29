@@ -141,7 +141,10 @@
           <input id="in-losen" type="password" placeholder="Lösenord" autocomplete="current-password">
           <button type="button" class="pw-visa" id="in-visa" aria-label="Visa lösenordet">Visa</button>
         </div>
-        <button class="knapp" id="in-btn">Logga in</button>
+        <!-- Avstängd tills kollaAlla() svarat: klickar man innan dess är
+             `sessioner` tom, alla projekt hamnar i `kvar`, och en redan
+             giltig session kan skrivas över. -->
+        <button class="knapp" id="in-btn" disabled>Kontrollerar…</button>
       </div>
       <ul class="status-lista" id="status-lista"></ul>
     </div>
@@ -275,9 +278,17 @@ function fornya(p) {
     method: 'POST',
     headers: { 'apikey': p.anonKey, 'Content-Type': 'application/json' },
     body: JSON.stringify({ refresh_token: s.refresh_token })
-  }).then(function (r) { return r.ok ? r.json() : null; })
-    .then(function (j) { if (j && j.access_token) { sparaSession(p, j); return true; } rensaSession(p); return false; })
-    .catch(function () { return false; });
+  }).then(function (r) {
+    if (r.ok) return r.json().then(function (j) { return { ny: j }; });
+    /* Radera BARA när servern säger att token faktiskt är ogiltig (4xx).
+       429 och 5xx är tillfälliga — raderar vi då kan enbart en trög stund
+       hos Supabase slå ut en fullt giltig session. */
+    return { doden: r.status >= 400 && r.status < 500 && r.status !== 429 };
+  }).then(function (svar) {
+    if (svar.ny && svar.ny.access_token) { sparaSession(p, svar.ny); return true; }
+    if (svar.doden) rensaSession(p);
+    return false;
+  }).catch(function () { return false; });   // nätverksfel: rör inte sessionen
 }
 
 /** Giltig session? Annars försök förnya en gång innan vi ger upp. */
@@ -353,6 +364,12 @@ function kollaAlla() {
     .then(function (res) {
       nycklar.forEach(function (k, i) { sessioner[k] = res[i]; });
       rita();
+    })
+    .catch(function () { /* kollaProjekt fångar allt själv — men lås aldrig knappen */ })
+    .then(function () {
+      var b = $('in-btn');
+      b.disabled = false;
+      b.textContent = 'Logga in';
     });
 }
 
@@ -402,9 +419,11 @@ function oppna() {
   $('hub').hidden = false;
   /* Tre av sidorna har egna lösenordsgrindar som sätter en sessionsflagga och
      annars kastar tillbaka besökaren (location.replace):
-       dashboard_ok     — Flocken Sverige (grind: F-analises/index.html "Mingau")
-                          och Nästa Hem (grind: NH-analises/index.html, samma ord)
-       dashboard_br_ok  — Flocken Brasilien (grind: F-analises/brasil.html "Malua")
+       dashboard_ok     — Flocken Sverige (grind: F-analises/index.html)
+                          och Nästa Hem (grind: NH-analises/index.html)
+       dashboard_br_ok  — Flocken Brasilien (grind: F-analises/brasil.html)
+     (Skriv aldrig ut grindarnas lösenord här — filen serveras publikt, och
+      att samla dem på ett ställe gör dem lättare att hitta än de var.)
      Navets lösenord ersätter dem: sätt båda flaggorna, annars studsar
      Brasilien-kortet till den portugisiska rutan. sessionStorage följer med
      vid navigering i samma flik.
