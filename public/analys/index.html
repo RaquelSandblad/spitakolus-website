@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Spitakolus · Analys</title>
+<style>
+  :root {
+    --bg:#15131a; --panel:#1e1b24; --panel-2:#262230; --line:#332e3d;
+    --text:#ECE8F0; --muted:#A49CAF; --dim:#7B7386;
+    --flocken:#8BA45D; --nh:#D4A574; --nara:#D488A2;
+    --ok:#7FBF8F; --warn:#E0A458; --neg:#E0796C;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body {
+    background:var(--bg); color:var(--text); min-height:100vh;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+    font-size:14px; line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  .wrap { max-width:1080px; margin:0 auto; padding:36px 24px 72px; }
+
+  /* ---------- Lösenordsgrind ---------- */
+  #gate { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+  .gate-card {
+    background:var(--panel); border:1px solid var(--line); border-radius:16px;
+    padding:32px; max-width:23rem; width:100%;
+  }
+  .gate-card h1 { font-size:1.35rem; margin-bottom:.3rem; letter-spacing:-.01em; }
+  .gate-card p { color:var(--muted); font-size:.9rem; margin-bottom:1.4rem; }
+  .pw-wrap { position:relative; }
+  input[type=password], input[type=text], input[type=email] {
+    width:100%; padding:.72rem .8rem; border-radius:.6rem; font:inherit;
+    border:1px solid var(--line); background:var(--bg); color:var(--text);
+  }
+  input:focus { outline:none; border-color:var(--nara); }
+  .pw-wrap input { padding-right:4rem; }
+  .pw-visa {
+    position:absolute; right:.4rem; top:50%; transform:translateY(-50%);
+    background:transparent; border:0; color:var(--muted); font:inherit;
+    font-size:.8rem; padding:.25rem .55rem; cursor:pointer; border-radius:.35rem;
+  }
+  .pw-visa:hover { color:var(--text); }
+  .knapp {
+    width:100%; margin-top:.9rem; padding:.75rem; border:0; border-radius:999px;
+    background:var(--nara); color:#2b1a21; font:inherit; font-weight:700; cursor:pointer;
+  }
+  .knapp:hover { filter:brightness(1.08); }
+  .knapp:disabled { opacity:.5; cursor:default; }
+  .fel { color:var(--neg); font-size:.85rem; margin-top:.8rem; min-height:1.2em; }
+
+  /* ---------- Nav ---------- */
+  .head { display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:6px; }
+  .head h1 { font-size:1.3rem; font-weight:600; letter-spacing:-.01em; }
+  .head h1 em { font-style:normal; color:var(--muted); font-weight:400; }
+  .lank {
+    background:transparent; border:1px solid var(--line); color:var(--muted);
+    border-radius:999px; padding:.35rem .85rem; font:inherit; font-size:.82rem; cursor:pointer;
+  }
+  .lank:hover { border-color:var(--nara); color:var(--text); }
+  .lede { color:var(--muted); font-size:.9rem; margin-bottom:28px; max-width:70ch; }
+
+  /* ---------- Inloggningspanel ---------- */
+  .login-panel {
+    background:var(--panel); border:1px solid var(--line); border-radius:12px;
+    padding:20px 22px; margin-bottom:30px;
+  }
+  .login-panel h2 { font-size:.95rem; margin-bottom:.25rem; }
+  .login-panel .sub { color:var(--muted); font-size:.85rem; margin-bottom:1rem; max-width:62ch; }
+  .login-row { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-start; }
+  .login-row > div { flex:1 1 200px; min-width:180px; }
+  .login-row .knapp { width:auto; margin-top:0; padding:.72rem 1.5rem; flex:0 0 auto; }
+  .status-lista { list-style:none; margin-top:.9rem; font-size:.85rem; display:flex; flex-direction:column; gap:.3rem; }
+  .status-lista li { color:var(--muted); display:flex; align-items:center; gap:.5rem; }
+
+  /* ---------- Appsektioner ---------- */
+  .app { margin-bottom:32px; }
+  .app-head { display:flex; align-items:center; gap:11px; margin-bottom:13px; }
+  .app-head .prick { width:11px; height:11px; border-radius:3px; flex:0 0 auto; }
+  .app-head h2 { font-size:1rem; font-weight:650; letter-spacing:-.01em; }
+  .app-head .db { color:var(--dim); font-size:.8rem; }
+  .app-head .rule { flex:1; height:1px; background:var(--line); }
+
+  .kort-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(255px, 1fr)); gap:12px; }
+  a.kort {
+    display:block; text-decoration:none; color:inherit; position:relative;
+    background:var(--panel); border:1px solid var(--line); border-radius:11px;
+    padding:16px 17px 15px 20px; overflow:hidden; transition:border-color .15s, transform .15s;
+  }
+  a.kort::before {
+    content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--f);
+  }
+  a.kort:hover { border-color:var(--f); transform:translateY(-1px); }
+  a.kort .titel { font-weight:640; font-size:.98rem; margin-bottom:.3rem; }
+  a.kort .txt { color:var(--muted); font-size:.85rem; line-height:1.5; }
+  .badge {
+    display:inline-block; margin-top:.7rem; padding:2px 9px; border-radius:999px;
+    font-size:.74rem; font-weight:600; letter-spacing:.01em;
+  }
+  .badge.ok    { background:rgba(127,191,143,.16); color:var(--ok); }
+  .badge.warn  { background:rgba(224,164,88,.16); color:var(--warn); }
+  .badge.oppen { background:var(--panel-2); color:var(--dim); }
+
+  footer { margin-top:38px; padding-top:18px; border-top:1px solid var(--line); color:var(--dim); font-size:.8rem; line-height:1.7; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+
+<!-- ---------- Lösenordsgrind ---------- -->
+<div id="gate">
+  <form class="gate-card" id="gate-form">
+    <h1>Spitakolus · Analys</h1>
+    <p>Alla dashboards för Flocken, Nästa Hem och Nära på ett ställe.</p>
+    <div class="pw-wrap">
+      <input id="gate-pw" type="password" placeholder="Lösenord" autocomplete="current-password" required>
+      <button type="button" class="pw-visa" id="gate-visa" aria-label="Visa lösenordet">Visa</button>
+    </div>
+    <button type="submit" class="knapp">Öppna</button>
+    <p class="fel" id="gate-fel"></p>
+  </form>
+</div>
+
+<!-- ---------- Navet ---------- -->
+<div id="hub" hidden>
+  <div class="wrap">
+    <div class="head">
+      <h1>Spitakolus <em>· Analys</em></h1>
+      <button class="lank" id="las-btn">Lås</button>
+    </div>
+    <p class="lede">Välj dashboard nedan. Logga in en gång här, så följer sessionen med till alla
+       sidor — du behöver inte logga in på varje dashboard för sig.</p>
+
+    <div class="login-panel" id="login-panel" hidden>
+      <h2>Logga in på databaserna</h2>
+      <p class="sub">Samma uppgifter provas mot alla databaser som saknar inloggning. Har du olika
+         lösenord för Flocken och Nära: logga in en gång per uppsättning, resten står kvar.</p>
+      <div class="login-row">
+        <div><input id="in-epost" type="email" placeholder="E-post" autocomplete="username"></div>
+        <div class="pw-wrap">
+          <input id="in-losen" type="password" placeholder="Lösenord" autocomplete="current-password">
+          <button type="button" class="pw-visa" id="in-visa" aria-label="Visa lösenordet">Visa</button>
+        </div>
+        <button class="knapp" id="in-btn">Logga in</button>
+      </div>
+      <ul class="status-lista" id="status-lista"></ul>
+    </div>
+
+    <div id="appar"></div>
+
+    <footer>
+      Sidan hämtar ingen extern kod. Inloggningen sker mot varje apps egen Supabase-databas och
+      ger bara åtkomst till konton som står som administratörer där — lösenordet till den här sidan
+      öppnar bara menyn, aldrig siffrorna.
+    </footer>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+var LOSEN = 'Smilla';
+var LAS_NYCKEL = 'spitakolus_analys_ok';
+
+/* De tre Supabase-projekt som kräver inloggning. `prefix` MÅSTE matcha den
+   nyckel varje dashboards egen auth-fil läser, annars hittar den ingen session:
+   Flocken använder flocken_dash_session_, Nära nara_dash_session_. */
+var PROJEKT = {
+  'flocken-eu': {
+    namn: 'Flocken Sverige',
+    url: 'https://jzbdxcsocwdxwzjjlnrw.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6YmR4Y3NvY3dkeHd6ampsbnJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyMjY4NTEsImV4cCI6MjA3NjgwMjg1MX0.eWpRvtv_2dClpwRYnLsD8yvNWz75jd1J42KLstVGpd4',
+    prefix: 'flocken_dash_session_'
+  },
+  'flocken-br': {
+    namn: 'Flocken Brasilien',
+    url: 'https://vdpdehoreqjlenvqumho.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkcGRlaG9yZXFqbGVudnF1bWhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0OTY0NDQsImV4cCI6MjA5NDA3MjQ0NH0.kVj5K22XGa5caJtSvzQwWYSB57C4nEY3-gapI-v_PSU',
+    prefix: 'flocken_dash_session_'
+  },
+  'nara': {
+    namn: 'Nära',
+    url: 'https://uodsosiuyjjfxmvgttjm.supabase.co',
+    anonKey: 'sb_publishable_37CPpF5PreAEvzfKSmAxLg_MXliX6IO',
+    prefix: 'nara_dash_session_'
+  }
+};
+
+var APPAR = [
+  {
+    namn: 'Flocken', farg: 'var(--flocken)', db: 'två databaser · Sverige och Brasilien',
+    sidor: [
+      { titel: 'Sverige', txt: 'Veckodashboard för den svenska databasen — konton, aktivitet, prenumerationer, nedladdningar.',
+        href: '/F-analises/flocken-veckodashboard.html', kraver: ['flocken-eu'] },
+      { titel: 'Brasilien', txt: 'Samma vy för den brasilianska databasen.',
+        href: '/F-analises/flocken-veckodashboard-brasilien.html', kraver: ['flocken-br'] },
+      { titel: 'Rapport & prognos', txt: 'Väger ihop båda regionerna — kräver därför inloggning på båda.',
+        href: '/F-analises/flocken-rapport.html', kraver: ['flocken-eu', 'flocken-br'] }
+    ]
+  },
+  {
+    namn: 'Nästa Hem', farg: 'var(--nh)', db: 'en databas',
+    sidor: [
+      { titel: 'Översikt', txt: 'Annonsbestånd, användare, BankID och händelser i appen.',
+        href: '/NH-analises/nastahem-dashboard.html', kraver: [] }
+    ]
+  },
+  {
+    namn: 'Nära', farg: 'var(--nara)', db: 'en databas',
+    sidor: [
+      { titel: 'Översikt', txt: 'Nedladdningar från App Store och Google Play, aktiva användare, aktiviteter och trygghet.',
+        href: '/N-analises/nara-dashboard.html', kraver: ['nara'] }
+    ]
+  }
+];
+
+var $ = function (id) { return document.getElementById(id); };
+var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+  return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]; }); };
+
+/* Visa/Dölj-knapp — samma beteende som på dashboardernas inloggningsrutor. */
+function kopplaVisa(knappId, faltId) {
+  $(knappId).addEventListener('click', function () {
+    var p = $(faltId);
+    var visas = p.type === 'text';
+    p.type = visas ? 'password' : 'text';
+    this.textContent = visas ? 'Visa' : 'Dölj';
+    this.setAttribute('aria-label', visas ? 'Visa lösenordet' : 'Dölj lösenordet');
+    p.focus();
+  });
+}
+kopplaVisa('gate-visa', 'gate-pw');
+kopplaVisa('in-visa', 'in-losen');
+
+/* ---------- Sessioner (delas med dashboardernas egna auth-filer) ---------- */
+function laddaSession(p) {
+  try { var r = localStorage.getItem(p.prefix + p.url); return r ? JSON.parse(r) : null; }
+  catch (e) { return null; }
+}
+function sparaSession(p, s) {
+  try { localStorage.setItem(p.prefix + p.url, JSON.stringify(s)); } catch (e) {}
+}
+function rensaSession(p) {
+  try { localStorage.removeItem(p.prefix + p.url); } catch (e) {}
+}
+function headers(p) {
+  var s = laddaSession(p);
+  return {
+    'apikey': p.anonKey,
+    'Authorization': 'Bearer ' + (s && s.access_token ? s.access_token : p.anonKey),
+    'Content-Type': 'application/json'
+  };
+}
+function epostUr(p) {
+  var s = laddaSession(p);
+  if (!s || !s.access_token) return null;
+  try {
+    var del = s.access_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(del)).email || null;
+  } catch (e) { return null; }
+}
+
+function arAdmin(p) {
+  return fetch(p.url + '/rest/v1/rpc/is_dashboard_admin', {
+    method: 'POST', headers: headers(p), body: '{}'
+  }).then(function (r) { return r.ok ? r.json() : false; })
+    .then(function (v) { return v === true; })
+    .catch(function () { return false; });
+}
+
+function fornya(p) {
+  var s = laddaSession(p);
+  if (!s || !s.refresh_token) return Promise.resolve(false);
+  return fetch(p.url + '/auth/v1/token?grant_type=refresh_token', {
+    method: 'POST',
+    headers: { 'apikey': p.anonKey, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refresh_token: s.refresh_token })
+  }).then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (j) { if (j && j.access_token) { sparaSession(p, j); return true; } rensaSession(p); return false; })
+    .catch(function () { return false; });
+}
+
+/** Giltig session? Annars försök förnya en gång innan vi ger upp. */
+function kollaProjekt(p) {
+  if (!laddaSession(p)) return Promise.resolve(false);
+  return arAdmin(p).then(function (ok) {
+    if (ok) return true;
+    return fornya(p).then(function (f) { return f ? arAdmin(p) : false; });
+  });
+}
+
+function loggaIn(p, epost, losen) {
+  return fetch(p.url + '/auth/v1/token?grant_type=password', {
+    method: 'POST',
+    headers: { 'apikey': p.anonKey, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: epost, password: losen })
+  }).then(function (r) {
+    return r.json().then(function (j) {
+      if (!r.ok || !j.access_token) {
+        var m = j.error_description || j.msg || j.message || '';
+        if (/invalid login credentials/i.test(m)) m = 'fel e-post eller lösenord';
+        else if (/email not confirmed/i.test(m)) m = 'e-postadressen är inte bekräftad';
+        else if (/rate limit|too many/i.test(m)) m = 'för många försök — vänta en stund';
+        throw new Error(m || 'inloggningen misslyckades');
+      }
+      return j;
+    });
+  });
+}
+
+/* ---------- Rendering ---------- */
+var sessioner = {};   // projektnyckel → true/false
+
+function rita() {
+  var nycklar = Object.keys(PROJEKT);
+  var saknas = nycklar.filter(function (k) { return !sessioner[k]; });
+
+  $('login-panel').hidden = saknas.length === 0;
+
+  $('status-lista').innerHTML = nycklar.map(function (k) {
+    var p = PROJEKT[k], ok = sessioner[k], epost = ok ? epostUr(p) : null;
+    return '<li><span style="color:' + (ok ? 'var(--ok)' : 'var(--warn)') + '">' +
+      (ok ? '&#10003;' : '&#8226;') + '</span> ' + esc(p.namn) + ' — ' +
+      (ok ? 'inloggad' + (epost ? ' som ' + esc(epost) : '') : 'ej inloggad') + '</li>';
+  }).join('');
+
+  $('appar').innerHTML = APPAR.map(function (app) {
+    var kort = app.sidor.map(function (s) {
+      var laget, klass;
+      if (!s.kraver.length) { laget = 'Öppen'; klass = 'oppen'; }
+      else if (s.kraver.every(function (k) { return sessioner[k]; })) { laget = 'Inloggad'; klass = 'ok'; }
+      else { laget = 'Kräver inloggning'; klass = 'warn'; }
+      return '<a class="kort" href="' + esc(s.href) + '" style="--f:' + app.farg + '">' +
+        '<div class="titel">' + esc(s.titel) + '</div>' +
+        '<div class="txt">' + esc(s.txt) + '</div>' +
+        '<span class="badge ' + klass + '">' + laget + '</span></a>';
+    }).join('');
+    return '<section class="app">' +
+      '<div class="app-head">' +
+        '<span class="prick" style="background:' + app.farg + '"></span>' +
+        '<h2>' + esc(app.namn) + '</h2>' +
+        '<span class="db">' + esc(app.db) + '</span>' +
+        '<span class="rule"></span>' +
+      '</div>' +
+      '<div class="kort-grid">' + kort + '</div>' +
+      '</section>';
+  }).join('');
+}
+
+function kollaAlla() {
+  var nycklar = Object.keys(PROJEKT);
+  return Promise.all(nycklar.map(function (k) { return kollaProjekt(PROJEKT[k]); }))
+    .then(function (res) {
+      nycklar.forEach(function (k, i) { sessioner[k] = res[i]; });
+      rita();
+    });
+}
+
+$('in-btn').addEventListener('click', function () {
+  var btn = this;
+  var epost = $('in-epost').value.trim();
+  var losen = $('in-losen').value;
+  if (!epost || !losen) return;
+
+  btn.disabled = true; btn.textContent = 'Loggar in…';
+  var kvar = Object.keys(PROJEKT).filter(function (k) { return !sessioner[k]; });
+  var utfall = {};
+
+  var kedja = Promise.resolve();
+  kvar.forEach(function (k) {
+    kedja = kedja.then(function () {
+      var p = PROJEKT[k];
+      return loggaIn(p, epost, losen)
+        .then(function (s) { sparaSession(p, s); return arAdmin(p); })
+        .then(function (ok) {
+          sessioner[k] = ok;
+          if (!ok) { rensaSession(p); utfall[k] = 'kontot saknar behörighet här'; }
+        })
+        .catch(function (e) { utfall[k] = e.message; });
+    });
+  });
+
+  kedja.then(function () {
+    btn.disabled = false; btn.textContent = 'Logga in';
+    rita();
+    var fel = Object.keys(utfall);
+    if (fel.length) {
+      $('status-lista').innerHTML += fel.map(function (k) {
+        return '<li style="color:var(--warn)">' + esc(PROJEKT[k].namn) + ': ' + esc(utfall[k]) + '</li>';
+      }).join('');
+    } else {
+      $('in-losen').value = '';
+    }
+  });
+});
+
+$('in-losen').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('in-btn').click(); });
+
+/* ---------- Grind ---------- */
+function oppna() {
+  $('gate').hidden = true;
+  $('hub').hidden = false;
+  /* Nästa Hems sida har en egen sessionsflagga — sätt den här så att länken
+     inte studsar tillbaka till en lösenordsruta. sessionStorage följer med
+     vid navigering i samma flik.
+     OBS: finans-dashboarden hör INTE hit (privat, inget med Spitakolus att
+     göra) — dess flagga ska aldrig sättas härifrån. */
+  try {
+    sessionStorage.setItem('dashboard_ok', '1');
+  } catch (e) {}
+  rita();
+  kollaAlla();
+}
+
+$('gate-form').addEventListener('submit', function (ev) {
+  ev.preventDefault();
+  if ($('gate-pw').value === LOSEN) {
+    try { localStorage.setItem(LAS_NYCKEL, '1'); } catch (e) {}
+    oppna();
+  } else {
+    $('gate-fel').textContent = 'Fel lösenord.';
+    $('gate-pw').select();
+  }
+});
+
+$('las-btn').addEventListener('click', function () {
+  try { localStorage.removeItem(LAS_NYCKEL); } catch (e) {}
+  location.reload();
+});
+
+try {
+  if (localStorage.getItem(LAS_NYCKEL) === '1') oppna();
+} catch (e) {}
+</script>
+</body>
+</html>
