@@ -400,13 +400,19 @@ $('in-losen').addEventListener('keydown', function (e) { if (e.key === 'Enter') 
 function oppna() {
   $('gate').hidden = true;
   $('hub').hidden = false;
-  /* Nästa Hems sida har en egen sessionsflagga — sätt den här så att länken
-     inte studsar tillbaka till en lösenordsruta. sessionStorage följer med
+  /* Tre av sidorna har egna lösenordsgrindar som sätter en sessionsflagga och
+     annars kastar tillbaka besökaren (location.replace):
+       dashboard_ok     — Flocken Sverige (grind: F-analises/index.html "Mingau")
+                          och Nästa Hem (grind: NH-analises/index.html, samma ord)
+       dashboard_br_ok  — Flocken Brasilien (grind: F-analises/brasil.html "Malua")
+     Navets lösenord ersätter dem: sätt båda flaggorna, annars studsar
+     Brasilien-kortet till den portugisiska rutan. sessionStorage följer med
      vid navigering i samma flik.
      OBS: finans-dashboarden hör INTE hit (privat, inget med Spitakolus att
      göra) — dess flagga ska aldrig sättas härifrån. */
   try {
     sessionStorage.setItem('dashboard_ok', '1');
+    sessionStorage.setItem('dashboard_br_ok', '1');
   } catch (e) {}
   rita();
   kollaAlla();

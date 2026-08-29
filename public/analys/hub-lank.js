@@ -18,6 +18,13 @@
     if (window.top !== window.self) return;              // inte i inbäddad ram
     if (location.pathname.indexOf('/analys') === 0) return; // inte på navet självt
 
+    /* Visa länken ENDAST för den som varit inne i navet. Flockens
+       Brasilien-dashboard används av brasilianska medarbetare (Patricia,
+       Julia) som bara har behörighet till sin egen region — för dem vore en
+       svensk länk till ett nav de inte har lösenord till bara förvirrande.
+       Har man aldrig låst upp navet ser sidan exakt ut som förut. */
+    if (localStorage.getItem('spitakolus_analys_ok') !== '1') return;
+
     var rita = function () {
       try {
         if (document.getElementById('hub-lank')) return;
