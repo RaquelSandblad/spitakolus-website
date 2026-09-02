@@ -143,7 +143,7 @@
   <div class="kpi-card"><div class="kpi-value loading" id="kpiMrr">…</div><div class="kpi-label">MRR (brutto)</div></div>
   <div class="kpi-card"><div class="kpi-value loading" id="kpiActives">…</div><div class="kpi-label">Betalande prenumeranter</div></div>
   <div class="kpi-card"><div class="kpi-value loading" id="kpiTrials">…</div><div class="kpi-label">Aktiva trials</div></div>
-  <div class="kpi-card"><div class="kpi-value loading" id="kpiNetto">…</div><div class="kpi-label">MRR netto (−15%)</div><div class="kpi-sub">efter App Store-avgift</div></div>
+  <div class="kpi-card"><div class="kpi-value loading" id="kpiNetto">…</div><div class="kpi-label">MRR netto</div><div class="kpi-sub">efter moms + butiksavgift, butiksviktat</div></div>
   <div class="kpi-card"><div class="kpi-value loading" id="kpiChurn">…</div><div class="kpi-label">Senaste churn %</div></div>
   <div class="kpi-card"><div class="kpi-value loading" id="kpiNewAccounts">…</div><div class="kpi-label">Nya konton senaste veckan</div></div>
 </div>
@@ -172,7 +172,7 @@
 ════════════════════════════════════════════════════════════ -->
 <div class="card">
   <h2>Intäkter per vecka</h2>
-  <p class="help">Källa: RevenueCat (synkad). Brutto inkl. Apple/Google-avgifter. Netto = brutto × 0.85.</p>
+  <p class="help">Källa: RevenueCat (synkad). Netto = brutto × (Apple-andel × 0,68 + Google-andel × Googles egen provisionskvot) — se "MRR netto"-kortet ovan för dagens faktor.</p>
   <div class="chart-wrap"><canvas id="revenueChart"></canvas></div>
   <div id="revenueKpis" class="kpi-grid"></div>
   <div class="callout callout-warning">
@@ -258,7 +258,7 @@
   <p class="help">
     Beräknas från live RC-data + branschbenchmarks (RevenueCat State of Subscription Apps 2026, nisch-marknadsplats-tillväxt).
     Modellen: nya betalande/månad + månadschurn + avmattning år 2 — <em>inte</em> fast procent på MRR varje månad.
-    Netto = efter 15&nbsp;% Apple/Google.
+    Netto = efter moms + butiksavgift, viktat mot er faktiska Apple/Google-fördelning.
   </p>
   <div id="prognosisBaseMrr" class="callout callout-info" style="display:none;"></div>
   <h3>Kort sikt — december 2026</h3>
@@ -411,7 +411,6 @@
   // Prognosis — branschbaserad modell (nya subs + churn, inte % MRR/mån)
   // ──────────────────────────────────────────────────────────────
   var USD_SEK = 10.65;
-  var PLATFORM_FEE = 0.15;
 
   var SCENARIO_DEFS = [
     { id: 'bear',   label: '1. Underpresterar', shortLabel: 'Under',  color: function() { return TICK_COLOR; }, dash: [4, 3],
@@ -765,8 +764,9 @@
   function buildPrognosis(latestMrrUsd, latestActives, cohortArr, rcMetrics, weeklyMain, brMetrics) {
     var actives = latestActives || 64;
     var startSubs = Math.max(1, actives); // dagens faktiska aktiva (även set-to-cancel betalar innevarande period)
-    var arpuNetSek = (latestMrrUsd * USD_SEK * (1 - PLATFORM_FEE)) / actives;
-    var netEurSek = Math.round(latestMrrUsd * USD_SEK * (1 - PLATFORM_FEE));
+    var netRatio = window.NET_RATIO || 0.68;
+    var arpuNetSek = (latestMrrUsd * USD_SEK * netRatio) / actives;
+    var netEurSek = Math.round(latestMrrUsd * USD_SEK * netRatio);
 
     var defs = cloneScenarioDefs();
     var derivedNewPaid = deriveNewPaidFromCohorts(cohortArr);
@@ -867,7 +867,7 @@
     var pct = first > 0 ? ((last - first) / first * 100).toFixed(0) : '—';
     document.getElementById('mrrKpis').innerHTML =
       kpiCard('$' + last.toFixed(0), 'Senaste MRR (brutto)', 'success') +
-      kpiCard('$' + (last * 0.85).toFixed(0), 'Senaste MRR (netto)', 'success') +
+      kpiCard('$' + (last * (window.NET_RATIO || 0.68)).toFixed(0), 'Senaste MRR (netto)', 'success') +
       kpiCard('+' + pct + '%', 'Tillväxt total period', 'success') +
       kpiCard('$' + first.toFixed(0), 'MRR vid periodens start');
   }
@@ -890,7 +890,7 @@
     var total = data.reduce(function(a, b) { return a + b; }, 0);
     document.getElementById('revenueKpis').innerHTML =
       kpiCard('$' + total.toFixed(0), 'Total bruttointäkt', 'success') +
-      kpiCard('$' + (total * 0.85).toFixed(0), 'Total nettointäkt', 'success') +
+      kpiCard('$' + (total * (window.NET_RATIO || 0.68)).toFixed(0), 'Total nettointäkt', 'success') +
       kpiCard('$' + data[data.length-1].toFixed(0), 'Senaste veckan (brutto)');
   }
 
@@ -1019,6 +1019,7 @@
     rpc('dashboard_rc_trials_summary'),
     rpc('dashboard_rc_weekly_metrics', 'brazil').catch(function() { return null; }),
     rpc('dashboard_new_paid_weekly').catch(function() { return null; }),
+    rpc('dashboard_subscription_summary').catch(function() { return null; }),
   ]).then(function(settled) {
     var failed = settled.filter(function(s) { return s.status === 'rejected'; });
     if (failed.length > 0) console.warn('Rapport: ' + failed.length + ' RPC(er) misslyckades:', failed.map(function(s) { return s.reason; }));
@@ -1031,6 +1032,34 @@
     var trialsSumm   = results[4];
     var brMetricsRaw = results[5];
     var newPaidWeekly = results[6];
+    var subSummary   = results[7];
+
+    // ── Butiksviktat netto (Apple vs Google) ─────────────────────────────
+    // Ersätter den gamla flata "brutto × 0.85"-gissningen. Apple/Google tar
+    // bevisat 15 % vardera (butiksavgifter-utredningen 2026-08-31), MEN
+    // kundpriset är momsinklusive → riktigt netto = brutto × 0,68 (25 % moms
+    // × 15 % avgift). RC:s egen "proceeds" duger för Google (verifierat ~15 %
+    // provision där) men är fel för Apple (RC antar där 30 % i stället för de
+    // bevisade 15 %) — därför räknas Apple alltid med den bevisade 0,68-satsen
+    // medan Google får sin EGEN, RC-verifierade kvot. Se snapshot-kolumnerna
+    // apple_gross_usd / google_gross_usd / google_proceeds_usd (migr 190).
+    var APPLE_NET_RATIO = 0.68;
+    var FALLBACK_NET_RATIO = 0.68; // om butiksdata saknas: samma bevisade sats för båda
+    var netRatio = FALLBACK_NET_RATIO;
+    var rcSnap = subSummary && subSummary.rc ? subSummary.rc : null;
+    if (rcSnap) {
+      var appleGross  = parseFloat(rcSnap.apple_gross_usd)  || 0;
+      var googleGross = parseFloat(rcSnap.google_gross_usd) || 0;
+      var googleNet   = parseFloat(rcSnap.google_proceeds_usd) || 0;
+      var totalGross  = appleGross + googleGross;
+      if (totalGross > 0) {
+        var appleShare  = appleGross / totalGross;
+        var googleShare = 1 - appleShare;
+        var googleRatio = googleGross > 0 ? googleNet / googleGross : FALLBACK_NET_RATIO;
+        netRatio = appleShare * APPLE_NET_RATIO + googleShare * googleRatio;
+      }
+    }
+    window.NET_RATIO = netRatio; // läses av renderMrrChart/renderRevenueChart
 
     // Normalize RPC results (jsonb RPCs are wrapped as [{ rpc_name: [...] }])
     function unwrap(r, key) {
@@ -1057,7 +1086,7 @@
       var latest = rcHistory[rcHistory.length-1];
       var latestMrr = parseFloat(rcMetrics.latest_mrr || latest.mrr_usd || 0);
       setText('kpiMrr', '$' + latestMrr.toFixed(0));
-      setText('kpiNetto', '$' + (latestMrr * 0.85).toFixed(0));
+      setText('kpiNetto', '$' + (latestMrr * (window.NET_RATIO || 0.68)).toFixed(0));
       setText('kpiChurn', (parseFloat(latest.churn_pct) || 0).toFixed(1) + '%');
       setText('kpiActives', latest.actives || '…');
 
@@ -1071,7 +1100,7 @@
       // RC-data saknas (synk-fel/nät). Visa senast kända nivå MEN flagga tydligt att det inte är live.
       buildLiveInsights({ latest_mrr: 534, latest_actives: 119 }, [], { actives: 119, mrr_usd: 534, churn_pct: 1 }, [], [], null);
       setText('kpiMrr', '$534');
-      setText('kpiNetto', '$454');
+      setText('kpiNetto', '$363');
       var warnEl = document.getElementById('liveSignals');
       if (warnEl) {
         warnEl.innerHTML = '<div class="callout callout-danger" style="font-weight:600;">⚠️ RC-data kunde inte hämtas — siffrorna är hårdkodade RESERVVÄRDEN (ej live). Ladda om eller kontrollera RC-synken (sync-rc-metrics).</div>' + warnEl.innerHTML;
