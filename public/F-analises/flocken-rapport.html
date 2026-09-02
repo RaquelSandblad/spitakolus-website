@@ -266,7 +266,7 @@
   <div id="projectionTableShort"></div>
 
   <h3 style="margin-top:1.5rem;">Multi-region — väg mot 100&nbsp;000 kr/mån</h3>
-  <p class="help">Scenario ★: SE+NO+DK (Europa-RC) + Brasilien från aug 2026. Streckad röd linje = målet.</p>
+  <p class="help">Scenario ★: SE+NO+DK (Europa-RC) + Brasilien betalande från nov 2026 (prel., ej beslutat). Streckad röd linje = målet.</p>
   <div class="chart-wrap" style="height:280px;"><canvas id="projectionChart100k"></canvas></div>
   <div id="projectionTable100k"></div>
 
@@ -341,7 +341,11 @@
   var SUPABASE_BR_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkcGRlaG9yZXFqbGVudnF1bWhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0OTY0NDQsImV4cCI6MjA5NDA3MjQ0NH0.kVj5K22XGa5caJtSvzQwWYSB57C4nEY3-gapI-v_PSU';
 
   var GOAL_NET_SEK = 100000;
-  var BR_LAUNCH = new Date('2026-08-01T00:00:00');
+  // Appen ar lanserad i Brasilien (sep 2026) men fortfarande helt GRATIS —
+  // betalning borjar prel. okt/nov 2026, ej beslutat an. Satt till det senare
+  // (mer konservativa) alternativet tills datumet ar spikat — justera hit
+  // nar Raquel bestammer sig.
+  var BR_LAUNCH = new Date('2026-11-01T00:00:00');
   var chartInstances = [];
 
   // ──────────────────────────────────────────────────────────────
@@ -587,12 +591,12 @@
     if (ctx.brMetrics && ctx.brMetrics.latest_actives > 0) {
       signals.push({ level: 'good', title: 'Brasilien-data kopplad', message: ctx.brMetrics.latest_actives + ' betalande i BR-DB.', action: 'Följ BR separat tills aggregering i denna vy är komplett.' });
     } else {
-      signals.push({ level: 'info', title: 'Brasilien inte i RC-synk än', message: 'Launch ~aug 2026 — BR-RC saknas eller är tom.', action: 'Efter launch: kör sync-rc-metrics mot Brazil-DB + aktivera BR i prognosen.' });
+      signals.push({ level: 'info', title: 'Brasilien lanserad men fortfarande gratis', message: 'Appen är live i BR (sep 2026), men betalning börjar först prel. nov 2026 (ej beslutat) — BR-RC är därför tom hittills.', action: 'När betalning startar: verifiera att sync-rc-metrics visar BR-aktiva innan prognosen litas på.' });
     }
 
     var eta = ctx.goalEta;
     if (eta) {
-      signals.push({ level: 'info', title: '100k ETA — spekulativt scenario', message: 'Modellen når 100k tidigast ~' + eta.label + ' (~' + fmtKr(eta.point.mrrNet) + '/mån) OM alla antaganden håller. Bygger till stor del på Brasilien som ÄNNU INTE är lanserat → ett scenario, inte en prognos.', action: 'Validera mot faktiska EU-siffror, och BR först efter lansering, innan datumet litas på.' });
+      signals.push({ level: 'info', title: '100k ETA — spekulativt scenario', message: 'Modellen når 100k tidigast ~' + eta.label + ' (~' + fmtKr(eta.point.mrrNet) + '/mån) OM alla antaganden håller. Bygger till stor del på Brasilien som ÄNNU INTE betalar (gratis till prel. nov 2026) → ett scenario, inte en prognos.', action: 'Validera mot faktiska EU-siffror, och BR först efter betalstart, innan datumet litas på.' });
     } else {
       signals.push({ level: 'info', title: '100k ej inom modellhorisont', message: 'I försiktigt scenario nås inte 100k inom 48 mån (scenario, ej prognos).', action: 'Öka trials/marknadsföring eller höj ARPU (kennel/dagis).' });
     }
@@ -623,7 +627,7 @@
       { id: 'conv', text: 'Konvertering trial→paid ≥ 50% (mogna cohorts)', status: (ca.convPct !== null && ca.convPct >= 50) ? 'ok' : (ca.convPct !== null && ca.convPct >= 40) ? 'warn' : 'bad' },
       { id: 'churn', text: 'Veckochurn under 5%', status: churn <= 5 && churn > 0 ? 'ok' : churn > 5 ? 'warn' : 'warn' },
       { id: 'norden', text: 'NO/DK bidrar (trials ≥ 15/v eller konton växer)', status: (ca.avgTrialsGood && ca.avgTrialsGood >= 15) ? 'ok' : 'warn' },
-      { id: 'brazil', text: 'Brasilien launch + RC-synk', status: (ctx.brMetrics && ctx.brMetrics.latest_actives > 0) ? 'ok' : 'warn' },
+      { id: 'brazil', text: 'Brasilien betalstart + RC-synk', status: (ctx.brMetrics && ctx.brMetrics.latest_actives > 0) ? 'ok' : 'warn' },
       { id: 'scale', text: 'Trials ≥ 20/v i snitt (SE+NO+DK)', status: (ca.avgTrialsGood && ca.avgTrialsGood >= 20) ? 'ok' : 'warn' },
     ];
     document.getElementById('playbookSteps').innerHTML = steps.map(function(s) {
@@ -818,7 +822,7 @@
       + actives + ' aktiva betalande. ARPU netto ≈ ' + Math.round(arpuNetSek) + ' kr/sub. '
       + (derivedNewPaid ? '~' + derivedNewPaid + ' nya betalande/mån (senaste bra cohorts). ' : '')
       + '<strong>EU-only jun 2028 (modell):</strong> ~' + baseEnd.subs + ' subs, ' + fmtKr(baseEnd.mrrNet) + '/mån. '
-      + (goalHit ? '<strong>100k (multi-region ★):</strong> tidigast ~' + goalHit.label + ' — <em>spekulativt, bygger på ej lanserad Brasilien</em>.' : '<strong>100k:</strong> kräver snabbare BR-ramp eller högre ARPU.');
+      + (goalHit ? '<strong>100k (multi-region ★):</strong> tidigast ~' + goalHit.label + ' — <em>spekulativt, bygger på Brasilien som ännu inte betalar</em>.' : '<strong>100k:</strong> kräver snabbare BR-ramp eller högre ARPU.');
     infoEl.style.display = 'block';
 
     return { netEurSek: netEurSek, goalEta: goalHit, arpuNetSek: arpuNetSek, derivedNewPaid: euNp };
