@@ -319,7 +319,7 @@
     Källor:
     <a href="https://www.revenuecat.com/state-of-subscription-apps/" target="_blank" rel="noopener">RevenueCat State of Subscription Apps 2026</a>,
     nisch-marknadsplats-tillväxt (likviditet före skalning).
-    Bas justeras från senaste RC-synk (committed subs ≈ 78&nbsp;% av aktiva betalande).
+    Bas = senaste RC-synk, alla aktiva betalande (inkl. de som satt till avslut men fortfarande betalar innevarande period).
   </div>
 </div>
 
@@ -412,7 +412,6 @@
   // ──────────────────────────────────────────────────────────────
   var USD_SEK = 10.65;
   var PLATFORM_FEE = 0.15;
-  var COMMITTED_RATIO = 0.78; // set-to-renew andel (justera vid behov)
 
   var SCENARIO_DEFS = [
     { id: 'bear',   label: '1. Underpresterar', shortLabel: 'Under',  color: function() { return TICK_COLOR; }, dash: [4, 3],
@@ -765,7 +764,7 @@
 
   function buildPrognosis(latestMrrUsd, latestActives, cohortArr, rcMetrics, weeklyMain, brMetrics) {
     var actives = latestActives || 64;
-    var startSubs = Math.max(1, Math.round(actives * COMMITTED_RATIO));
+    var startSubs = Math.max(1, actives); // dagens faktiska aktiva (även set-to-cancel betalar innevarande period)
     var arpuNetSek = (latestMrrUsd * USD_SEK * (1 - PLATFORM_FEE)) / actives;
     var netEurSek = Math.round(latestMrrUsd * USD_SEK * (1 - PLATFORM_FEE));
 
@@ -816,7 +815,7 @@
     var baseEnd = longSeries[1][24];
     var infoEl = document.getElementById('prognosisBaseMrr');
     infoEl.innerHTML = '<strong>Bas (live RC):</strong> '
-      + actives + ' betalande → ' + startSubs + ' committed subs. ARPU netto ≈ ' + Math.round(arpuNetSek) + ' kr/sub. '
+      + actives + ' aktiva betalande. ARPU netto ≈ ' + Math.round(arpuNetSek) + ' kr/sub. '
       + (derivedNewPaid ? '~' + derivedNewPaid + ' nya betalande/mån (senaste bra cohorts). ' : '')
       + '<strong>EU-only jun 2028 (modell):</strong> ~' + baseEnd.subs + ' subs, ' + fmtKr(baseEnd.mrrNet) + '/mån. '
       + (goalHit ? '<strong>100k (multi-region ★):</strong> tidigast ~' + goalHit.label + ' — <em>spekulativt, bygger på ej lanserad Brasilien</em>.' : '<strong>100k:</strong> kräver snabbare BR-ramp eller högre ARPU.');
