@@ -224,28 +224,19 @@
      Nya konton + innehållstillväxt
 ════════════════════════════════════════════════════════════ -->
 <div class="card">
-  <h2>Nya konton per vecka</h2>
-  <p class="help">Källa: Supabase (profiles.created_at). Exkluderar teamkonton.</p>
+  <h2>Nya konton per vecka — varav betalda</h2>
+  <p class="help">Totalhöjd = nya konton (Supabase, profiles.created_at, exkl. teamkonton). Blå topp =
+    nya betalda samma period (RevenueCat, <em>förändring i aktiva prenumerationer + churnade</em>,
+    inte statusfält i profiltabellen). 🪤 Källorna veckoindelar olika (Supabase-veckan startar onsdag,
+    RC-veckan lördag/söndag) — den blå toppen är därför den RC-vecka som ligger närmast, inte exakt
+    samma 7 dagar, och betalningarna kommer ofta från konton skapade tidigare veckor, inte nödvändigtvis
+    samma veckas nya konton. Sista stapeln är innevarande, ofullständiga vecka.</p>
   <div class="chart-wrap"><canvas id="accountsChart"></canvas></div>
   <div id="accountsKpis" class="kpi-grid"></div>
   <div class="callout callout-info">
     <strong>Lanserings-peak mars:</strong> 333 nya konton veckan 16 mar, 304 v. 9 mar. Betalväggen (1 apr)
     sänkte inflödet till ~79/vecka. Mid-april (öppning gratis-konton) stabiliserade det på ~100/vecka.
   </div>
-</div>
-
-<hr class="divider">
-
-<!-- ═══════════════════════════════════════════════════════════
-     Betalda konton per vecka
-════════════════════════════════════════════════════════════ -->
-<div class="card">
-  <h2>Betalda konton per vecka</h2>
-  <p class="help">Källa: RevenueCat (analytics_rc_weekly_metrics, synkas dagligen). Nya betalande
-    härleds som <em>förändring i aktiva prenumerationer + churnade samma vecka</em> — dvs. faktiska
-    betalande, inte statusfält i profiltabellen. Sista stapeln är innevarande, ofullständiga vecka.</p>
-  <div class="chart-wrap"><canvas id="newPaidChart"></canvas></div>
-  <div id="newPaidKpis" class="kpi-grid"></div>
 </div>
 
 <hr class="divider">
@@ -959,55 +950,62 @@
       kpiCard(last + '%', 'Senaste veckan', last > 5 ? 'danger' : 'success');
   }
 
-  function renderNewPaidChart(rows) {
-    if (!rows || !rows.length) return;
-    var labels = rows.map(function(r) { return r.label || ''; });
-    var data   = rows.map(function(r) { return r.nya_betalda || 0; });
-    var ctx = document.getElementById('newPaidChart').getContext('2d');
+  // Källorna veckoindelar olika (Supabase-veckan börjar onsdag, RC-veckan
+  // lördag/söndag, se dashboard-rpc-audit-2026-08) — det finns ingen exakt
+  // gemensam vecka. Matchar mot den RC-vecka vars start ligger NÄRMAST denna
+  // Supabase-veckas start (max 6 dagars glapp, annars 0 = "ingen matchning").
+  function nearestPaid(weekStart, newPaidRows) {
+    if (!newPaidRows || !newPaidRows.length) return 0;
+    var target = new Date(weekStart).getTime();
+    var best = null, bestDiff = Infinity;
+    newPaidRows.forEach(function(p) {
+      var diff = Math.abs(new Date(p.week_start).getTime() - target);
+      if (diff < bestDiff) { bestDiff = diff; best = p; }
+    });
+    var maxDiffMs = 6 * 24 * 3600 * 1000;
+    return (best && bestDiff <= maxDiffMs) ? (best.nya_betalda || 0) : 0;
+  }
+
+  function renderAccountsChart(weekly, newPaidRows) {
+    if (!weekly || !weekly.length) return;
+    // Use last 16 weeks, field is nya_konton
+    var recent = weekly.slice(-16);
+    var labels   = recent.map(function(r) { return r.label || ''; });
+    var accounts = recent.map(function(r) { return r.nya_konton || 0; });
+    var paid     = recent.map(function(r) { return Math.min(nearestPaid(r.week_start, newPaidRows), r.nya_konton || 0); });
+    var rest     = accounts.map(function(a, i) { return Math.max(0, a - paid[i]); });
+
+    var ctx = document.getElementById('accountsChart').getContext('2d');
     new Chart(ctx, {
       type: 'bar',
-      data: { labels: labels, datasets: [{ label: 'Nya betalda konton', data: data, backgroundColor: isDark ? 'rgba(122,178,243,0.6)' : 'rgba(29,90,160,0.55)' }] },
+      data: {
+        labels: labels,
+        datasets: [
+          { label: 'Nya konton', data: rest, backgroundColor: isDark ? 'rgba(143,211,143,0.55)' : 'rgba(45,90,39,0.5)', stack: 's' },
+          { label: 'Varav nya betalda', data: paid, backgroundColor: isDark ? 'rgba(122,178,243,0.85)' : 'rgba(29,90,160,0.85)', stack: 's' }
+        ]
+      },
       options: {
         responsive: true, maintainAspectRatio: false,
         plugins: { legend: { labels: { color: TEXT_COLOR } } },
         scales: {
-          x: { ticks: { color: TICK_COLOR, maxRotation: 45, minRotation: 45 }, grid: { color: GRID_COLOR } },
-          y: { beginAtZero: true, ticks: { color: TICK_COLOR, precision: 0 }, grid: { color: GRID_COLOR } }
+          x: { stacked: true, ticks: { color: TICK_COLOR, maxTicksLimit: 18 }, grid: { color: GRID_COLOR } },
+          y: { stacked: true, beginAtZero: true, ticks: { color: TICK_COLOR }, grid: { color: GRID_COLOR } }
         }
       }
     });
 
-    var total = data.reduce(function(a,b){return a+b;},0);
-    var lastFour = data.slice(-4).reduce(function(a,b){return a+b;},0);
-    document.getElementById('newPaidKpis').innerHTML =
-      kpiCard(total, 'Totalt nya betalda (period)', '') +
-      kpiCard(Math.round(lastFour/4), 'Genomsnitt senaste 4 v', '') +
-      kpiCard(data[data.length-1], 'Senaste veckan', '');
-  }
-
-  function renderAccountsChart(weekly) {
-    if (!weekly || !weekly.length) return;
-    // Use last 16 weeks, field is nya_konton
-    var recent = weekly.slice(-16);
-    var labels = recent.map(function(r) { return r.label || ''; });
-    var data   = recent.map(function(r) { return r.nya_konton || 0; });
-    var ctx = document.getElementById('accountsChart').getContext('2d');
-    new Chart(ctx, {
-      type: 'bar',
-      data: { labels: labels, datasets: [{ label: 'Nya konton', data: data, backgroundColor: isDark ? 'rgba(143,211,143,0.6)' : 'rgba(45,90,39,0.55)' }] },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { labels: { color: TEXT_COLOR } } },
-        scales: { x: axisOpts({ ticks: { maxTicksLimit: 18 } }), y: axisOpts({ beginAtZero: true }) }
-      }
-    });
-
-    var total = data.reduce(function(a,b){return a+b;},0);
-    var lastFour = data.slice(-4).reduce(function(a,b){return a+b;},0);
+    var total       = accounts.reduce(function(a,b){return a+b;},0);
+    var totalPaid   = paid.reduce(function(a,b){return a+b;},0);
+    var lastFour     = accounts.slice(-4).reduce(function(a,b){return a+b;},0);
+    var lastFourPaid = paid.slice(-4).reduce(function(a,b){return a+b;},0);
     document.getElementById('accountsKpis').innerHTML =
       kpiCard(total, 'Totalt nya konton (period)', '') +
-      kpiCard(Math.round(lastFour/4), 'Genomsnitt senaste 4 v', '') +
-      kpiCard(data[data.length-1], 'Senaste veckan', '');
+      kpiCard(totalPaid, 'Varav nya betalda (period)', '') +
+      kpiCard(Math.round(lastFour/4), 'Snitt konton/v (4v)', '') +
+      kpiCard(Math.round(lastFourPaid/4), 'Snitt betalda/v (4v)', '') +
+      kpiCard(accounts[accounts.length-1], 'Senaste veckan (konton)', '') +
+      kpiCard(paid[paid.length-1], 'Senaste veckan (betalda)', '');
   }
 
   // ──────────────────────────────────────────────────────────────
@@ -1127,13 +1125,11 @@
       setText('kpiTrials', '—');
     }
 
-    // ── Betalda konton per vecka (dashboard_new_paid_weekly) ────
-    if (Array.isArray(newPaidWeekly) && newPaidWeekly.length) renderNewPaidChart(newPaidWeekly);
-
-    // ── Weekly main: new accounts per week (field: nya_konton) ───
+    // ── Nya konton per vecka, varav nya betalda (dashboard_weekly_main + dashboard_new_paid_weekly) ────
     var wArr = Array.isArray(weeklyMain) ? weeklyMain : [];
+    var newPaidArr = Array.isArray(newPaidWeekly) ? newPaidWeekly : [];
     if (wArr.length) {
-      renderAccountsChart(wArr);
+      renderAccountsChart(wArr, newPaidArr);
       var lastWeek = wArr[wArr.length - 1];
       setText('kpiNewAccounts', (lastWeek && lastWeek.nya_konton) || '—');
     }
