@@ -66,7 +66,7 @@ export default function Gravspelet() {
               priority
             />
             <span className="inline-block rounded-full border-2 border-[#ffd65a]/60 px-4 py-1 text-sm font-semibold text-[#ffd65a]">
-              Under utveckling · snart på Android
+              Under utveckling · snart på Android och iPhone
             </span>
             <h1 className="mt-5 text-5xl font-extrabold tracking-tight sm:text-6xl">Glimmerbaggen</h1>
             <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-[#d6cbea] lg:mx-0">
