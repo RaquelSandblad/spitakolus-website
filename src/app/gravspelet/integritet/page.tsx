@@ -2,20 +2,20 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Integritet i Grävspelet – Spitakolus AB',
-  description: 'Vilka uppgifter Grävspelet sparar och varför.',
+  title: 'Integritet i Glimmerbaggen – Spitakolus AB',
+  description: 'Vilka uppgifter Glimmerbaggen sparar och varför.',
 };
 
-// Kort integritetstext för Grävspelets konton. (Utkast – granskas innan spelet släpps.)
+// Kort integritetstext för Glimmerbaggens konton. (Utkast – granskas innan spelet släpps.)
 export default function GravspeletIntegritet() {
   return (
     <div className="px-5 py-14">
       <article className="mx-auto max-w-3xl rounded-3xl border-[3px] border-[#0b0614] bg-[#fff4d6] p-8 text-[#1b1030] shadow-[0_6px_0_#0b0614] sm:p-10">
-        <p className="text-sm font-semibold uppercase tracking-wider text-[#8a7aa0]">Grävspelet</p>
+        <p className="text-sm font-semibold uppercase tracking-wider text-[#8a7aa0]">Glimmerbaggen</p>
         <h1 className="mt-1 text-3xl font-extrabold">Integritet</h1>
         <div className="mt-6 space-y-5 leading-relaxed text-[#4a3d5c]">
           <p>
-            Grävspelet går att spela utan konto. Då sparas allt bara i din telefon eller webbläsare och ingenting skickas
+            Glimmerbaggen går att spela utan konto. Då sparas allt bara i din telefon eller webbläsare och ingenting skickas
             till oss.
           </p>
           <h2 className="text-xl font-bold text-[#1b1030]">Om du skapar ett konto</h2>

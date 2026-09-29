@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import AuthCard, { Notice, PrimaryButton } from '../AuthCard';
 import { isGravspeletConfigured, parseVerifyType, useRedirectResult, verifyToken } from '@/lib/gravspelet';
 
-// Hit leder länken i mejlet när man skapat ett konto (eller bytt e-post) i Grävspelet.
+// Hit leder länken i mejlet när man skapat ett konto (eller bytt e-post) i Glimmerbaggen.
 // Bekräftelsen görs först när man trycker på knappen, så att mejlprogram som "förhandsgranskar"
 // länkar inte råkar använda upp den.
 function ConfirmContent() {
@@ -34,7 +34,7 @@ function ConfirmContent() {
   if (!isGravspeletConfigured()) {
     return (
       <AuthCard title="Bekräfta e-post">
-        <Notice kind="info">Konton i Grävspelet är inte påslagna än. Försök igen lite senare.</Notice>
+        <Notice kind="info">Konton i Glimmerbaggen är inte påslagna än. Försök igen lite senare.</Notice>
       </AuthCard>
     );
   }
@@ -61,7 +61,7 @@ function ConfirmContent() {
     <AuthCard title={type === 'email_change' ? 'Bekräfta ny e-post' : 'Bekräfta e-post'}>
       {state === 'done' ? (
         <Notice kind="ok">
-          <strong>Klart!</strong> Din e-post är bekräftad. Öppna Grävspelet, gå till <strong>Meny → Konto</strong> och logga
+          <strong>Klart!</strong> Din e-post är bekräftad. Öppna Glimmerbaggen, gå till <strong>Meny → Konto</strong> och logga
           in.
         </Notice>
       ) : (

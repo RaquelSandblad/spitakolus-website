@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from 'react';
 
-// Grävspelets konton (Supabase Auth) – används av sidorna under /gravspelet.
+// Glimmerbaggens (förut Grävspelet) konton (Supabase Auth) – används av sidorna under /gravspelet.
 // Pratar direkt med Supabase REST-gränssnitt, så att hemsidan inte behöver något extra paket.
 
 // Projektet "gravspelet" (organisationen Grävspelet). Den publika nyckeln är gjord för att synas

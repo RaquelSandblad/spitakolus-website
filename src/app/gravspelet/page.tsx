@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-// Grävspelets egen sida. Färgerna är desamma som i spelet.
+// Glimmerbaggens egen sida. Färgerna är desamma som i spelet.
 const FEATURES = [
   {
     title: 'Gräv i en oändlig värld',
@@ -43,7 +43,7 @@ export default function Gravspelet() {
             <span className="inline-block rounded-full border-2 border-[#ffd65a]/60 px-4 py-1 text-sm font-semibold text-[#ffd65a]">
               Under utveckling · snart på Android
             </span>
-            <h1 className="mt-5 text-5xl font-extrabold tracking-tight sm:text-6xl">Grävspelet</h1>
+            <h1 className="mt-5 text-5xl font-extrabold tracking-tight sm:text-6xl">Glimmerbaggen</h1>
             <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-[#d6cbea] lg:mx-0">
               En liten lila skalbagge med pannlampa gräver sig ner genom jorden, hittar uråldriga ruiner och letar efter
               kartans fyra bitar – de visar vägen till Glimmerstaden och Jordens hjärta, 800–1000 meter ner.

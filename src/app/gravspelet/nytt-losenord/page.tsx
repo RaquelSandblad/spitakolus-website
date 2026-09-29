@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import AuthCard, { Notice, PrimaryButton } from '../AuthCard';
 import { isGravspeletConfigured, MIN_PASSWORD_LENGTH, updatePassword, useRedirectResult, verifyToken } from '@/lib/gravspelet';
 
-// Hit leder länken i mejlet när man tryckt på "Glömt lösenordet?" i Grävspelet.
+// Hit leder länken i mejlet när man tryckt på "Glömt lösenordet?" i Glimmerbaggen.
 // Länken används först när man skickar det nya lösenordet (den går bara att använda en gång).
 function ResetContent() {
   const params = useSearchParams();
@@ -55,7 +55,7 @@ function ResetContent() {
   if (!isGravspeletConfigured()) {
     return (
       <AuthCard title="Nytt lösenord">
-        <Notice kind="info">Konton i Grävspelet är inte påslagna än. Försök igen lite senare.</Notice>
+        <Notice kind="info">Konton i Glimmerbaggen är inte påslagna än. Försök igen lite senare.</Notice>
       </AuthCard>
     );
   }
@@ -72,7 +72,7 @@ function ResetContent() {
     return (
       <AuthCard title="Nytt lösenord">
         <Notice kind="info">
-          Tryck på <strong>Glömt lösenordet?</strong> under Meny → Konto i Grävspelet, så får du ett mejl med en länk hit.
+          Tryck på <strong>Glömt lösenordet?</strong> under Meny → Konto i Glimmerbaggen, så får du ett mejl med en länk hit.
         </Notice>
       </AuthCard>
     );
@@ -82,7 +82,7 @@ function ResetContent() {
     return (
       <AuthCard title="Nytt lösenord">
         <Notice kind="ok">
-          <strong>Klart!</strong> Ditt lösenord är bytt. Öppna Grävspelet, gå till <strong>Meny → Konto</strong> och logga in
+          <strong>Klart!</strong> Ditt lösenord är bytt. Öppna Glimmerbaggen, gå till <strong>Meny → Konto</strong> och logga in
           med det nya lösenordet.
         </Notice>
       </AuthCard>

@@ -1,25 +1,25 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-// Ett kort i Grävspelets stil för kontosidorna (bekräfta e-post, nytt lösenord).
+// Ett kort i Glimmerbaggens stil för kontosidorna (bekräfta e-post, nytt lösenord).
 export default function AuthCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="flex min-h-[70vh] items-center justify-center px-5 py-14">
       <div className="w-full max-w-md rounded-3xl border-[3px] border-[#0b0614] bg-[#fff4d6] p-8 text-center text-[#1b1030] shadow-[0_6px_0_#0b0614] sm:p-10">
         <Image
           src="/gravspelet/skalbagge.svg"
-          alt="Grävspelet"
+          alt="Glimmerbaggen"
           width={72}
           height={72}
           className="mx-auto mb-4 h-[72px] w-[72px]"
           priority
         />
-        <p className="text-sm font-semibold uppercase tracking-wider text-[#8a7aa0]">Grävspelet</p>
+        <p className="text-sm font-semibold uppercase tracking-wider text-[#8a7aa0]">Glimmerbaggen</p>
         <h1 className="mt-1 text-3xl font-extrabold">{title}</h1>
         <div className="mt-5 text-left leading-relaxed text-[#4a3d5c]">{children}</div>
         <p className="mt-8 text-sm text-[#8a7aa0]">
           <Link href="/gravspelet" className="underline">
-            Om Grävspelet
+            Om Glimmerbaggen
           </Link>{' '}
           ·{' '}
           <a href="mailto:support@spitakolus.com" className="underline">
