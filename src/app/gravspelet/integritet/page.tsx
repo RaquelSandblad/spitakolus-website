@@ -43,7 +43,11 @@ export default function GravspeletIntegritet() {
           </p>
           <h2 className="text-xl font-bold text-[#1b1030]">Ta bort ditt konto</h2>
           <p>
-            Mejla{' '}
+            I spelet: <strong>Meny → Konto → Ta bort konto</strong> (tryck två gånger). Då tas kontot, användarnamnet och
+            ditt sparade spel i molnet bort direkt och för alltid. Spelet som är sparat i din telefon finns kvar.
+          </p>
+          <p>
+            Kommer du inte åt spelet? Mejla{' '}
             <a href="mailto:support@spitakolus.com" className="font-semibold text-[#6d3ccc] underline">
               support@spitakolus.com
             </a>{' '}

@@ -142,7 +142,7 @@ export default function Gravspelet() {
               där du väljer ett nytt.
             </li>
             <li>
-              <strong>Frågor eller vill du ta bort ditt konto?</strong> Mejla{' '}
+              <strong>Ta bort ditt konto:</strong> Meny → Konto → Ta bort konto i spelet. <strong>Frågor?</strong> Mejla{' '}
               <a href="mailto:support@spitakolus.com" className="font-semibold text-[#6d3ccc] underline">
                 support@spitakolus.com
               </a>
