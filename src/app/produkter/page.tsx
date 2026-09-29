@@ -61,8 +61,8 @@ export default function Produkter() {
             Våra Produkter
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Alla tre apparna är lanserade och tillgängliga på iOS och Android.
-            Ladda ner dem idag!
+            Nästa Hem, Flocken och Nära finns på iOS och Android – ladda ner dem idag!
+            Och snart kommer kortspelet Buraco.
           </p>
         </div>
 
@@ -253,6 +253,52 @@ export default function Produkter() {
                 <div className="pt-6 border-t border-gray-100">
                   <p className="text-sm font-medium text-gray-900 mb-3">Ladda ner Nära:</p>
                   <StoreBadges ios={APP_LINKS.nara.ios} android={APP_LINKS.nara.android} color="accent" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Buraco */}
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div className="md:flex">
+              <div className="md:flex-shrink-0 bg-gradient-to-br from-[#16624f] to-[#0b2f28] md:w-1/3 flex items-center justify-center p-12">
+                <div className="text-white text-center">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/buraco/icon.svg" alt="" className="w-24 h-24 mx-auto mb-4 rounded-2xl" />
+                  <h2 className="text-3xl font-bold italic">Buraco</h2>
+                  <a
+                    href="/buraco"
+                    className="inline-block mt-2 text-emerald-200 hover:text-white transition-colors text-sm underline underline-offset-2"
+                  >
+                    spitakolus.com/buraco
+                  </a>
+                </div>
+              </div>
+              <div className="p-8 md:w-2/3">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Kortspelet två mot två – online</h3>
+                <p className="text-gray-600 mb-6">
+                  Buraco är det klassiska kortspelet där två lag spelar mot varandra med två kortlekar. Välj nivå
+                  och spelsätt, tryck på Spela – så hittar appen tre andra spelare åt dig. Kommer ingen fyller
+                  datorspelare de tomma platserna, och du kan alltid öva mot datorn.
+                </p>
+                <div className="mb-8">
+                  <h4 className="font-semibold text-gray-900 mb-2">I spelet:</h4>
+                  <ul className="list-disc list-inside text-gray-600 space-y-2">
+                    <li>Tre spelsätt: Öppen, Stängd och Strikt</li>
+                    <li>Nybörjarbord för dig som lär dig, Mästarbord för vana spelare</li>
+                    <li>Handritade kort och ett bord gjort för mobilen</li>
+                    <li>På svenska, engelska och portugisiska</li>
+                    <li>Gratis med reklam – med Premium spelar du helt utan reklam</li>
+                  </ul>
+                </div>
+                <div className="pt-6 border-t border-gray-100">
+                  <p className="text-sm font-medium text-gray-900 mb-3">Kommer snart på Google Play och App Store.</p>
+                  <a
+                    href="/buraco"
+                    className="inline-flex items-center gap-2 bg-[#0f4a3d] hover:bg-[#0b3a30] text-white px-5 py-3 rounded-lg transition-colors font-medium"
+                  >
+                    Läs mer om Buraco
+                  </a>
                 </div>
               </div>
             </div>
