@@ -3,7 +3,7 @@ import { Fraunces } from 'next/font/google';
 
 export const metadata: Metadata = {
   title: 'Buraco – Spitakolus AB',
-  description: 'Buraco – kortspelet för fyra spelare, två mot två, online.',
+  description: 'Buraco – kortspelet två mot två, online.',
   icons: { icon: '/buraco/icon.svg' },
 };
 

@@ -105,10 +105,10 @@ const sv: Texts = {
     company: 'Buraco görs av Spitakolus AB (org.nr 559554-6101).',
   },
   home: {
-    metaTitle: 'Buraco – kortspelet för fyra, online',
-    metaDescription: 'Buraco är kortspelet för fyra spelare, två mot två, online. Kommer snart på Google Play och App Store.',
+    metaTitle: 'Buraco – kortspelet två mot två, online',
+    metaDescription: 'Buraco är kortspelet två mot två, online. Kommer snart på Google Play och App Store.',
     badge: 'Kommer snart på Google Play och App Store',
-    lead: 'Det klassiska kortspelet för fyra – två mot två, online. Samarbeta med din partner, lägg ut serier och bygg kanastor innan motståndarna hinner före.',
+    lead: 'Det klassiska kortspelet två mot två, online. Samarbeta med din partner, lägg ut serier och bygg kanastor innan motståndarna hinner före.',
     features: [
       {
         title: 'Två mot två',
@@ -263,7 +263,7 @@ const sv: Texts = {
       {
         h: 'Tjänsten',
         p: [
-          'Buraco är ett kortspel online för fyra spelare, två mot två. Är en plats tom efter 30 sekunder tar en datorspelare den. Du kan också öva mot datorn. Du väljer nivå (Nybörjarbord eller Mästarbord) och spelsätt (Öppen, Stängd eller Strikt).',
+          'Buraco är ett kortspel online, två mot två. Är en plats tom efter 30 sekunder tar en datorspelare den. Du kan också öva mot datorn. Du väljer nivå (Nybörjarbord eller Mästarbord) och spelsätt (Öppen, Stängd eller Strikt).',
         ],
       },
       {
@@ -401,10 +401,10 @@ const en: Texts = {
     company: 'Buraco is made by Spitakolus AB (Swedish company reg. no. 559554-6101).',
   },
   home: {
-    metaTitle: 'Buraco – the card game for four, online',
-    metaDescription: 'Buraco is the card game for four players, two against two, online. Coming soon to Google Play and the App Store.',
+    metaTitle: 'Buraco – the card game two against two, online',
+    metaDescription: 'Buraco is the card game two against two, online. Coming soon to Google Play and the App Store.',
     badge: 'Coming soon to Google Play and the App Store',
-    lead: 'The classic card game for four – two against two, online. Team up with your partner, lay down melds and build canastas before your opponents do.',
+    lead: 'The classic card game, two against two, online. Team up with your partner, lay down melds and build canastas before your opponents do.',
     features: [
       {
         title: 'Two against two',
@@ -557,7 +557,7 @@ const en: Texts = {
       {
         h: 'The service',
         p: [
-          'Buraco is an online card game for four players, two against two. If a seat is empty after 30 seconds, a computer player takes it. You can also practise against the computer. You choose a level (Beginner table or Master table) and a mode (Open, Closed or Strict).',
+          'Buraco is an online card game, two against two. If a seat is empty after 30 seconds, a computer player takes it. You can also practise against the computer. You choose a level (Beginner table or Master table) and a mode (Open, Closed or Strict).',
         ],
       },
       {
@@ -695,10 +695,10 @@ const pt: Texts = {
     company: 'O Buraco é feito pela Spitakolus AB (empresa sueca, nº de registro 559554-6101).',
   },
   home: {
-    metaTitle: 'Buraco – o jogo de cartas para quatro, online',
-    metaDescription: 'Buraco é o jogo de cartas para quatro jogadores, dois contra dois, online. Em breve no Google Play e na App Store.',
+    metaTitle: 'Buraco – o jogo de cartas em dupla, online',
+    metaDescription: 'Buraco é o jogo de cartas em dupla, dois contra dois, online. Em breve no Google Play e na App Store.',
     badge: 'Em breve no Google Play e na App Store',
-    lead: 'O clássico jogo de cartas para quatro – dois contra dois, online. Jogue junto com seu parceiro, baixe jogos e forme canastras antes dos adversários.',
+    lead: 'O clássico jogo de cartas em dupla, dois contra dois, online. Jogue junto com seu parceiro, baixe jogos e forme canastras antes dos adversários.',
     features: [
       {
         title: 'Dois contra dois',
@@ -851,7 +851,7 @@ const pt: Texts = {
       {
         h: 'O serviço',
         p: [
-          'O Buraco é um jogo de cartas online para quatro jogadores, dois contra dois. Se um lugar ficar vazio por 30 segundos, um jogador do computador ocupa o lugar. Você também pode treinar contra o computador. Você escolhe o nível (Mesa de iniciantes ou Mesa de mestres) e o modo (Aberto, Fechado ou Rigoroso).',
+          'O Buraco é um jogo de cartas online, dois contra dois. Se um lugar ficar vazio por 30 segundos, um jogador do computador ocupa o lugar. Você também pode treinar contra o computador. Você escolhe o nível (Mesa de iniciantes ou Mesa de mestres) e o modo (Aberto, Fechado ou Rigoroso).',
         ],
       },
       {
