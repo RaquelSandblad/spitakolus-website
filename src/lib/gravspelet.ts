@@ -131,3 +131,32 @@ export async function updatePassword(accessToken: string, password: string): Pro
     return { ok: false, error: 'Ingen kontakt med servern. Kontrollera att du är ansluten till internet.' };
   }
 }
+
+/** Tar bort kontot från webben: loggar in med e-post och lösenord och tar sedan bort kontot
+ *  (samma som Meny → Konto → Ta bort konto i spelet). Profilen och det sparade spelet följer med. */
+export async function deleteAccount(email: string, password: string): Promise<{ ok: true } | { ok: false; error: string }> {
+  try {
+    const login = await call('/auth/v1/token?grant_type=password', {
+      method: 'POST',
+      body: JSON.stringify({ email: email.trim(), password }),
+    });
+    const data = login.body as { access_token?: string } & SupabaseError;
+    if (login.status < 200 || login.status >= 300 || !data?.access_token) {
+      const code = String(data?.error_code ?? data?.code ?? '');
+      if (code === 'email_not_confirmed') {
+        return { ok: false, error: 'E-posten är inte bekräftad än. Mejla support@spitakolus.com så tar vi bort kontot.' };
+      }
+      if (code === 'invalid_credentials' || login.status === 400) {
+        return { ok: false, error: 'Fel e-post eller lösenord.' };
+      }
+      return { ok: false, error: swedishError(data, login.status) };
+    }
+    const del = await call('/rest/v1/rpc/delete_my_account', { method: 'POST', token: data.access_token, body: '{}' });
+    if (del.status >= 200 && del.status < 300) {
+      return { ok: true };
+    }
+    return { ok: false, error: `Kunde inte ta bort kontot (${del.status}). Mejla support@spitakolus.com så hjälper vi dig.` };
+  } catch {
+    return { ok: false, error: 'Ingen kontakt med servern. Kontrollera att du är ansluten till internet.' };
+  }
+}

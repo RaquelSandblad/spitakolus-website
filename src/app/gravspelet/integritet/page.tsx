@@ -75,7 +75,14 @@ export default function GravspeletIntegritet() {
             ditt sparade spel i molnet bort direkt och för alltid. Spelet som är sparat i din telefon finns kvar.
           </p>
           <p>
-            Kommer du inte åt spelet? Mejla{' '}
+            På webben:{' '}
+            <Link href="/gravspelet/ta-bort-konto" className={link}>
+              spitakolus.com/gravspelet/ta-bort-konto
+            </Link>{' '}
+            – logga in med e-post och lösenord och ta bort kontot direkt.
+          </p>
+          <p>
+            Kommer du inte åt kontot? Mejla{' '}
             <a href="mailto:support@spitakolus.com" className={link}>
               support@spitakolus.com
             </a>{' '}
