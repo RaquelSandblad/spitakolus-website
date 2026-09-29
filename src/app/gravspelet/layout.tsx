@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Glimmerbaggen – Spitakolus AB',
-  description: 'Ett mysigt grävspel där en liten lila skalbagge gräver sig ner mot jordens hjärta. Bygg ditt hem, hitta kartans fyra bitar och spela ihop med kompisar.',
+  description: 'Ett mysigt grävspel där en liten lila skalbagge gräver sig ner genom grottor, ruiner och en sovande stad mot jordens hjärta. Rädda grannarna, bygg ditt hem och spela ihop med kompisar.',
 };
 
 // Glimmerbaggens egna färger (samma som i spelet).

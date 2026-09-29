@@ -5,24 +5,49 @@ import Link from 'next/link';
 const FEATURES = [
   {
     title: 'Gräv i en oändlig värld',
-    text: 'Under ängen finns jord, sten, kol, rötter och vattenfickor – och jättelika grottor med sjöar på botten. Ju djupare du kommer, desto mörkare blir det.',
+    text: 'Under ängen finns jord, sten, kol, rötter och vattenfickor – och stora grottor med sjöar. Baggen rullar nerför branta gångar och går en bit i taket med klibbiga fötter. Varje värld är ny.',
     color: '#ffd65a',
   },
   {
     title: 'Ljus är trygghet',
-    text: 'Spindlar och skorpioner bor i mörkret. Tänd facklor, svamplyktor och läger – i ljuset vågar de inte komma nära.',
+    text: 'Spindlar och skorpioner bor i mörkret. Tänd facklor, svamplyktor och läger – i ljuset vågar de inte komma nära. Djupt nere sover jordmaskar som vaknar när du gräver för högljutt.',
     color: '#ff9ecb',
   },
   {
     title: 'Bygg för att komma fram',
-    text: 'Stegar, stöd och block tar dig upp ur grottorna och över hålen. Lös jord kan spricka – sätt upp ett stöd innan taket rasar.',
+    text: 'Stegar, stöd och block tar dig upp ur grottorna och över hålen. Lös jord kan spricka, och en del gamla väggar håller tillbaka vatten – knakar det är det bråttom!',
     color: '#b8f07a',
   },
   {
     title: 'Ett hem som växer',
-    text: 'Bygg till stugan med verkstad, sovrum och museum. I verkstaden gör du en vassare hacka, en starkare lampa och till slut en stenborr.',
+    text: 'Bygg till stugan med verkstad, sovrum och museum. Rädda Glimmerstadens sju vilsna invånare – de flyttar hem till dig, gården vid stugan växer och grannarna berättar om den gamla staden.',
     color: '#8fd3ff',
   },
+  {
+    title: 'Ljuset avslöjar hemligheter',
+    text: 'Lys upp det gamla – allt syns inte i mörkret. Djupt nere finns hemligheter som bara visar sig i rätt ljus.',
+    color: '#a066f2',
+  },
+  {
+    title: 'Ljud och musik',
+    text: 'Mjuk musik som byter stämning i varje område, och små ljud för allt du gräver, bygger och hittar – allt gjort för spelet.',
+    color: '#2ec4b6',
+  },
+];
+
+// Lagren på vägen ner mot Glimmerstaden.
+const AREAS = [
+  { name: 'Rotlabyrinten', depth: '40–160 m', text: 'ett nät av jätterötter som växer igen', color: '#b8f07a' },
+  { name: 'De översvämmade kamrarna', depth: '160–360 m', text: 'sjöar och källor där vattnet stiger och sjunker', color: '#8fd3ff' },
+  { name: 'Kolskogen', depth: '360–600 m', text: 'stammar av kol och facklor som flammar upp', color: '#ffb86b' },
+  { name: 'Kristallgrottan', depth: '600 m –', text: 'kristaller som tänds av ljus och tänder varandra', color: '#a066f2' },
+];
+
+// Fler bilder från spelet.
+const GALLERY = [
+  { src: '/gravspelet/kristallruinen.webp', alt: 'En kristallruin där pannlampans stråle studsar i kristallerna', caption: 'Kristallruinerna: vrid kristallerna så att strålen når symbolen.' },
+  { src: '/gravspelet/dammen.webp', alt: 'Vatten väller ut i en tunnel och svampar lyser', caption: 'En gammal vägg brister – och de törstiga svamparna vaknar.' },
+  { src: '/gravspelet/hemligheten.webp', alt: 'Skalbaggen med pannlampan i en mörk ruin', caption: 'Allt syns inte i mörkret …' },
 ];
 
 export default function Gravspelet() {
@@ -45,8 +70,9 @@ export default function Gravspelet() {
             </span>
             <h1 className="mt-5 text-5xl font-extrabold tracking-tight sm:text-6xl">Glimmerbaggen</h1>
             <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-[#d6cbea] lg:mx-0">
-              En liten lila skalbagge med pannlampa gräver sig ner genom jorden, hittar uråldriga ruiner och letar efter
-              kartans fyra bitar – de visar vägen till Glimmerstaden och Jordens hjärta, 800–1000 meter ner.
+              En liten lila skalbagge med pannlampa har en stuga på ängen – och under den väntar en hel värld. Gräv dig ner
+              genom grottor och ruiner, hitta kartans fyra bitar och väck Den gamla staden kring Jordens hjärta, 800–1000
+              meter ner.
             </p>
             <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
               <a
@@ -63,7 +89,7 @@ export default function Gravspelet() {
               </a>
             </div>
           </div>
-          <Screenshot src="/gravspelet/ytan.png" alt="Skalbaggen på ängen vid sin stuga" />
+          <Screenshot src="/gravspelet/hemmet.webp" alt="Stugan på ängen med verkstad, sovrum och museum, och grannarna på gården" priority />
         </div>
       </section>
 
@@ -71,7 +97,7 @@ export default function Gravspelet() {
       <section className="px-5 py-14">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-center text-3xl font-extrabold sm:text-4xl">Vad gör man?</h2>
-          <div className="mt-10 grid gap-5 sm:grid-cols-2">
+          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((f) => (
               <div key={f.title} className="rounded-3xl border-[3px] border-[#1b1030] bg-[#241638] p-6 shadow-[0_5px_0_#0b0614]">
                 <div className="mb-3 h-2 w-14 rounded-full" style={{ backgroundColor: f.color }} />
@@ -83,17 +109,77 @@ export default function Gravspelet() {
         </div>
       </section>
 
+      {/* Områdena */}
+      <section className="px-5 py-14">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-2">
+          <div className="order-2 lg:order-1">
+            <h2 className="text-3xl font-extrabold sm:text-4xl">Områden som känns olika</h2>
+            <p className="mt-4 text-lg leading-relaxed text-[#d6cbea]">
+              Ju djupare du kommer, desto mörkare blir det – och varje lager har sina egna regler.
+            </p>
+            <ul className="mt-6 space-y-3">
+              {AREAS.map((a) => (
+                <li key={a.name} className="flex gap-3 rounded-2xl border-[3px] border-[#1b1030] bg-[#241638] px-5 py-3">
+                  <span className="mt-2 h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: a.color }} />
+                  <span className="leading-relaxed text-[#d6cbea]">
+                    <strong className="text-[#fff4d6]">{a.name}</strong> <span className="text-sm">({a.depth})</span> – {a.text}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="order-1 lg:order-2">
+            <Screenshot src="/gravspelet/kolskogen.webp" alt="Kolskogen: en grotta med kolstammar och flammande facklor" />
+          </div>
+        </div>
+      </section>
+
       {/* Ruinerna */}
       <section className="px-5 py-14">
         <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-2">
-          <Screenshot src="/gravspelet/labyrint.png" alt="En ruin som är en labyrint, med en skorpion som vaktar skatten" />
+          <Screenshot src="/gravspelet/teckningen.webp" alt="En ruin med facklor och en gammal teckning av dansen runt hjärtat" />
           <div>
             <h2 className="text-3xl font-extrabold sm:text-4xl">Ruiner som är labyrinter</h2>
             <p className="mt-4 text-lg leading-relaxed text-[#d6cbea]">
-              Djupt nere ligger gamla ruiner – varje ruin är en egen labyrint med flera ingångar. Längst in väntar en skatt
-              till ditt museum, och någonstans finns en av kartans bitar. Men akta dig: en skorpion vandrar runt i gångarna,
-              och spindlar hänger i taket.
+              Djupt nere ligger gamla ruiner – varje ruin är en egen labyrint. Längst in väntar en skatt till ditt museum,
+              och någonstans finns en av kartans bitar. Glimmerfolket som bodde här har lämnat spår efter sig: sängar,
+              leksaker och teckningar som visar hur de levde.
             </p>
+            <p className="mt-4 text-lg leading-relaxed text-[#d6cbea]">
+              Men akta dig: skorpioner vandrar i gångarna och spindlar hänger i taket.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Den gamla staden */}
+      <section className="px-5 py-14">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-2">
+          <div className="order-2 lg:order-1">
+            <h2 className="text-3xl font-extrabold sm:text-4xl">Den gamla staden</h2>
+            <p className="mt-4 text-lg leading-relaxed text-[#d6cbea]">
+              Kring Jordens hjärta ligger Glimmerstadens ruiner: gator i fyra våningar, hus, trappor och gamla maskiner som
+              har somnat. Väck maskinerna med kol, så tänds lyktorna och hissarna börjar gå – en stadsdel i taget, tills
+              hela staden vaknar.
+            </p>
+          </div>
+          <div className="order-1 lg:order-2">
+            <Screenshot src="/gravspelet/gamla-staden.webp" alt="Den gamla staden med trappor, en maskin och lyktor som lyser" />
+          </div>
+        </div>
+      </section>
+
+      {/* Fler bilder */}
+      <section className="px-5 py-14">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="text-center text-3xl font-extrabold sm:text-4xl">Mer att upptäcka</h2>
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
+            {GALLERY.map((g) => (
+              <figure key={g.src}>
+                <Screenshot src={g.src} alt={g.alt} small />
+                <figcaption className="mt-3 text-center leading-relaxed text-[#d6cbea]">{g.caption}</figcaption>
+              </figure>
+            ))}
           </div>
         </div>
       </section>
@@ -123,7 +209,7 @@ export default function Gravspelet() {
             </div>
           </div>
           <div className="order-1 lg:order-2">
-            <Screenshot src="/gravspelet/lagspel.png" alt="Lagspel: det lila lagets bas med kristallkistan" />
+            <Screenshot src="/gravspelet/lagspel.webp" alt="Lagspel: det lila lagets bas med kristallkistan och ställningen" />
           </div>
         </div>
       </section>
@@ -166,10 +252,18 @@ export default function Gravspelet() {
   );
 }
 
-function Screenshot({ src, alt }: { src: string; alt: string }) {
+function Screenshot({ src, alt, priority = false, small = false }: { src: string; alt: string; priority?: boolean; small?: boolean }) {
   return (
     <div className="overflow-hidden rounded-[28px] border-[4px] border-[#0b0614] bg-[#0b0614] shadow-[0_10px_0_#0b0614,0_20px_50px_rgba(160,102,242,0.25)]">
-      <Image src={src} alt={alt} width={1280} height={720} className="h-auto w-full" sizes="(min-width: 1024px) 560px, 100vw" />
+      <Image
+        src={src}
+        alt={alt}
+        width={1600}
+        height={900}
+        className="h-auto w-full"
+        sizes={small ? '(min-width: 768px) 360px, 100vw' : '(min-width: 1024px) 560px, 100vw'}
+        priority={priority}
+      />
     </div>
   );
 }
