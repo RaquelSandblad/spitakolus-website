@@ -153,6 +153,10 @@ export default function Gravspelet() {
             Läs om{' '}
             <Link href="/gravspelet/integritet" className="underline">
               vilka uppgifter spelet sparar
+            </Link>{' '}
+            och{' '}
+            <Link href="/gravspelet/villkor" className="underline">
+              villkoren
             </Link>
             .
           </p>
