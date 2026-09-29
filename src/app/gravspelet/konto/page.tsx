@@ -3,7 +3,7 @@
 import { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import AuthCard, { Notice, PrimaryButton } from '../AuthCard';
-import { isGravspeletConfigured, parseVerifyType, verifyToken } from '@/lib/gravspelet';
+import { isGravspeletConfigured, parseVerifyType, useRedirectResult, verifyToken } from '@/lib/gravspelet';
 
 // Hit leder länken i mejlet när man skapat ett konto (eller bytt e-post) i Grävspelet.
 // Bekräftelsen görs först när man trycker på knappen, så att mejlprogram som "förhandsgranskar"
@@ -12,8 +12,13 @@ function ConfirmContent() {
   const params = useSearchParams();
   const tokenHash = params.get('token_hash') ?? '';
   const type = parseVerifyType(params.get('type'), 'email');
-  const [state, setState] = useState<'ready' | 'working' | 'done' | 'error'>('ready');
-  const [error, setError] = useState('');
+  // Kom man hit från Supabases standardmejl är e-posten redan bekräftad (eller så står felet efter #).
+  const redirect = useRedirectResult();
+  const redirected = redirect.accessToken !== '' || redirect.error !== '';
+  const [ownState, setState] = useState<'ready' | 'working' | 'done' | 'error'>('ready');
+  const [ownError, setError] = useState('');
+  const state = redirect.accessToken ? 'done' : redirect.error ? 'error' : ownState;
+  const error = redirect.error || ownError;
 
   async function confirm() {
     setState('working');
@@ -34,7 +39,15 @@ function ConfirmContent() {
     );
   }
 
-  if (!tokenHash) {
+  if (redirected && state === 'error') {
+    return (
+      <AuthCard title="Bekräfta e-post">
+        <Notice kind="error">{error}</Notice>
+      </AuthCard>
+    );
+  }
+
+  if (!tokenHash && !redirected) {
     return (
       <AuthCard title="Bekräfta e-post">
         <Notice kind="info">

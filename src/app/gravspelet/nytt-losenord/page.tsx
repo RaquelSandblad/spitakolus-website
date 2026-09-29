@@ -3,7 +3,7 @@
 import { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import AuthCard, { Notice, PrimaryButton } from '../AuthCard';
-import { isGravspeletConfigured, MIN_PASSWORD_LENGTH, updatePassword, verifyToken } from '@/lib/gravspelet';
+import { isGravspeletConfigured, MIN_PASSWORD_LENGTH, updatePassword, useRedirectResult, verifyToken } from '@/lib/gravspelet';
 
 // Hit leder länken i mejlet när man tryckt på "Glömt lösenordet?" i Grävspelet.
 // Länken används först när man skickar det nya lösenordet (den går bara att använda en gång).
@@ -12,7 +12,11 @@ function ResetContent() {
   const tokenHash = params.get('token_hash') ?? '';
   const [password, setPassword] = useState('');
   const [repeat, setRepeat] = useState('');
-  const [accessToken, setAccessToken] = useState('');
+  // Från Supabases standardmejl är länken redan bekräftad – inloggningen står efter # i adressen.
+  const redirect = useRedirectResult();
+  const linkError = redirect.error;
+  const [verifiedToken, setAccessToken] = useState('');
+  const accessToken = verifiedToken || redirect.accessToken;
   const [state, setState] = useState<'ready' | 'working' | 'done'>('ready');
   const [error, setError] = useState('');
 
@@ -56,7 +60,15 @@ function ResetContent() {
     );
   }
 
-  if (!tokenHash) {
+  if (linkError) {
+    return (
+      <AuthCard title="Nytt lösenord">
+        <Notice kind="error">{linkError}</Notice>
+      </AuthCard>
+    );
+  }
+
+  if (!tokenHash && !accessToken) {
     return (
       <AuthCard title="Nytt lösenord">
         <Notice kind="info">

@@ -1,8 +1,12 @@
+import { useSyncExternalStore } from 'react';
+
 // Grävspelets konton (Supabase Auth) – används av sidorna under /gravspelet.
 // Pratar direkt med Supabase REST-gränssnitt, så att hemsidan inte behöver något extra paket.
 
-export const GRAVSPELET_SUPABASE_URL = (process.env.NEXT_PUBLIC_GRAVSPELET_SUPABASE_URL ?? '').replace(/\/$/, '');
-export const GRAVSPELET_SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_GRAVSPELET_SUPABASE_ANON_KEY ?? '';
+// Projektet "gravspelet" (organisationen Grävspelet). Den publika nyckeln är gjord för att synas
+// i webbläsare och appar – databasens radsäkerhet skyddar allt. Kan bytas med miljövariabler.
+export const GRAVSPELET_SUPABASE_URL = (process.env.NEXT_PUBLIC_GRAVSPELET_SUPABASE_URL ?? 'https://ztibbevpkmhhbkwunpzo.supabase.co').replace(/\/$/, '');
+export const GRAVSPELET_SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_GRAVSPELET_SUPABASE_ANON_KEY ?? 'sb_publishable_39mQlJLW-u5uoE2U_cjBJw_Zv0zc0u0';
 
 export const MIN_PASSWORD_LENGTH = 6;
 
@@ -76,6 +80,39 @@ export async function verifyToken(tokenHash: string, type: VerifyType): Promise<
   } catch {
     return { ok: false, error: 'Ingen kontakt med servern. Kontrollera att du är ansluten till internet.' };
   }
+}
+
+/**
+ * Supabases egna standardmejl (innan spelets svenska mejl är påslagna) bekräftar länken hos
+ * Supabase och skickar sedan hit med resultatet efter #: antingen en inloggning (access_token)
+ * eller ett fel. Läser det som står efter # i adressen.
+ */
+export function useRedirectResult(): { accessToken: string; error: string } {
+  // delen efter # finns bara i webbläsaren – på servern räknas den som tom (så blir det ingen krock)
+  const hash = useSyncExternalStore(
+    (onChange) => {
+      window.addEventListener('hashchange', onChange);
+      return () => window.removeEventListener('hashchange', onChange);
+    },
+    () => window.location.hash,
+    () => '',
+  );
+  return parseRedirectHash(hash);
+}
+
+export function parseRedirectHash(hash: string): { accessToken: string; error: string } {
+  if (hash.length < 2) {
+    return { accessToken: '', error: '' };
+  }
+  const params = new URLSearchParams(hash.slice(1));
+  const code = params.get('error_code') ?? '';
+  let error = '';
+  if (params.get('error') || code) {
+    error = code === 'otp_expired'
+      ? 'Länken har gått ut eller redan använts. Be om en ny länk i spelet.'
+      : params.get('error_description')?.replace(/\+/g, ' ') ?? 'Länken fungerade inte. Be om en ny länk i spelet.';
+  }
+  return { accessToken: params.get('access_token') ?? '', error };
 }
 
 /** Byter lösenord för den som just verifierade en länk för nytt lösenord. */
