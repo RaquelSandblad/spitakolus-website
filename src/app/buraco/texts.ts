@@ -161,7 +161,7 @@ const sv: Texts = {
           '**Lösenord** – sköts av Supabase Auth och lagras bara hashat. Ingen, inte heller vi, kan läsa det.',
           '**Statistik** – hur många partier du har spelat och vunnit.',
           '**Premium** – om du har köpt Premium (inga annonser).',
-          '**Tidsspärr** – om du har lämnat ett pågående parti, så att tiden på 10 minuter innan nästa parti kan räknas.',
+          '**Tidsspärr** – om du har lämnat ett pågående parti, så att tiden på 5 minuter innan nästa parti kan räknas.',
         ],
         after: [
           'Det finns ingen chatt i spelet. Pågående partier – korten, dragen och vilka som sitter vid bordet – finns bara i spelserverns minne och sparas inte när partiet är slut. För att spelet ska kunna skicka data till din telefon behöver spelservern tekniska uppgifter som din IP-adress medan du är ansluten.',
@@ -296,7 +296,7 @@ const sv: Texts = {
       {
         h: 'Om du lämnar ett parti',
         p: [
-          'Lämnar du ett pågående parti får du vänta **10 minuter** innan du kan börja nästa. Det gäller alla, även den som har Premium, så att partierna inte förstörs för de andra.',
+          'Lämnar du ett pågående parti får du vänta **5 minuter** innan du kan börja nästa. Det gäller alla, även den som har Premium, så att partierna inte förstörs för de andra.',
         ],
       },
       {
@@ -457,7 +457,7 @@ const en: Texts = {
           '**Password** – handled by Supabase Auth and stored only in hashed form. Nobody, not even we, can read it.',
           '**Statistics** – how many games you have played and won.',
           '**Premium** – whether you have bought Premium (no ads).',
-          '**Time-out** – whether you have left a game in progress, so that the 10-minute wait before your next game can be counted.',
+          '**Time-out** – whether you have left a game in progress, so that the 5-minute wait before your next game can be counted.',
         ],
         after: [
           'There is no chat in the game. Games in progress – the cards, the moves and who is at the table – exist only in the game server’s memory and are not stored once the game is over. To send data to your phone, the game server needs technical data such as your IP address while you are connected.',
@@ -590,7 +590,7 @@ const en: Texts = {
       {
         h: 'If you leave a game',
         p: [
-          'If you leave a game in progress, you must wait **10 minutes** before you can start your next one. This applies to everyone, including Premium players, so that games are not spoiled for the others.',
+          'If you leave a game in progress, you must wait **5 minutes** before you can start your next one. This applies to everyone, including Premium players, so that games are not spoiled for the others.',
         ],
       },
       {
@@ -751,7 +751,7 @@ const pt: Texts = {
           '**Senha** – gerenciada pelo Supabase Auth e guardada só em forma de hash. Ninguém, nem nós, consegue lê-la.',
           '**Estatísticas** – quantas partidas você jogou e ganhou.',
           '**Premium** – se você comprou o Premium (sem anúncios).',
-          '**Bloqueio de tempo** – se você saiu de uma partida em andamento, para contar os 10 minutos de espera até a próxima partida.',
+          '**Bloqueio de tempo** – se você saiu de uma partida em andamento, para contar os 5 minutos de espera até a próxima partida.',
         ],
         after: [
           'Não há chat no jogo. As partidas em andamento – as cartas, as jogadas e quem está na mesa – ficam só na memória do servidor do jogo e não são guardadas quando a partida termina. Para enviar dados ao seu celular, o servidor precisa de dados técnicos, como o seu endereço IP, enquanto você está conectado.',
@@ -884,7 +884,7 @@ const pt: Texts = {
       {
         h: 'Se você sair de uma partida',
         p: [
-          'Se você sair de uma partida em andamento, precisa esperar **10 minutos** antes de começar a próxima. Isso vale para todos, inclusive quem tem o Premium, para que a partida não seja estragada para os outros.',
+          'Se você sair de uma partida em andamento, precisa esperar **5 minutos** antes de começar a próxima. Isso vale para todos, inclusive quem tem o Premium, para que a partida não seja estragada para os outros.',
         ],
       },
       {
