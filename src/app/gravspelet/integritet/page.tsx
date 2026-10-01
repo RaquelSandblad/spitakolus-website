@@ -16,11 +16,12 @@ export default function GravspeletIntegritet() {
       <article className="mx-auto max-w-3xl rounded-3xl border-[3px] border-[#0b0614] bg-[#fff4d6] p-8 text-[#1b1030] shadow-[0_6px_0_#0b0614] sm:p-10">
         <p className="text-sm font-semibold uppercase tracking-wider text-[#8a7aa0]">Glimmerbaggen</p>
         <h1 className="mt-1 text-3xl font-extrabold">Integritet</h1>
+        <p className="mt-2 text-sm text-[#8a7aa0]">Senast ändrad 1 oktober 2026</p>
         <div className="mt-6 space-y-5 leading-relaxed text-[#4a3d5c]">
           <p>
             Glimmerbaggen görs av Spitakolus AB. Spelet går att spela utan konto. Då sparas din värld bara i din telefon eller
-            webbläsare och ingenting om dig skickas till oss. Spelet har ingen reklam, inga köp och ingen statistik som följer
-            dig.
+            webbläsare och ingenting om dig skickas till oss. Spelet har ingen reklam och ingen statistik som följer dig. Den
+            som vill kan köpa <strong>Hela spelet</strong> (ett engångsköp, se nedan).
           </p>
 
           <h2 className="text-xl font-bold text-[#1b1030]">Om du skapar ett konto</h2>
@@ -39,6 +40,41 @@ export default function GravspeletIntegritet() {
             </li>
           </ul>
           <p>Konton är till för dig som är 13 år eller äldre.</p>
+
+          <h2 className="text-xl font-bold text-[#1b1030]">Köpet Hela spelet</h2>
+          <p>
+            Början av spelet är gratis. Resten av äventyret låser du upp med ett engångsköp, <strong>Hela spelet</strong>.
+            Köpet görs i Google Play eller App Store, och det är Google eller Apple som tar betalt och hanterar dina
+            betalningsuppgifter. Vi får aldrig se ditt kortnummer eller andra betalningsuppgifter.
+          </p>
+          <p>
+            För att spelet ska veta att du har köpt Hela spelet, och för att du ska kunna <strong>återställa köpet</strong>{' '}
+            på en ny telefon, kontrolleras köpet av <strong>RevenueCat</strong>. RevenueCat får:
+          </p>
+          <ul className="list-disc space-y-2 pl-5">
+            <li>
+              <strong>Ett id-nummer</strong> – ett slumpat id som inte säger något om dig, eller ditt kontos id-nummer om
+              du är inloggad (så att köpet följer med ditt konto).
+            </li>
+            <li>
+              <strong>Köphistoriken</strong> – vad som har köpts och när, och kvittot från butiken.
+            </li>
+          </ul>
+          <p>
+            RevenueCat får inte ditt namn, din e-postadress eller ditt användarnamn. Som alla tjänster på nätet ser
+            RevenueCat också tekniska uppgifter som behövs för att köpet ska fungera, till exempel IP-adress, appversion och
+            vilken butik och vilket land köpet gäller. Uppgifterna används bara för att låsa upp det du har köpt och för att
+            du ska kunna återställa köpet.
+          </p>
+          <p>
+            Uppgifterna om köpet sparas hos RevenueCat och i Google Play eller App Store så länge det behövs för köpet,
+            bokföring och reklamationer, enligt deras villkor. Vill du att vi tar bort det som finns om dig hos RevenueCat,
+            mejla{' '}
+            <a href="mailto:support@spitakolus.com" className={link}>
+              support@spitakolus.com
+            </a>
+            . Själva köpet finns kvar hos Google eller Apple, så du kan fortfarande återställa det.
+          </p>
 
           <h2 className="text-xl font-bold text-[#1b1030]">Spela ihop</h2>
           <p>
@@ -63,10 +99,18 @@ export default function GravspeletIntegritet() {
             <li>
               <strong>Resend</strong> – skickar spelets mejl, från Irland (EU).
             </li>
+            <li>
+              <strong>RevenueCat</strong> (RevenueCat Inc.) – kontrollerar köpet Hela spelet (se ovan). RevenueCat är ett
+              amerikanskt bolag, så uppgifterna förs över till USA. Överföringen skyddas med EU:s standardavtalsklausuler.
+            </li>
+            <li>
+              <strong>Google Play och Apple App Store</strong> – själva köpet och betalningen. De hanterar den som egna
+              personuppgiftsansvariga enligt sina egna villkor.
+            </li>
           </ul>
           <p>
-            De här företagen hanterar uppgifterna åt oss och får inte använda dem till något annat. Vi säljer inga
-            uppgifter och delar dem inte med någon annan. Allt skickas krypterat.
+            Supabase, Railway, Resend och RevenueCat hanterar uppgifterna åt oss och får inte använda dem till något annat.
+            Vi säljer inga uppgifter och delar dem inte med någon annan. Allt skickas krypterat.
           </p>
 
           <h2 className="text-xl font-bold text-[#1b1030]">Ta bort ditt konto</h2>
@@ -87,6 +131,12 @@ export default function GravspeletIntegritet() {
               support@spitakolus.com
             </a>{' '}
             från adressen du har kontot på, så tar vi bort kontot och allt som hör till det inom 30 dagar.
+          </p>
+          <p>
+            När kontot är borttaget finns inget kvar hos oss som kopplar kontots id-nummer till dig. Köphistoriken som
+            RevenueCat har under det id-numret finns kvar enligt avsnittet om köpet ovan – mejla oss om du vill att den
+            också tas bort. Har du köpt Hela spelet finns köpet kvar hos Google eller Apple, och du kan återställa det i
+            spelet (<strong>Meny → Konto → Återställ köp</strong>).
           </p>
 
           <h2 className="text-xl font-bold text-[#1b1030]">Dina rättigheter</h2>

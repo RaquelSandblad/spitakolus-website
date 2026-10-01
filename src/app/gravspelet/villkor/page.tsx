@@ -16,6 +16,7 @@ export default function GravspeletVillkor() {
       <article className="mx-auto max-w-3xl rounded-3xl border-[3px] border-[#0b0614] bg-[#fff4d6] p-8 text-[#1b1030] shadow-[0_6px_0_#0b0614] sm:p-10">
         <p className="text-sm font-semibold uppercase tracking-wider text-[#8a7aa0]">Glimmerbaggen</p>
         <h1 className="mt-1 text-3xl font-extrabold">Villkor och regler</h1>
+        <p className="mt-2 text-sm text-[#8a7aa0]">Senast ändrad 1 oktober 2026</p>
         <div className="mt-6 space-y-5 leading-relaxed text-[#4a3d5c]">
           <p>
             Glimmerbaggen görs av Spitakolus AB. När du spelar Glimmerbaggen, skapar ett konto eller spelar ihop med andra
@@ -51,6 +52,18 @@ export default function GravspeletVillkor() {
           <p>
             Konton är till för dig som är 13 år eller äldre. Du ansvarar för ditt lösenord. Du kan ta bort kontot när du vill
             i spelet (<strong>Meny → Konto → Ta bort konto</strong>).
+          </p>
+
+          <h2 className="text-xl font-bold text-[#1b1030]">Köpet Hela spelet</h2>
+          <p>
+            Början av spelet är gratis. <strong>Hela spelet</strong> är ett engångsköp som låser upp resten av äventyret för
+            alltid – det är ingen prenumeration. Köpet görs i Google Play eller App Store, och deras villkor gäller för
+            betalningen och för återbetalningar. Vill du ha pengarna tillbaka frågar du Google eller Apple.
+          </p>
+          <p>
+            Köpet hör till ditt Google- eller Apple-konto. Byter du telefon eller installerar om spelet trycker du på{' '}
+            <strong>Meny → Konto → Återställ köp</strong>. Är du inloggad i spelet följer köpet också med ditt konto. Spela
+            ihop som gäst och lagspel är gratis för alla.
           </p>
 
           <h2 className="text-xl font-bold text-[#1b1030]">Spelet</h2>
