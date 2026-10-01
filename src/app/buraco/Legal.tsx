@@ -1,5 +1,5 @@
 import type { Lang } from '@/lib/buraco';
-import type { LegalTexts } from './texts';
+import { APP_NAME, type LegalTexts } from './texts';
 import { Shell } from './Shell';
 import { Card, Eyebrow, Rich } from './ui';
 
@@ -9,7 +9,7 @@ export default function Legal({ lang, texts }: { lang: Lang; texts: LegalTexts }
     <Shell lang={lang}>
       <Card className="mx-auto max-w-3xl">
         <article>
-          <Eyebrow>Buraco</Eyebrow>
+          <Eyebrow>{APP_NAME}</Eyebrow>
           <h1 className="mt-1 text-3xl font-extrabold text-[#14231e] sm:text-4xl">{texts.title}</h1>
           <p className="mt-2 text-sm text-[#6b7a73]">{texts.updated}</p>
           <div className="mt-6 space-y-4 leading-relaxed">

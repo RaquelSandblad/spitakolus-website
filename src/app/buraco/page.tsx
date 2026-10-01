@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getLang, type SearchParams } from './lang';
 import { Shell } from './Shell';
-import { t } from './texts';
+import { APP_NAME, t } from './texts';
 import { Card, Rich, withLang } from './ui';
 
 type Props = { searchParams: SearchParams };
@@ -15,7 +15,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
 const ACCENTS = ['#f2b84b', '#6cb6ff', '#ff8a65', '#9be3c1'];
 
-// Buracos egen sida: kort presentation och länkar till integritet, villkor och konto.
+// Sidan om appen Mesa 11 (kortspelet Buraco): kort presentation och länkar till integritet, villkor och konto.
 export default async function Buraco({ searchParams }: Props) {
   const lang = await getLang(searchParams);
   const { home, common } = t(lang);
@@ -33,13 +33,13 @@ export default async function Buraco({ searchParams }: Props) {
           <span className="inline-block rounded-full border border-[#f2b84b]/60 bg-[#04150f]/30 px-4 py-1 text-sm font-semibold text-[#f2b84b]">
             {home.badge}
           </span>
-          <h1 className="mt-5 font-[family-name:var(--font-buraco-display)] text-6xl font-semibold italic tracking-tight sm:text-7xl">Buraco</h1>
+          <h1 className="mt-5 font-[family-name:var(--font-buraco-display)] text-6xl font-semibold italic tracking-tight sm:text-7xl">{APP_NAME}</h1>
           <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-[#cfe3da] lg:mx-0">{home.lead}</p>
         </div>
         <div className="mx-auto w-56 sm:w-72">
           <Image
             src="/buraco/icon.svg"
-            alt="Buraco"
+            alt={APP_NAME}
             width={288}
             height={288}
             priority

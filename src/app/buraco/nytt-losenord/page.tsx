@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { getLang, type SearchParams } from '../lang';
 import { Shell } from '../Shell';
-import { t } from '../texts';
+import { APP_NAME, t } from '../texts';
 import { Card, Eyebrow } from '../ui';
 import ResetForm from './ResetForm';
 
@@ -23,7 +23,7 @@ export default async function BuracoNyttLosenord({ searchParams }: Props) {
   return (
     <Shell lang={lang}>
       <Card className="mx-auto max-w-md">
-        <Eyebrow>Buraco</Eyebrow>
+        <Eyebrow>{APP_NAME}</Eyebrow>
         <h1 className="mt-1 text-3xl font-extrabold text-[#14231e]">{reset.title}</h1>
         <div className="mt-5">
           <ResetForm lang={lang} tokenHash={tokenHash} texts={reset.form} />

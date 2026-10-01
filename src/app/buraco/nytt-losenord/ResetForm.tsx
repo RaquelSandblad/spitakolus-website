@@ -5,7 +5,7 @@ import { errorText, isBuracoConfigured, MIN_PASSWORD_LENGTH, parseRedirectHash, 
 import type { ResetFormTexts } from '../texts';
 import { Notice, PrimaryButton, Rich, inputClass } from '../ui';
 
-// Hit leder länken i mejlet när man tryckt på "Glömt lösenordet?" i Buraco. Två fall:
+// Hit leder länken i mejlet när man tryckt på "Glömt lösenordet?" i appen Mesa 11. Två fall:
 // 1. Länken har token_hash i adressen (egna mejlmallar) – den används först när man sparar,
 //    eftersom den bara går att använda en gång.
 // 2. Supabases standardmejl har redan bekräftat länken – inloggningen står efter # i adressen.

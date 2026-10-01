@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { Lang } from '@/lib/buraco';
 
-// Byggstenar för Buracos sidor, i spelets färger: mörkgrön filt, elfenbensvita kort och guld.
+// Byggstenar för sidorna om Mesa 11 (under /buraco), i spelets färger: mörkgrön filt, elfenbensvita kort och guld.
 // Filen har inget som bara fungerar på servern, så formulären (klientkomponenter) kan också använda den.
 
 export const linkClass = 'font-semibold text-[#11694f] underline decoration-[#11694f]/40 underline-offset-2 hover:decoration-[#11694f]';

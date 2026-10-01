@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import { Fraunces } from 'next/font/google';
 
 export const metadata: Metadata = {
-  title: 'Buraco – Spitakolus AB',
-  description: 'Buraco – kortspelet två mot två, online.',
+  title: 'Mesa 11 – Spitakolus AB',
+  description: 'Mesa 11 – kortspelet Buraco två mot två, online.',
   icons: { icon: '/buraco/icon.svg' },
 };
 
@@ -15,7 +15,7 @@ const fraunces = Fraunces({
   variable: '--font-buraco-display',
 });
 
-// Buracos egna färger (samma som i spelet): mörkgrön filt och guld.
+// Appens egna färger (samma som i spelet): mörkgrön filt och guld.
 export default function BuracoLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <div

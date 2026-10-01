@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { getLang, type SearchParams } from '../lang';
 import { Shell } from '../Shell';
-import { t } from '../texts';
+import { APP_NAME, t } from '../texts';
 import { Card, Eyebrow, Rich } from '../ui';
 import DeleteForm from './DeleteForm';
 
@@ -12,7 +12,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   return { title: del.metaTitle, description: del.metaDescription };
 }
 
-// Ta bort sitt Buraco-konto från webben (krav från Google Play och App Store).
+// Ta bort sitt konto i Mesa 11 från webben (krav från Google Play och App Store).
 export default async function BuracoTaBortKonto({ searchParams }: Props) {
   const lang = await getLang(searchParams);
   const del = t(lang).del;
@@ -20,7 +20,7 @@ export default async function BuracoTaBortKonto({ searchParams }: Props) {
   return (
     <Shell lang={lang}>
       <Card className="mx-auto max-w-2xl">
-        <Eyebrow>Buraco</Eyebrow>
+        <Eyebrow>{APP_NAME}</Eyebrow>
         <h1 className="mt-1 text-3xl font-extrabold text-[#14231e] sm:text-4xl">{del.title}</h1>
         <p className="mt-4 leading-relaxed">{del.intro}</p>
 
