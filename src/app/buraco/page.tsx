@@ -35,6 +35,15 @@ export default async function Buraco({ searchParams }: Props) {
           </span>
           <h1 className="mt-5 font-[family-name:var(--font-buraco-display)] text-6xl font-semibold italic tracking-tight sm:text-7xl">{APP_NAME}</h1>
           <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-[#cfe3da] lg:mx-0">{home.lead}</p>
+          {/* Appen finns på Google Play; App Store-länken läggs till när Apple har godkänt appen. */}
+          <a
+            href={home.playUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-7 inline-block rounded-full bg-[#f2b84b] px-6 py-3 text-base font-semibold text-[#04150f] shadow-[0_4px_0_#b07d22] transition-transform hover:-translate-y-0.5"
+          >
+            {home.playButton}
+          </a>
         </div>
         <div className="mx-auto w-56 sm:w-72">
           <Image

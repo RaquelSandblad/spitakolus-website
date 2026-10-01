@@ -292,7 +292,7 @@ export default function Produkter() {
                   </ul>
                 </div>
                 <div className="pt-6 border-t border-gray-100">
-                  <p className="text-sm font-medium text-gray-900 mb-3">Kommer snart på Google Play och App Store.</p>
+                  <p className="text-sm font-medium text-gray-900 mb-3"><a className="underline" href="https://play.google.com/store/apps/details?id=com.spitakolus.buraco&hl=sv" target="_blank" rel="noopener noreferrer">Finns på Google Play</a> – snart även i App Store.</p>
                   <a
                     href="/buraco"
                     className="inline-flex items-center gap-2 bg-[#0f4a3d] hover:bg-[#0b3a30] text-white px-5 py-3 rounded-lg transition-colors font-medium"

@@ -65,6 +65,8 @@ export type Texts = {
     metaTitle: string;
     metaDescription: string;
     badge: string;
+    playButton: string;
+    playUrl: string;
     lead: string;
     features: { title: string; text: string }[];
     freeTitle: string;
@@ -110,8 +112,10 @@ const sv: Texts = {
   },
   home: {
     metaTitle: 'Mesa 11 – kortspelet Buraco två mot två, online',
-    metaDescription: 'Mesa 11 är appen för Buraco, kortspelet två mot två, online. Kommer snart på Google Play och App Store.',
-    badge: 'Kommer snart på Google Play och App Store',
+    metaDescription: 'Mesa 11 är appen för Buraco, kortspelet två mot två, online. Finns på Google Play – snart även i App Store.',
+    badge: 'Nu på Google Play – snart i App Store',
+    playButton: 'Ladda ner på Google Play',
+    playUrl: 'https://play.google.com/store/apps/details?id=com.spitakolus.buraco&hl=sv',
     lead: 'Det klassiska kortspelet Buraco, två mot två, online. Samarbeta med din partner, lägg ut serier och bygg kanastor innan motståndarna hinner före.',
     features: [
       {
@@ -441,8 +445,10 @@ const en: Texts = {
   },
   home: {
     metaTitle: 'Mesa 11 – Buraco, the two-against-two card game, online',
-    metaDescription: 'Mesa 11 is the app for Buraco, the card game played two against two, online. Coming soon to Google Play and the App Store.',
-    badge: 'Coming soon to Google Play and the App Store',
+    metaDescription: 'Mesa 11 is the app for Buraco, the card game played two against two, online. Available on Google Play – coming soon to the App Store.',
+    badge: 'Now on Google Play – coming soon to the App Store',
+    playButton: 'Get it on Google Play',
+    playUrl: 'https://play.google.com/store/apps/details?id=com.spitakolus.buraco&hl=en',
     lead: 'The classic card game Buraco, two against two, online. Team up with your partner, lay down melds and build canastas before your opponents do.',
     features: [
       {
@@ -770,8 +776,10 @@ const pt: Texts = {
   },
   home: {
     metaTitle: 'Mesa 11 – Buraco, o jogo de cartas em dupla, online',
-    metaDescription: 'Mesa 11 é o app de Buraco, o jogo de cartas em dupla, dois contra dois, online. Em breve no Google Play e na App Store.',
-    badge: 'Em breve no Google Play e na App Store',
+    metaDescription: 'Mesa 11 é o app de Buraco, o jogo de cartas em dupla, dois contra dois, online. Já no Google Play – em breve na App Store.',
+    badge: 'Já no Google Play – em breve na App Store',
+    playButton: 'Baixar no Google Play',
+    playUrl: 'https://play.google.com/store/apps/details?id=com.spitakolus.buraco&hl=pt_BR',
     lead: 'Buraco, o clássico jogo de cartas em dupla, dois contra dois, online. Jogue junto com seu parceiro, baixe jogos e forme canastras antes dos adversários.',
     features: [
       {
