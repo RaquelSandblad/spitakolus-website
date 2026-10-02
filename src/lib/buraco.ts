@@ -1,4 +1,4 @@
-// Buracos konton – används av sidorna under /buraco (nytt lösenord, ta bort konto).
+// Buracos konton – används av sidorna under /buraco (nytt lösenord, ta bort konto, länken med vänkoden).
 // Lösenord byts direkt mot Supabase Auth (REST), så att hemsidan inte behöver något extra paket.
 // Konton tas bort via spelservern, som också rensar profil och statistik.
 
@@ -71,6 +71,36 @@ export type BuracoErrorKey = keyof typeof ERRORS;
 
 export function errorText(key: BuracoErrorKey, lang: Lang): string {
   return ERRORS[key][lang];
+}
+
+// ---------- Vänkoder (sidan /buraco/v/<kod>) ----------
+// Kopia av normalizeFriendCode och formatFriendCode i spelets shared/src/friendCode.ts (hemsidan kan inte
+// importera spelets paket) – ändra båda. Sidan frågar aldrig spelservern: den visar bara koden, aldrig vems den är.
+
+/** Vänkoder: 8 tecken Crockford base32 (siffror och versaler utan I, L, O och U). */
+export const FRIEND_CODE_RE = /^[0-9A-HJKMNP-TV-Z]{8}$/;
+
+/**
+ * Kod från länken (eller inskriven) → kanonisk kod, eller null om den inte är giltig.
+ * Tar även en hel länk (…/buraco/v/K7QM4XPD). Små bokstäver, mellanslag, - och _ går bra;
+ * O läses som 0 och I/L som 1 (Crockford). U är aldrig giltigt.
+ */
+export function normalizeFriendCode(input: string): string | null {
+  if (typeof input !== 'string') return null;
+  let s = input;
+  const at = s.lastIndexOf('/v/');
+  if (at >= 0) s = s.slice(at + 3).split(/[?#/]/)[0];
+  s = s
+    .toUpperCase()
+    .replace(/[\s\-_]/g, '')
+    .replace(/O/g, '0')
+    .replace(/[IL]/g, '1');
+  return FRIEND_CODE_RE.test(s) ? s : null;
+}
+
+/** "K7QM4XPD" → "K7QM-4XPD". */
+export function formatFriendCode(code: string): string {
+  return `${code.slice(0, 4)}-${code.slice(4)}`;
 }
 
 // ---------- Supabase Auth (nytt lösenord) ----------

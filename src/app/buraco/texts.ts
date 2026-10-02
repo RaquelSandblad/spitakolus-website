@@ -96,6 +96,26 @@ export type Texts = {
     title: string;
     form: ResetFormTexts;
   };
+  /** Sidan /buraco/v/<kod>, som länken och QR-koden från "Spela med vänner" i appen öppnar. */
+  friendLink: {
+    metaTitle: string;
+    metaDescription: string;
+    title: string;
+    codeLabel: string;
+    copy: CopyCodeTexts;
+    invalidTitle: string;
+    invalidText: string;
+    stepsTitle: string;
+    steps: string[];
+    appStoreSoon: string;
+    note: string;
+  };
+};
+
+export type CopyCodeTexts = {
+  button: string;
+  copied: string;
+  failed: string;
 };
 
 const MIN = MIN_PASSWORD_LENGTH;
@@ -171,6 +191,9 @@ const sv: Texts = {
           '**Rankingresultat** – för varje onlineparti som du spelar klart eller lämnar sparar vi när partiet slutade, om du vann och hur många rankingpoäng det gav (vinst 3, förlust 1, lämnat i förtid 0). Övningspartier mot datorn sparas inte.',
           '**Premium** – om du har köpt Premium (ingen reklam och plats i rankingen).',
           '**Tidsspärr** – om du har lämnat ett pågående parti, så att tiden på 5 minuter innan nästa parti kan räknas.',
+          '**Vänkod** – en slumpad kod som du kan dela, så att andra kan skicka en vänförfrågan till dig. Du kan byta koden när du vill, och då slutar den gamla att fungera direkt. Koden skapas först när du öppnar Vänner i appen.',
+          '**Vänner, vänförfrågningar och blockeringar** – vilka du är vän med, förfrågningar som du har skickat och fått, och konton som du har blockerat. En vänförfrågan sparas i högst 30 dagar.',
+          '**Inställning för onlinestatus** – om dina vänner får se när du är online.',
         ],
         after: [
           'Det finns ingen chatt i spelet. Pågående partier – korten, dragen och vilka som sitter vid bordet – finns bara i spelserverns minne och sparas inte när partiet är slut. Det enda som sparas efter partiet är din statistik och ditt rankingresultat (se ovan). För att spelet ska kunna skicka data till din telefon behöver spelservern tekniska uppgifter som din IP-adress medan du är ansluten.',
@@ -182,6 +205,20 @@ const sv: Texts = {
         p: [
           'Har du Premium är du med i rankingen: en topplista för månaden och en för alla tider. Där syns ditt användarnamn, din placering, dina rankingpoäng, antal vinster och antal partier. Bara Premium-spelare står i rankingen, och bara Premium-spelare kan se den – att du står där visar alltså också att du har Premium.',
           'Resultaten sparas för alla spelare, även utan Premium. När du har Premium räknas alla dina sparade onlinepartier in i det som andra Premium-spelare ser: månadens partier i topplistan för månaden, och alla partier – även de från tiden innan du hade Premium – i topplistan för alla tider. Slutar du ha Premium syns du inte längre i rankingen, men resultaten finns kvar tills du tar bort kontot och syns igen om du skaffar Premium på nytt.',
+        ],
+      },
+      {
+        h: 'Vänner och vänbord',
+        p: [
+          'I appen kan du spela med vänner. Man blir vänner bara genom en vänkod som delas utanför spelet, och den som äger koden måste godkänna förfrågan. Det går inte att söka efter andra spelare.',
+        ],
+        ul: [
+          '**Ditt användarnamn** visas för den som skriver in din kod (så att hen kan se att det är rätt person innan förfrågan skickas) och för dina vänner.',
+          '**Onlinestatus** – bara vänner som du har godkänt ser om du är online, spelar eller är offline. Statusen räknas fram medan du är ansluten, finns bara i spelserverns minne och sparas aldrig. Du kan stänga av den i appen. Då syns du alltid som offline, men inbjudningar kommer ändå fram.',
+          '**Inbjudningar och vänbord** finns bara i spelserverns minne och sparas inte. En inbjudan gäller i högst 20 minuter. Svaren (”Ja”, ”Om 5 min” och ”Inte nu”) är färdiga texter – det finns ingen chatt och inga meddelanden.',
+          '**Partier vid vänbord** räknas i din statistik och i rankingen bara om varje lag hade minst en riktig spelare när partiet började. Spelar två av er i samma lag mot datorn räknas partiet inte, och inget om det sparas. Lämnar du ett parti som räknas och inte tar tillbaka din plats innan det är slut, sparas det som lämnat (0 rankingpoäng). Du får ingen tidsspärr för att lämna ett vänparti.',
+          '**Avböjer du en förfrågan** eller tar bort en vän får den andra inget meddelande om det. Blockerar du någon kan hen inte längre skicka förfrågningar till dig, bjuda in dig eller se din status. Blockeringen gäller kontot, även om någon av er byter kod.',
+          '**När du delar din kod** via WhatsApp eller telefonens delningsmeny sker det i appen som du väljer. Vi får inget därifrån och läser aldrig dina kontakter. Länksidan på spitakolus.com visar bara koden – aldrig vem den tillhör.',
         ],
       },
       {
@@ -210,26 +247,30 @@ const sv: Texts = {
           '**För att ge dig spelet** (konto, inloggning, användarnamn, partier, statistik, ranking, tidsspärr, Premium och uppdateringar av appen): det behövs för att uppfylla avtalet med dig, alltså användarvillkoren (artikel 6.1 b GDPR).',
           '**Anpassade annonser**: i EU/EES, Storbritannien och Schweiz ditt samtycke (artikel 6.1 a GDPR). I andra länder vårt berättigade intresse av att finansiera det kostnadsfria spelet med reklam (artikel 6.1 f GDPR, och i Brasilien artikel 7 IX LGPD). Du kan när som helst invända genom att stänga av anpassade annonser i telefonens inställningar.',
           '**Säkerhet, felsökning och att stoppa fusk och missbruk** (bland annat tekniska loggar): vårt berättigade intresse av en trygg, fungerande och schysst tjänst (artikel 6.1 f GDPR).',
+          '**Vänner** (vänkod, vänlista, förfrågningar, blockeringar, onlinestatus, inbjudningar och vänbord): det behövs för att uppfylla avtalet med dig (artikel 6.1 b GDPR).',
+          '**Gränser för kodförsök, förfrågningar och inbjudningar, och blockeringar**, för att stoppa missbruk och skydda spelarna: vårt berättigade intresse av en trygg tjänst (artikel 6.1 f GDPR).',
         ],
       },
       {
         h: 'Var finns uppgifterna och vilka hjälper oss?',
         ul: [
-          '**Supabase** – konton (e-post, användarnamn, hashat lösenord, statistik, rankingresultat, Premium och tidsspärr), på servrar i EU (Stockholm, Sverige).',
+          '**Supabase** – konton (e-post, användarnamn, hashat lösenord, statistik, rankingresultat, Premium och tidsspärr) och vänner (vänkod, vänlista, förfrågningar, blockeringar och inställningen för onlinestatus), på servrar i EU (Stockholm, Sverige).',
           '**Railway** – spelservern, i EU-regionen (Amsterdam, Nederländerna). Railway är ett amerikanskt bolag, så uppgifter kan föras över till USA. Överföringen skyddas med EU:s standardavtalsklausuler.',
           '**Resend** – skickar mejlet när du har tryckt på ”Glömt lösenordet?” och får då din e-postadress. Resend är ett amerikanskt bolag, så uppgifter kan föras över till USA. Överföringen skyddas med EU:s standardavtalsklausuler.',
           '**RevenueCat** – kontrollerar köp av Premium (se ovan). RevenueCat är ett amerikanskt bolag, så uppgifter kan föras över till USA. Överföringen skyddas med EU:s standardavtalsklausuler.',
           '**Google AdMob** – annonser, för dig som inte har Premium (se ovan).',
           '**Google Play och Apple App Store** – köp av Premium. De hanterar betalningen som egna personuppgiftsansvariga enligt sina egna villkor.',
+          '**Vercel** – driver webbplatsen spitakolus.com, med bland annat den här policyn, sidan för att ta bort kontot och länksidan för vänkoder. Vercel sparar tekniska loggar över besöken (bland annat IP-adress och besökt adress – för länksidan alltså vänkoden) en begränsad tid. Vercel är ett amerikanskt bolag, så uppgifter kan föras över till USA. Överföringen skyddas med EU:s standardavtalsklausuler.',
         ],
         after: [
-          'Supabase, Railway, Resend och RevenueCat behandlar uppgifterna bara för vår räkning och får inte använda dem till något annat. Vi säljer aldrig dina uppgifter. Allt skickas krypterat.',
+          'Supabase, Railway, Resend, RevenueCat och Vercel behandlar uppgifterna bara för vår räkning och får inte använda dem till något annat. Vi säljer aldrig dina uppgifter. Allt skickas krypterat.',
         ],
       },
       {
         h: 'Hur länge sparar vi uppgifterna?',
         p: [
           'Kontouppgifterna, statistiken och rankingresultaten sparas så länge du har kvar ditt konto. Pågående partier finns bara kvar medan partiet pågår. När du tar bort ditt konto raderas kontot, användarnamnet, statistiken och rankingresultaten direkt och för alltid. Tekniska loggar (se ovan) sparas bara en begränsad tid och raderas sedan automatiskt.',
+          'Vänkoden och vänlistan sparas tills du byter kod, tar bort en vän eller tar bort kontot. En vänförfrågan sparas i högst 30 dagar. Blockeringar sparas tills du häver dem eller tills något av kontona tas bort. Onlinestatus och inbjudningar sparas aldrig.',
           'Uppgifter om köp av Premium (kvitton kopplade till kontots id-nummer) raderas inte när du tar bort kontot. De finns kvar hos RevenueCat och i Google Play/App Store så länge det behövs för bokföring och reklamationer.',
         ],
       },
@@ -243,6 +284,7 @@ const sv: Texts = {
         ],
         after: [
           'Kontot, användarnamnet, statistiken och rankingresultaten raderas direkt. Det går inte att ångra. Tekniska loggar raderas automatiskt efter en begränsad tid, och uppgifter om köp finns kvar hos RevenueCat och butiken (se ovan), och en prenumeration på Premium fortsätter tills du avslutar den i Google Play eller App Store.',
+          'Samtidigt raderas din vänkod, din vänlista (du försvinner från dina vänners listor), vänförfrågningar till och från dig och alla blockeringar – både dina och andras blockeringar av dig.',
         ],
       },
       {
@@ -325,7 +367,7 @@ const sv: Texts = {
       {
         h: 'Om du lämnar ett parti',
         p: [
-          'Lämnar du ett pågående onlineparti – eller tappar anslutningen i mer än två minuter – tar en datorspelare över din plats. Du får då vänta **5 minuter** innan du kan börja nästa parti, och partiet du lämnade ger 0 rankingpoäng. Det gäller alla, även den som har Premium, så att partierna inte förstörs för de andra.',
+          'Lämnar du ett pågående onlineparti – eller tappar anslutningen i mer än två minuter – tar en datorspelare över din plats. Du får då vänta **5 minuter** innan du kan börja nästa parti, och partiet du lämnade ger 0 rankingpoäng. Det gäller alla, även den som har Premium, så att partierna inte förstörs för de andra. Vid ett vänbord blir det ingen tidsspärr: du kan ta tillbaka din plats så länge partiet pågår.',
         ],
       },
       {
@@ -340,7 +382,7 @@ const sv: Texts = {
         h: 'Rankingen',
         ul: [
           'Rankingen är en topplista för månaden (den börjar om den 1:a varje månad) och en för alla tider.',
-          'Varje onlineparti ger rankingpoäng: vinst 3 poäng, förlust 1 poäng och lämnat parti 0 poäng. Övningspartier mot datorn räknas inte. Vid lika poäng går den med flest vinster först.',
+          'Varje onlineparti ger rankingpoäng: vinst 3 poäng, förlust 1 poäng och lämnat parti 0 poäng. Övningspartier mot datorn räknas inte. Partier vid vänbord räknas bara om varje lag hade minst en riktig spelare när partiet började. Vid lika poäng går den med flest vinster först.',
           'Bara Premium-spelare står i rankingen och kan se den. Andra Premium-spelare ser där ditt användarnamn, dina poäng, dina vinster och ditt antal partier.',
           'Dina onlinepartier räknas även innan du har Premium. När du skaffar Premium syns du direkt med månadens poäng i topplistan för månaden och med alla dina poäng – även från tiden innan du hade Premium – i topplistan för alla tider. Slutar du ha Premium försvinner du ur rankingen, men poängen finns kvar tills du tar bort kontot.',
         ],
@@ -393,6 +435,7 @@ const sv: Texts = {
       'ditt konto, e-postadress och lösenord,',
       'ditt användarnamn,',
       'din statistik (spelade och vunna partier) och dina rankingresultat,',
+      'din vänkod och din vänlista (du försvinner från dina vänners listor), vänförfrågningar och blockeringar,',
       'din Premium och din eventuella tidsspärr.',
     ],
     warning: 'Det går inte att ångra. Premium försvinner från kontot, men en prenumeration fortsätter att löpa och kosta pengar tills du avslutar den i Google Play eller App Store. Vill du inte betala mer, avsluta den där. Behåller du prenumerationen kan du flytta den till ett nytt konto med ”Återställ köp” i appen.',
@@ -405,13 +448,13 @@ const sv: Texts = {
       loginLabel: 'E-post eller användarnamn',
       loginPlaceholder: 'namn@exempel.se',
       passwordLabel: 'Lösenord',
-      confirmLabel: 'Jag förstår att mitt konto, mitt användarnamn, min statistik och mina rankingresultat tas bort för alltid.',
+      confirmLabel: 'Jag förstår att mitt konto, mitt användarnamn, min statistik, mina rankingresultat och min vänlista tas bort för alltid.',
       submit: 'Ta bort mitt konto för alltid',
       working: 'Tar bort …',
       missingFields: 'Skriv din e-post eller ditt användarnamn och ditt lösenord.',
       needConfirm: 'Kryssa i rutan för att bekräfta att du vill ta bort kontot.',
       doneTitle: 'Kontot är borttaget.',
-      doneText: 'Ditt konto, ditt användarnamn, din statistik och dina rankingresultat är raderade. Tack för att du har spelat Buraco!',
+      doneText: 'Ditt konto, ditt användarnamn, din statistik, dina rankingresultat och din vänlista är raderade. Tack för att du har spelat Buraco!',
     },
   },
   reset: {
@@ -430,6 +473,28 @@ const sv: Texts = {
       doneText: 'Ditt lösenord är bytt. Öppna Mesa 11 och logga in med det nya lösenordet.',
       notConfigured: 'Det går inte att byta lösenord just nu. Försök igen lite senare.',
     },
+  },
+  friendLink: {
+    metaTitle: 'Spela Buraco med en vän i Mesa 11',
+    metaDescription: 'Du har fått en vänkod till Mesa 11, appen för kortspelet Buraco. Lägg till koden i appen, så kan ni spela vid samma bord.',
+    title: 'Spela Buraco med en vän i Mesa 11',
+    codeLabel: 'Vänkod',
+    copy: {
+      button: 'Kopiera koden',
+      copied: 'Kopierad!',
+      failed: 'Det gick inte att kopiera. Markera koden och kopiera den själv.',
+    },
+    invalidTitle: 'Länken är inte komplett.',
+    // Exempelkoden har ett hårt bindestreck (U+2011), så att den inte bryts mitt i.
+    invalidText: 'Be den som skickade länken om vänkoden igen – den har 8 tecken, till exempel K7QM‑4XPD.',
+    stepsTitle: 'Så här gör du',
+    steps: [
+      'Ladda ner **Mesa 11** – det är gratis – och skapa ett konto eller logga in.',
+      'Öppna Mesa 11 → **Spela med vänner** → **Lägg till vän** och skriv koden.',
+      'Skicka förfrågan. Ni blir vänner när den som gav dig koden har godkänt den – sedan kan ni bjuda in varandra till ett bord.',
+    ],
+    appStoreSoon: 'App Store – kommer snart',
+    note: 'Sidan visar bara koden – inte vem den tillhör. Namnet ser du i appen innan du skickar förfrågan. Lägg bara till personer du känner.',
   },
 };
 
@@ -504,6 +569,9 @@ const en: Texts = {
           '**Ranking results** – for every online game you finish or leave, we store when the game ended, whether you won and how many ranking points it gave (win 3, loss 1, left early 0). Practice games against the computer are not stored.',
           '**Premium** – whether you have bought Premium (no ads and a place in the ranking).',
           '**Time-out** – whether you have left a game in progress, so that the 5-minute wait before your next game can be counted.',
+          '**Friend code** – a random code you can share so that others can send you a friend request. You can replace it at any time, and the old code stops working immediately. The code is only created when you open Friends in the app.',
+          '**Friends, friend requests and blocks** – who you are friends with, requests you have sent and received, and accounts you have blocked. A friend request is kept for at most 30 days.',
+          '**Online status setting** – whether your friends may see when you are online.',
         ],
         after: [
           'There is no chat in the game. Games in progress – the cards, the moves and who is at the table – exist only in the game server’s memory and are not stored once the game is over. The only things kept afterwards are your statistics and your ranking result (see above). To send data to your phone, the game server needs technical data such as your IP address while you are connected.',
@@ -515,6 +583,20 @@ const en: Texts = {
         p: [
           'If you have Premium, you are in the ranking: a monthly leaderboard and an all-time leaderboard. It shows your username, your position, your ranking points, your number of wins and your number of games. Only Premium players are listed, and only Premium players can view it – so being listed also shows that you have Premium.',
           'Results are stored for all players, including those without Premium. When you have Premium, all your stored online games count towards what other Premium players see: this month’s games in the monthly leaderboard, and all your games – including those from before you had Premium – in the all-time leaderboard. If your Premium ends, you are no longer shown in the ranking, but the results are kept until you delete your account and show up again if you get Premium again.',
+        ],
+      },
+      {
+        h: 'Friends and friends tables',
+        p: [
+          'In the app you can play with friends. You only become friends through a friend code shared outside the game, and the owner of the code must accept the request. It is not possible to search for other players.',
+        ],
+        ul: [
+          '**Your username** is shown to someone who enters your code (so that they can check it is the right person before the request is sent) and to your friends.',
+          '**Online status** – only friends you have accepted can see whether you are online, playing or offline. The status is worked out while you are connected, exists only in the game server’s memory and is never stored. You can turn it off in the app. You then always appear offline, but invites still reach you.',
+          '**Invites and friends tables** exist only in the game server’s memory and are not stored. An invite is valid for at most 20 minutes. The replies (“Yes”, “In 5 min” and “Not now”) are fixed texts – there is no chat and there are no messages.',
+          '**Games at friends tables** count in your statistics and in the ranking only if each team had at least one real player when the game started. If two of you play on the same team against the computer, the game does not count and nothing about it is stored. If you leave a game that counts and do not take your seat back before it ends, it is stored as left (0 ranking points). Leaving a game at a friends table never gives you a time-out.',
+          '**If you decline a request** or remove a friend, the other person is not told. If you block someone, they can no longer send you requests, invite you or see your status. A block applies to the account, even if one of you gets a new code.',
+          '**When you share your code** via WhatsApp or your phone’s share menu, this happens in the app you choose. We receive nothing from it and never access your contacts. The link page on spitakolus.com shows only the code – never whose it is.',
         ],
       },
       {
@@ -543,26 +625,30 @@ const en: Texts = {
           '**To provide the game** (account, login, username, games, statistics, ranking, time-out, Premium and app updates): necessary to perform our contract with you, i.e. the terms of use (Article 6(1)(b) GDPR).',
           '**Personalised ads**: in the EU/EEA, the UK and Switzerland, your consent (Article 6(1)(a) GDPR). In other countries, our legitimate interest in funding the free game with ads (Article 6(1)(f) GDPR; in Brazil, Article 7(IX) LGPD). You can object at any time by turning off personalised ads in your phone’s settings.',
           '**Security, troubleshooting and stopping cheating and abuse** (including technical logs): our legitimate interest in a safe, reliable and fair service (Article 6(1)(f) GDPR).',
+          '**Friends** (friend code, friends list, requests, blocks, online status, invites and friends tables): necessary to perform our contract with you (Article 6(1)(b) GDPR).',
+          '**Limits on code lookups, requests and invites, and blocks**, to stop abuse and protect players: our legitimate interest in a safe service (Article 6(1)(f) GDPR).',
         ],
       },
       {
         h: 'Where is the data kept, and who helps us?',
         ul: [
-          '**Supabase** – accounts (email, username, hashed password, statistics, ranking results, Premium and time-out), on servers in the EU (Stockholm, Sweden).',
+          '**Supabase** – accounts (email, username, hashed password, statistics, ranking results, Premium and time-out) and friends (friend code, friends list, requests, blocks and the online status setting), on servers in the EU (Stockholm, Sweden).',
           '**Railway** – the game server, in the EU region (Amsterdam, the Netherlands). Railway is a US company, so data may be transferred to the United States. The transfer is protected by the EU Standard Contractual Clauses.',
           '**Resend** – sends the email when you tap “Forgot your password?”, and receives your email address for that. Resend is a US company, so data may be transferred to the United States. The transfer is protected by the EU Standard Contractual Clauses.',
           '**RevenueCat** – verifies Premium purchases (see above). RevenueCat is a US company, so data may be transferred to the United States. The transfer is protected by the EU Standard Contractual Clauses.',
           '**Google AdMob** – ads, for players without Premium (see above).',
           '**Google Play and the Apple App Store** – Premium purchases. They handle the payment as independent controllers under their own terms.',
+          '**Vercel** – runs the spitakolus.com website, including this policy, the account deletion page and the link page for friend codes. Vercel keeps technical logs of visits (including IP address and the address visited – for the link page, that includes the friend code) for a limited time. Vercel is a US company, so data may be transferred to the United States. The transfer is protected by the EU Standard Contractual Clauses.',
         ],
         after: [
-          'Supabase, Railway, Resend and RevenueCat process the data only on our behalf and may not use it for anything else. We never sell your data. Everything is sent encrypted.',
+          'Supabase, Railway, Resend, RevenueCat and Vercel process the data only on our behalf and may not use it for anything else. We never sell your data. Everything is sent encrypted.',
         ],
       },
       {
         h: 'How long do we keep the data?',
         p: [
           'Account data, statistics and ranking results are kept for as long as you keep your account. Games in progress exist only while the game is being played. When you delete your account, the account, the username, the statistics and the ranking results are deleted immediately and permanently. Technical logs (see above) are deleted automatically after a limited time.',
+          'Your friend code and friends list are kept until you replace the code, remove a friend or delete your account. A friend request is kept for at most 30 days. Blocks are kept until you lift them or one of the accounts is deleted. Online status and invites are never stored.',
           'Data about Premium purchases (receipts linked to your account ID) is not deleted when you delete your account. It is kept by RevenueCat and in Google Play/the App Store for as long as needed for accounting and complaints.',
         ],
       },
@@ -576,6 +662,7 @@ const en: Texts = {
         ],
         after: [
           'The account, the username, the statistics and the ranking results are deleted immediately. This cannot be undone. Technical logs are deleted automatically after a limited time, and purchase data stays with RevenueCat and the store (see above), and a Premium subscription keeps running until you cancel it in Google Play or the App Store.',
+          'At the same time, your friend code, your friends list (you disappear from your friends’ lists), friend requests to and from you and all blocks – both yours and other players’ blocks of you – are deleted.',
         ],
       },
       {
@@ -656,7 +743,7 @@ const en: Texts = {
       {
         h: 'If you leave a game',
         p: [
-          'If you leave an online game in progress – or lose your connection for more than two minutes – a computer player takes your seat. You then have to wait **5 minutes** before you can start your next game, and the game you left gives you 0 ranking points. This applies to everyone, including Premium players, so that games are not spoiled for the others.',
+          'If you leave an online game in progress – or lose your connection for more than two minutes – a computer player takes your seat. You then have to wait **5 minutes** before you can start your next game, and the game you left gives you 0 ranking points. This applies to everyone, including Premium players, so that games are not spoiled for the others. At a friends table there is no waiting time: you can take your seat back as long as the game is going on.',
         ],
       },
       {
@@ -671,7 +758,7 @@ const en: Texts = {
         h: 'The ranking',
         ul: [
           'The ranking is a monthly leaderboard (it starts over on the 1st of every month) and an all-time leaderboard.',
-          'Every online game gives ranking points: a win 3 points, a loss 1 point and leaving a game 0 points. Practice games against the computer do not count. On equal points, the player with the most wins goes first.',
+          'Every online game gives ranking points: a win 3 points, a loss 1 point and leaving a game 0 points. Practice games against the computer do not count. Games at friends tables only count if each team had at least one real player when the game started. On equal points, the player with the most wins goes first.',
           'Only Premium players are listed in the ranking and can view it. Other Premium players can see your username, points, wins and number of games there.',
           'Your online games count even before you have Premium. When you get Premium you show up right away with the month’s points in the monthly leaderboard and with all your points – including those from before you had Premium – in the all-time leaderboard. If your Premium ends you drop out of the ranking, but your points are kept until you delete your account.',
         ],
@@ -724,6 +811,7 @@ const en: Texts = {
       'your account, email address and password,',
       'your username,',
       'your statistics (games played and won) and your ranking results,',
+      'your friend code and friends list (you disappear from your friends’ lists), friend requests and blocks,',
       'your Premium and any time-out.',
     ],
     warning: 'This cannot be undone. Premium disappears from the account, but a subscription keeps running and costing money until you cancel it in Google Play or the App Store. If you do not want to pay any more, cancel it there. If you keep the subscription, you can move it to a new account with “Restore purchases” in the app.',
@@ -736,13 +824,13 @@ const en: Texts = {
       loginLabel: 'Email or username',
       loginPlaceholder: 'name@example.com',
       passwordLabel: 'Password',
-      confirmLabel: 'I understand that my account, my username, my statistics and my ranking results will be deleted permanently.',
+      confirmLabel: 'I understand that my account, my username, my statistics, my ranking results and my friends list will be deleted permanently.',
       submit: 'Delete my account permanently',
       working: 'Deleting …',
       missingFields: 'Enter your email or username and your password.',
       needConfirm: 'Tick the box to confirm that you want to delete your account.',
       doneTitle: 'Your account has been deleted.',
-      doneText: 'Your account, your username, your statistics and your ranking results have been deleted. Thank you for playing Buraco!',
+      doneText: 'Your account, your username, your statistics, your ranking results and your friends list have been deleted. Thank you for playing Buraco!',
     },
   },
   reset: {
@@ -761,6 +849,27 @@ const en: Texts = {
       doneText: 'Your password has been changed. Open Mesa 11 and log in with your new password.',
       notConfigured: 'Changing passwords is not possible right now. Please try again a little later.',
     },
+  },
+  friendLink: {
+    metaTitle: 'Play Buraco with a friend in Mesa 11',
+    metaDescription: 'You have been given a friend code for Mesa 11, the app for the card game Buraco. Add the code in the app and play at the same table.',
+    title: 'Play Buraco with a friend in Mesa 11',
+    codeLabel: 'Friend code',
+    copy: {
+      button: 'Copy code',
+      copied: 'Copied!',
+      failed: 'Could not copy. Select the code and copy it yourself.',
+    },
+    invalidTitle: 'The link is incomplete.',
+    invalidText: 'Ask the person who sent the link for the friend code again – it has 8 characters, for example K7QM‑4XPD.',
+    stepsTitle: 'How it works',
+    steps: [
+      'Download **Mesa 11** – it is free – and create an account or log in.',
+      'Open Mesa 11 → **Play with friends** → **Add friend** and type the code.',
+      'Send the request. You become friends once the person who gave you the code accepts it – then you can invite each other to a table.',
+    ],
+    appStoreSoon: 'App Store – coming soon',
+    note: 'This page only shows the code – not whose it is. You will see the name in the app before you send the request. Only add people you know.',
   },
 };
 
@@ -835,6 +944,9 @@ const pt: Texts = {
           '**Resultados do ranking** – para cada partida online que você termina ou abandona, guardamos quando a partida acabou, se você ganhou e quantos pontos de ranking ela deu (vitória 3, derrota 1, abandono 0). Partidas de treino contra o computador não são guardadas.',
           '**Premium** – se você comprou o Premium (sem anúncios e com lugar no ranking).',
           '**Bloqueio de tempo** – se você saiu de uma partida em andamento, para contar os 5 minutos de espera até a próxima partida.',
+          '**Código de amigo** – um código aleatório que você pode compartilhar para que outras pessoas te enviem um pedido de amizade. Você pode trocar o código quando quiser, e o antigo para de funcionar na hora. O código só é criado quando você abre Amigos no app.',
+          '**Amigos, pedidos de amizade e contas bloqueadas** – de quem você é amigo, os pedidos que você enviou e recebeu e as contas que você bloqueou. Um pedido de amizade fica guardado por no máximo 30 dias.',
+          '**Configuração do status online** – se os seus amigos podem ver quando você está online.',
         ],
         after: [
           'Não há chat no jogo. As partidas em andamento – as cartas, as jogadas e quem está na mesa – ficam só na memória do servidor do jogo e não são guardadas quando a partida termina. Depois da partida, só ficam guardados o seu resultado do ranking e as suas estatísticas (veja acima). Para enviar dados ao seu celular, o servidor precisa de dados técnicos, como o seu endereço IP, enquanto você está conectado.',
@@ -846,6 +958,20 @@ const pt: Texts = {
         p: [
           'Se você tem o Premium, você participa do ranking: uma classificação do mês e uma geral. Nele aparecem o seu nome de usuário, a sua posição, os seus pontos de ranking, o número de vitórias e o número de partidas. Só jogadores Premium aparecem no ranking, e só jogadores Premium podem vê-lo – então aparecer nele também mostra que você tem o Premium.',
           'Os resultados são guardados para todos os jogadores, mesmo sem o Premium. Quando você tem o Premium, todas as suas partidas online guardadas contam no que os outros jogadores Premium veem: as partidas do mês na classificação do mês, e todas as partidas – inclusive as de antes de você ter o Premium – na classificação geral. Se o seu Premium acabar, você deixa de aparecer no ranking, mas os resultados ficam guardados até você excluir a conta e voltam a aparecer se você assinar o Premium de novo.',
+        ],
+      },
+      {
+        h: 'Amigos e mesas de amigos',
+        p: [
+          'No app você pode jogar com amigos. Só dá para virar amigo por meio de um código de amigo compartilhado fora do jogo, e o dono do código precisa aceitar o pedido. Não dá para buscar outros jogadores.',
+        ],
+        ul: [
+          '**O seu nome de usuário** aparece para quem digita o seu código (para a pessoa conferir que é você antes de enviar o pedido) e para os seus amigos.',
+          '**Status online** – só os amigos que você aceitou veem se você está online, jogando ou offline. O status é calculado enquanto você está conectado, fica só na memória do servidor do jogo e nunca é guardado. Você pode desligá-lo no app. Aí você sempre aparece como offline, mas os convites continuam chegando.',
+          '**Convites e mesas de amigos** ficam só na memória do servidor do jogo e não são guardados. Um convite vale por no máximo 20 minutos. As respostas (“Sim”, “Em 5 min” e “Agora não”) são textos prontos – não há chat nem mensagens.',
+          '**As partidas na mesa de amigos** só contam nas suas estatísticas e no ranking se cada time tinha pelo menos um jogador de verdade quando a partida começou. Se dois de vocês jogarem no mesmo time contra o computador, a partida não conta e nada sobre ela é guardado. Se você sair de uma partida que conta e não voltar ao seu lugar antes do fim, ela é guardada como abandono (zero pontos de ranking). Sair de uma partida na mesa de amigos nunca gera bloqueio de tempo.',
+          '**Se você recusar um pedido** ou remover um amigo, a outra pessoa não é avisada. Se você bloquear alguém, essa pessoa não pode mais te mandar pedidos, te convidar nem ver o seu status. O bloqueio vale para a conta, mesmo que um de vocês troque de código.',
+          '**Quando você compartilha o seu código** pelo WhatsApp ou pelo menu de compartilhamento do celular, isso acontece no app que você escolher. Não recebemos nada disso e nunca acessamos os seus contatos. A página do link em spitakolus.com mostra só o código – nunca de quem ele é.',
         ],
       },
       {
@@ -874,26 +1000,30 @@ const pt: Texts = {
           '**Para oferecer o jogo** (conta, login, nome de usuário, partidas, estatísticas, ranking, bloqueio de tempo, Premium e atualizações do app): necessário para cumprir o contrato com você, ou seja, os termos de uso (artigo 6.1 b do GDPR).',
           '**Anúncios personalizados**: na UE/EEE, no Reino Unido e na Suíça, o seu consentimento (artigo 6.1 a do GDPR). Nos outros países, o nosso interesse legítimo em financiar o jogo gratuito com anúncios (artigo 6.1 f do GDPR; no Brasil, artigo 7º, IX, da LGPD). Você pode se opor a qualquer momento desativando os anúncios personalizados nas configurações do celular.',
           '**Segurança, correção de erros e combate a trapaças e abusos** (inclusive os registros técnicos): o nosso interesse legítimo em um serviço seguro, justo e que funcione bem (artigo 6.1 f do GDPR).',
+          '**Amigos** (código de amigo, lista de amigos, pedidos, contas bloqueadas, status online, convites e mesas de amigos): necessário para cumprir o contrato com você (artigo 6.1 b do GDPR).',
+          '**Limites de tentativas de código, de pedidos e de convites, e os bloqueios de contas**, para impedir abusos e proteger os jogadores: o nosso interesse legítimo em um serviço seguro (artigo 6.1 f do GDPR).',
         ],
       },
       {
         h: 'Onde ficam os dados e quem nos ajuda?',
         ul: [
-          '**Supabase** – contas (e-mail, nome de usuário, hash da senha, estatísticas, resultados do ranking, Premium e bloqueio de tempo), em servidores na UE (Estocolmo, Suécia).',
+          '**Supabase** – contas (e-mail, nome de usuário, hash da senha, estatísticas, resultados do ranking, Premium e bloqueio de tempo) e amigos (código de amigo, lista de amigos, pedidos, contas bloqueadas e a configuração do status online), em servidores na UE (Estocolmo, Suécia).',
           '**Railway** – o servidor do jogo, na região da UE (Amsterdã, Holanda). A Railway é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. A transferência é protegida pelas Cláusulas Contratuais Padrão da UE.',
           '**Resend** – envia o e-mail quando você toca em “Esqueceu a senha?” e, para isso, recebe o seu e-mail. A Resend é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. A transferência é protegida pelas Cláusulas Contratuais Padrão da UE.',
           '**RevenueCat** – verifica as compras do Premium (veja acima). A RevenueCat é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. A transferência é protegida pelas Cláusulas Contratuais Padrão da UE.',
           '**Google AdMob** – anúncios, para quem não tem o Premium (veja acima).',
           '**Google Play e Apple App Store** – compras do Premium. Eles cuidam do pagamento como controladores independentes, pelos próprios termos.',
+          '**Vercel** – hospeda o site spitakolus.com, com, entre outras, esta política, a página para excluir a conta e a página do link de códigos de amigo. A Vercel guarda registros técnicos das visitas (entre eles o endereço IP e o endereço visitado – na página do link, isso inclui o código de amigo) por um período limitado. A Vercel é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. A transferência é protegida pelas Cláusulas Contratuais Padrão da UE.',
         ],
         after: [
-          'A Supabase, a Railway, a Resend e a RevenueCat tratam os dados só em nosso nome e não podem usá-los para mais nada. Nunca vendemos os seus dados. Tudo é enviado de forma criptografada.',
+          'A Supabase, a Railway, a Resend, a RevenueCat e a Vercel tratam os dados só em nosso nome e não podem usá-los para mais nada. Nunca vendemos os seus dados. Tudo é enviado de forma criptografada.',
         ],
       },
       {
         h: 'Por quanto tempo guardamos os dados?',
         p: [
           'Os dados da conta, as estatísticas e os resultados do ranking ficam guardados enquanto você tiver a conta. As partidas em andamento só existem enquanto a partida está sendo jogada. Quando você exclui a conta, a conta, o nome de usuário, as estatísticas e os resultados do ranking são apagados na hora e para sempre. Os registros técnicos (veja acima) são apagados automaticamente após um período limitado.',
+          'O código de amigo e a lista de amigos ficam guardados até você trocar o código, remover um amigo ou excluir a conta. Um pedido de amizade fica guardado por no máximo 30 dias. Os bloqueios de contas ficam guardados até você desfazê-los ou até uma das contas ser excluída. O status online e os convites nunca são guardados.',
           'Os dados de compras do Premium (recibos ligados ao número de identificação da sua conta) não são apagados quando você exclui a conta. Eles ficam na RevenueCat e no Google Play/na App Store pelo tempo necessário para a contabilidade e para reclamações.',
         ],
       },
@@ -907,6 +1037,7 @@ const pt: Texts = {
         ],
         after: [
           'A conta, o nome de usuário, as estatísticas e os resultados do ranking são apagados na hora. Não dá para desfazer. Os registros técnicos são apagados automaticamente após um período limitado, e os dados de compras ficam na RevenueCat e na loja (veja acima), e uma assinatura do Premium continua até você cancelá-la no Google Play ou na App Store.',
+          'Ao mesmo tempo são apagados o seu código de amigo, a sua lista de amigos (você some das listas dos seus amigos), os pedidos de amizade enviados e recebidos e todos os bloqueios de contas – tanto os seus quanto os de outros jogadores contra você.',
         ],
       },
       {
@@ -987,7 +1118,7 @@ const pt: Texts = {
       {
         h: 'Se você sair de uma partida',
         p: [
-          'Se você sair de uma partida online em andamento – ou perder a conexão por mais de dois minutos – um jogador do computador assume o seu lugar. Aí você precisa esperar **5 minutos** antes de começar a próxima partida, e a partida que você abandonou vale zero pontos de ranking. Isso vale para todos, inclusive quem tem o Premium, para que a partida não seja estragada para os outros.',
+          'Se você sair de uma partida online em andamento – ou perder a conexão por mais de dois minutos – um jogador do computador assume o seu lugar. Aí você precisa esperar **5 minutos** antes de começar a próxima partida, e a partida que você abandonou vale zero pontos de ranking. Isso vale para todos, inclusive quem tem o Premium, para que a partida não seja estragada para os outros. Na mesa de amigos não há tempo de espera: você pode voltar ao seu lugar enquanto a partida continuar.',
         ],
       },
       {
@@ -1002,7 +1133,7 @@ const pt: Texts = {
         h: 'O ranking',
         ul: [
           'O ranking tem uma classificação do mês (que recomeça todo dia 1º) e uma geral.',
-          'Cada partida online vale pontos de ranking: vitória vale 3 pontos, derrota 1 ponto e abandonar a partida, zero. Partidas de treino contra o computador não contam. Em caso de empate nos pontos, fica na frente quem tem mais vitórias.',
+          'Cada partida online vale pontos de ranking: vitória vale 3 pontos, derrota 1 ponto e abandonar a partida, zero. Partidas de treino contra o computador não contam. Partidas na mesa de amigos só contam se cada time tinha pelo menos um jogador de verdade quando a partida começou. Em caso de empate nos pontos, fica na frente quem tem mais vitórias.',
           'Só jogadores Premium aparecem no ranking e podem vê-lo. Ali, outros jogadores Premium veem o seu nome de usuário, os seus pontos, as suas vitórias e o número de partidas.',
           'As suas partidas online contam mesmo antes de você ter o Premium. Quando assinar, você aparece na hora com os pontos do mês na classificação do mês e com todos os seus pontos – inclusive os de antes de você ter o Premium – na classificação geral. Se o seu Premium acabar, você sai do ranking, mas os pontos ficam guardados até você excluir a conta.',
         ],
@@ -1055,6 +1186,7 @@ const pt: Texts = {
       'a sua conta, o e-mail e a senha,',
       'o seu nome de usuário,',
       'as suas estatísticas (partidas jogadas e ganhas) e os seus resultados do ranking,',
+      'o seu código de amigo e a sua lista de amigos (você some das listas dos seus amigos), os pedidos de amizade e os bloqueios de contas,',
       'o seu Premium e um eventual bloqueio de tempo.',
     ],
     warning: 'Não dá para desfazer. O Premium sai da conta, mas uma assinatura continua ativa e sendo cobrada até você cancelá-la no Google Play ou na App Store. Se não quiser pagar mais, cancele lá. Se mantiver a assinatura, você pode passá-la para uma conta nova com “Restaurar compras” no app.',
@@ -1067,13 +1199,13 @@ const pt: Texts = {
       loginLabel: 'E-mail ou nome de usuário',
       loginPlaceholder: 'nome@exemplo.com.br',
       passwordLabel: 'Senha',
-      confirmLabel: 'Entendo que a minha conta, o meu nome de usuário, as minhas estatísticas e os meus resultados do ranking serão apagados para sempre.',
+      confirmLabel: 'Entendo que a minha conta, o meu nome de usuário, as minhas estatísticas, os meus resultados do ranking e a minha lista de amigos serão apagados para sempre.',
       submit: 'Excluir minha conta para sempre',
       working: 'Excluindo …',
       missingFields: 'Digite o seu e-mail ou nome de usuário e a sua senha.',
       needConfirm: 'Marque a caixa para confirmar que você quer excluir a conta.',
       doneTitle: 'A conta foi excluída.',
-      doneText: 'A sua conta, o seu nome de usuário, as suas estatísticas e os seus resultados do ranking foram apagados. Obrigado por jogar Buraco!',
+      doneText: 'A sua conta, o seu nome de usuário, as suas estatísticas, os seus resultados do ranking e a sua lista de amigos foram apagados. Obrigado por jogar Buraco!',
     },
   },
   reset: {
@@ -1092,6 +1224,27 @@ const pt: Texts = {
       doneText: 'A sua senha foi trocada. Abra o app Mesa 11 e entre com a nova senha.',
       notConfigured: 'Não é possível trocar a senha agora. Tente de novo mais tarde.',
     },
+  },
+  friendLink: {
+    metaTitle: 'Jogue Buraco com um amigo no app Mesa 11',
+    metaDescription: 'Você recebeu um código de amigo do Mesa 11, o app do jogo de cartas Buraco. Adicione o código no app e joguem na mesma mesa.',
+    title: 'Jogue Buraco com um amigo no app Mesa 11',
+    codeLabel: 'Código de amigo',
+    copy: {
+      button: 'Copiar código',
+      copied: 'Copiado!',
+      failed: 'Não deu para copiar. Selecione o código e copie você mesmo.',
+    },
+    invalidTitle: 'O link está incompleto.',
+    invalidText: 'Peça o código de amigo de novo para quem te mandou o link – ele tem 8 caracteres, por exemplo K7QM‑4XPD.',
+    stepsTitle: 'Como fazer',
+    steps: [
+      'Baixe o app **Mesa 11** – é grátis – e crie uma conta ou entre na sua.',
+      'Abra o app Mesa 11 → **Jogar com amigos** → **Adicionar amigo** e digite o código.',
+      'Envie o pedido. Vocês viram amigos quando quem te deu o código aceitar – aí podem se convidar para uma mesa.',
+    ],
+    appStoreSoon: 'App Store – em breve',
+    note: 'Esta página mostra só o código – não de quem ele é. Você vê o nome no app antes de enviar o pedido. Adicione só pessoas que você conhece.',
   },
 };
 
