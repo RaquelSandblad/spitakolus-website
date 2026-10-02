@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.spitakolus.buraco",
+      "sha256_cert_fingerprints": [
+        "30:AF:6A:A1:7E:7D:E5:FB:16:B7:99:77:0C:03:1B:93:FA:1D:83:E2:B1:1C:73:98:2F:FB:B4:2F:2F:04:A4:09",
+        "16:BA:F0:1B:23:D4:79:A0:98:6A:EC:6D:C1:86:6A:5B:9B:9C:67:45:3E:C0:93:DE:46:C6:AD:1B:4D:25:B8:49"
+      ]
+    }
+  }
+]

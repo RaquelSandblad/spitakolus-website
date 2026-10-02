@@ -17,6 +17,16 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // Applänkar för Mesa 11 (vänlänkar /buraco/v/… öppnar appen): Android och iOS hämtar filerna i
+  // /.well-known/ och kräver JSON. apple-app-site-association har ingen filändelse.
+  async headers() {
+    return [
+      {
+        source: '/.well-known/:file(assetlinks.json|apple-app-site-association)',
+        headers: [{ key: 'Content-Type', value: 'application/json' }],
+      },
+    ];
+  },
   // Produktsidan vilande tills vidare (företaget tonas ner). Slå på igen
   // genom att ta bort denna redirect.
   async redirects() {

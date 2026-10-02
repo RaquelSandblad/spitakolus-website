@@ -1,0 +1,12 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["HWBGW56WBU.com.spitakolus.buraco"],
+        "components": [
+          { "/": "/buraco/v/*", "comment": "Mesa 11: vänlänk öppnar appen och fyller i vänkoden" }
+        ]
+      }
+    ]
+  }
+}
