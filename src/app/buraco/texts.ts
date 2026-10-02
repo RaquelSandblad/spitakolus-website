@@ -169,7 +169,7 @@ const sv: Texts = {
     metaTitle: 'Integritetspolicy för Mesa 11 – Spitakolus AB',
     metaDescription: 'Vilka uppgifter appen Mesa 11 (kortspelet Buraco) sparar, varför, var de finns och hur du tar bort dem.',
     title: 'Integritetspolicy',
-    updated: 'Senast ändrad 1 oktober 2026',
+    updated: 'Senast ändrad 2 oktober 2026',
     intro: [
       'Här beskriver vi vilka personuppgifter appen Mesa 11 (kortspelet Buraco) och dess spelserver behandlar, varför, var de finns och vilka rättigheter du har enligt dataskyddsförordningen (GDPR).',
     ],
@@ -194,6 +194,7 @@ const sv: Texts = {
           '**Vänkod** – en slumpad kod som du kan dela, så att andra kan skicka en vänförfrågan till dig. Du kan byta koden när du vill, och då slutar den gamla att fungera direkt. Koden skapas först när du öppnar Vänner i appen.',
           '**Vänner, vänförfrågningar och blockeringar** – vilka du är vän med, förfrågningar som du har skickat och fått, och konton som du har blockerat. En vänförfrågan sparas i högst 30 dagar.',
           '**Inställning för onlinestatus** – om dina vänner får se när du är online.',
+          '**Notiser** – om du tillåter notiser: telefonens push-adress, om telefonen är Android eller iPhone, appens språk och när appen senast hörde av sig, och dina val för notiser och tysta timmar (med telefonens tidszon när tysta timmar är på).',
         ],
         after: [
           'Det finns ingen chatt i spelet. Pågående partier – korten, dragen och vilka som sitter vid bordet – finns bara i spelserverns minne och sparas inte när partiet är slut. Det enda som sparas efter partiet är din statistik och ditt rankingresultat (se ovan). För att spelet ska kunna skicka data till din telefon behöver spelservern tekniska uppgifter som din IP-adress medan du är ansluten.',
@@ -219,6 +220,19 @@ const sv: Texts = {
           '**Partier vid vänbord** räknas i din statistik och i rankingen bara om varje lag hade minst en riktig spelare när partiet började. Spelar två av er i samma lag mot datorn räknas partiet inte, och inget om det sparas. Lämnar du ett parti som räknas och inte tar tillbaka din plats innan det är slut, sparas det som lämnat (0 rankingpoäng). Du får ingen tidsspärr för att lämna ett vänparti.',
           '**Avböjer du en förfrågan** eller tar bort en vän får den andra inget meddelande om det. Blockerar du någon kan hen inte längre skicka förfrågningar till dig, bjuda in dig eller se din status. Blockeringen gäller kontot, även om någon av er byter kod.',
           '**När du delar din kod** via WhatsApp eller telefonens delningsmeny sker det i appen som du väljer. Vi får inget därifrån och läser aldrig dina kontakter. Länksidan på spitakolus.com visar bara koden – aldrig vem den tillhör.',
+        ],
+      },
+      {
+        h: 'Notiser',
+        p: [
+          'Om du tillåter det i telefonen får du en notis när en vän bjuder in dig till ett vänbord, när någon skickar en vänförfrågan till dig och när din förfrågan har godkänts. Inga andra notiser och ingen reklam. Notisen innehåller en fast text, avsändarens användarnamn och ett tekniskt id för bordet eller förfrågan – inget annat.',
+        ],
+        ul: [
+          '**Push-adressen** är en slumpad kod från Google eller Apple som gör att notisen hittar rätt telefon. Vi sparar den kopplad till ditt konto, tillsammans med om telefonen är Android eller iPhone och appens språk (så att notisen kommer på rätt språk). Loggar du ut tas den bort.',
+          '**Tysta timmar** väljer du själv i appen under Vänner. När de är på sparas telefonens tidszon (till exempel Europe/Stockholm), så att timmarna följer din klocka. Inbjudningar i appen kommer alltid fram medan appen är öppen.',
+          '**Om appen är öppen** eller i bakgrunden vet spelservern medan du är ansluten, så att du inte får en notis om något du redan ser. Det finns bara i serverns minne och sparas inte.',
+          'Du kan stänga av notiserna i appen eller i telefonens inställningar när du vill.',
+          'Notiserna skickas via **Firebase Cloud Messaging** från Google och, till iPhone, vidare via Apples tjänst för notiser. Vi använder inte Firebase Analytics eller någon annan spårning från Firebase.',
         ],
       },
       {
@@ -248,22 +262,24 @@ const sv: Texts = {
           '**Anpassade annonser**: i EU/EES, Storbritannien och Schweiz ditt samtycke (artikel 6.1 a GDPR). I andra länder vårt berättigade intresse av att finansiera det kostnadsfria spelet med reklam (artikel 6.1 f GDPR, och i Brasilien artikel 7 IX LGPD). Du kan när som helst invända genom att stänga av anpassade annonser i telefonens inställningar.',
           '**Säkerhet, felsökning och att stoppa fusk och missbruk** (bland annat tekniska loggar): vårt berättigade intresse av en trygg, fungerande och schysst tjänst (artikel 6.1 f GDPR).',
           '**Vänner** (vänkod, vänlista, förfrågningar, blockeringar, onlinestatus, inbjudningar och vänbord): det behövs för att uppfylla avtalet med dig (artikel 6.1 b GDPR).',
+          '**Notiser** (push-adress, språk, notisinställningar och tysta timmar), när du har tillåtit notiser: det behövs för att uppfylla avtalet med dig (artikel 6.1 b GDPR). Du kan stänga av dem när du vill.',
           '**Gränser för kodförsök, förfrågningar och inbjudningar, och blockeringar**, för att stoppa missbruk och skydda spelarna: vårt berättigade intresse av en trygg tjänst (artikel 6.1 f GDPR).',
         ],
       },
       {
         h: 'Var finns uppgifterna och vilka hjälper oss?',
         ul: [
-          '**Supabase** – konton (e-post, användarnamn, hashat lösenord, statistik, rankingresultat, Premium och tidsspärr) och vänner (vänkod, vänlista, förfrågningar, blockeringar och inställningen för onlinestatus), på servrar i EU (Stockholm, Sverige).',
+          '**Supabase** – konton (e-post, användarnamn, hashat lösenord, statistik, rankingresultat, Premium och tidsspärr) och vänner (vänkod, vänlista, förfrågningar, blockeringar och inställningen för onlinestatus) och notiser (push-adresser och notisinställningar), på servrar i EU (Stockholm, Sverige).',
           '**Railway** – spelservern, i EU-regionen (Amsterdam, Nederländerna). Railway är ett amerikanskt bolag, så uppgifter kan föras över till USA. Överföringen skyddas med EU:s standardavtalsklausuler.',
           '**Resend** – skickar mejlet när du har tryckt på ”Glömt lösenordet?” och får då din e-postadress. Resend är ett amerikanskt bolag, så uppgifter kan föras över till USA. Överföringen skyddas med EU:s standardavtalsklausuler.',
           '**RevenueCat** – kontrollerar köp av Premium (se ovan). RevenueCat är ett amerikanskt bolag, så uppgifter kan föras över till USA. Överföringen skyddas med EU:s standardavtalsklausuler.',
           '**Google AdMob** – annonser, för dig som inte har Premium (se ovan).',
+          '**Google Firebase Cloud Messaging** – skickar notiserna och får då push-adressen och notisens text. Google är ett amerikanskt bolag, så uppgifter kan föras över till USA. Överföringen skyddas med EU:s standardavtalsklausuler. Till iPhone går notisen vidare via **Apple Push Notification service**.',
           '**Google Play och Apple App Store** – köp av Premium. De hanterar betalningen som egna personuppgiftsansvariga enligt sina egna villkor.',
           '**Vercel** – driver webbplatsen spitakolus.com, med bland annat den här policyn, sidan för att ta bort kontot och länksidan för vänkoder. Vercel sparar tekniska loggar över besöken (bland annat IP-adress och besökt adress – för länksidan alltså vänkoden) en begränsad tid. Vercel är ett amerikanskt bolag, så uppgifter kan föras över till USA. Överföringen skyddas med EU:s standardavtalsklausuler.',
         ],
         after: [
-          'Supabase, Railway, Resend, RevenueCat och Vercel behandlar uppgifterna bara för vår räkning och får inte använda dem till något annat. Vi säljer aldrig dina uppgifter. Allt skickas krypterat.',
+          'Supabase, Railway, Resend, RevenueCat, Vercel och Google Firebase behandlar uppgifterna bara för vår räkning och får inte använda dem till något annat. Vi säljer aldrig dina uppgifter. Allt skickas krypterat.',
         ],
       },
       {
@@ -271,6 +287,7 @@ const sv: Texts = {
         p: [
           'Kontouppgifterna, statistiken och rankingresultaten sparas så länge du har kvar ditt konto. Pågående partier finns bara kvar medan partiet pågår. När du tar bort ditt konto raderas kontot, användarnamnet, statistiken och rankingresultaten direkt och för alltid. Tekniska loggar (se ovan) sparas bara en begränsad tid och raderas sedan automatiskt.',
           'Vänkoden och vänlistan sparas tills du byter kod, tar bort en vän eller tar bort kontot. En vänförfrågan sparas i högst 30 dagar. Blockeringar sparas tills du häver dem eller tills något av kontona tas bort. Onlinestatus och inbjudningar sparas aldrig.',
+          'En push-adress sparas tills du loggar ut eller tar bort kontot, eller tills Google eller Apple meddelar att den inte gäller längre. En push-adress som inte har använts på 180 dagar raderas automatiskt. Notiserna sparas inte hos oss när de har skickats.',
           'Uppgifter om köp av Premium (kvitton kopplade till kontots id-nummer) raderas inte när du tar bort kontot. De finns kvar hos RevenueCat och i Google Play/App Store så länge det behövs för bokföring och reklamationer.',
         ],
       },
@@ -284,7 +301,7 @@ const sv: Texts = {
         ],
         after: [
           'Kontot, användarnamnet, statistiken och rankingresultaten raderas direkt. Det går inte att ångra. Tekniska loggar raderas automatiskt efter en begränsad tid, och uppgifter om köp finns kvar hos RevenueCat och butiken (se ovan), och en prenumeration på Premium fortsätter tills du avslutar den i Google Play eller App Store.',
-          'Samtidigt raderas din vänkod, din vänlista (du försvinner från dina vänners listor), vänförfrågningar till och från dig och alla blockeringar – både dina och andras blockeringar av dig.',
+          'Samtidigt raderas din vänkod, din vänlista (du försvinner från dina vänners listor), vänförfrågningar till och från dig och alla blockeringar – både dina och andras blockeringar av dig – liksom telefonernas push-adresser och dina notisinställningar.',
         ],
       },
       {
@@ -436,6 +453,7 @@ const sv: Texts = {
       'ditt användarnamn,',
       'din statistik (spelade och vunna partier) och dina rankingresultat,',
       'din vänkod och din vänlista (du försvinner från dina vänners listor), vänförfrågningar och blockeringar,',
+      'telefonernas push-adresser och dina notisinställningar,',
       'din Premium och din eventuella tidsspärr.',
     ],
     warning: 'Det går inte att ångra. Premium försvinner från kontot, men en prenumeration fortsätter att löpa och kosta pengar tills du avslutar den i Google Play eller App Store. Vill du inte betala mer, avsluta den där. Behåller du prenumerationen kan du flytta den till ett nytt konto med ”Återställ köp” i appen.',
@@ -547,7 +565,7 @@ const en: Texts = {
     metaTitle: 'Mesa 11 Privacy Policy – Spitakolus AB',
     metaDescription: 'What data the Mesa 11 app (the card game Buraco) stores, why, where it is kept and how to delete it.',
     title: 'Privacy Policy',
-    updated: 'Last updated 1 October 2026',
+    updated: 'Last updated 2 October 2026',
     intro: [
       'This policy explains what personal data the Mesa 11 app (the card game Buraco) and its game server process, why, where it is kept and what rights you have under the General Data Protection Regulation (GDPR).',
     ],
@@ -572,6 +590,7 @@ const en: Texts = {
           '**Friend code** – a random code you can share so that others can send you a friend request. You can replace it at any time, and the old code stops working immediately. The code is only created when you open Friends in the app.',
           '**Friends, friend requests and blocks** – who you are friends with, requests you have sent and received, and accounts you have blocked. A friend request is kept for at most 30 days.',
           '**Online status setting** – whether your friends may see when you are online.',
+          '**Notifications** – if you allow notifications: your phone’s push address, whether the phone is Android or iPhone, the app language and when the app last checked in, and your notification and quiet hours settings (with your phone’s time zone when quiet hours are on).',
         ],
         after: [
           'There is no chat in the game. Games in progress – the cards, the moves and who is at the table – exist only in the game server’s memory and are not stored once the game is over. The only things kept afterwards are your statistics and your ranking result (see above). To send data to your phone, the game server needs technical data such as your IP address while you are connected.',
@@ -597,6 +616,19 @@ const en: Texts = {
           '**Games at friends tables** count in your statistics and in the ranking only if each team had at least one real player when the game started. If two of you play on the same team against the computer, the game does not count and nothing about it is stored. If you leave a game that counts and do not take your seat back before it ends, it is stored as left (0 ranking points). Leaving a game at a friends table never gives you a time-out.',
           '**If you decline a request** or remove a friend, the other person is not told. If you block someone, they can no longer send you requests, invite you or see your status. A block applies to the account, even if one of you gets a new code.',
           '**When you share your code** via WhatsApp or your phone’s share menu, this happens in the app you choose. We receive nothing from it and never access your contacts. The link page on spitakolus.com shows only the code – never whose it is.',
+        ],
+      },
+      {
+        h: 'Notifications',
+        p: [
+          'If you allow it on your phone, you get a notification when a friend invites you to a friends table, when someone sends you a friend request and when your request has been accepted. No other notifications and no ads. A notification contains a fixed text, the sender’s username and a technical id for the table or request – nothing else.',
+        ],
+        ul: [
+          '**The push address** is a random code from Google or Apple that lets the notification reach the right phone. We store it linked to your account, together with whether the phone is Android or iPhone and the app language (so the notification arrives in the right language). It is removed when you log out.',
+          '**Quiet hours** are your own choice in the app under Friends. When they are on, your phone’s time zone (for example Europe/Stockholm) is stored so that the hours follow your clock. Invites in the app always arrive while the app is open.',
+          '**Whether the app is open** or in the background is known to the game server while you are connected, so that you are not notified about something you can already see. It exists only in the server’s memory and is not stored.',
+          'You can turn notifications off in the app or in your phone’s settings at any time.',
+          'Notifications are sent through **Firebase Cloud Messaging** from Google and, for iPhone, passed on through Apple’s notification service. We do not use Firebase Analytics or any other tracking from Firebase.',
         ],
       },
       {
@@ -626,22 +658,24 @@ const en: Texts = {
           '**Personalised ads**: in the EU/EEA, the UK and Switzerland, your consent (Article 6(1)(a) GDPR). In other countries, our legitimate interest in funding the free game with ads (Article 6(1)(f) GDPR; in Brazil, Article 7(IX) LGPD). You can object at any time by turning off personalised ads in your phone’s settings.',
           '**Security, troubleshooting and stopping cheating and abuse** (including technical logs): our legitimate interest in a safe, reliable and fair service (Article 6(1)(f) GDPR).',
           '**Friends** (friend code, friends list, requests, blocks, online status, invites and friends tables): necessary to perform our contract with you (Article 6(1)(b) GDPR).',
+          '**Notifications** (push address, language, notification settings and quiet hours), once you have allowed notifications: necessary to perform our contract with you (Article 6(1)(b) GDPR). You can turn them off at any time.',
           '**Limits on code lookups, requests and invites, and blocks**, to stop abuse and protect players: our legitimate interest in a safe service (Article 6(1)(f) GDPR).',
         ],
       },
       {
         h: 'Where is the data kept, and who helps us?',
         ul: [
-          '**Supabase** – accounts (email, username, hashed password, statistics, ranking results, Premium and time-out) and friends (friend code, friends list, requests, blocks and the online status setting), on servers in the EU (Stockholm, Sweden).',
+          '**Supabase** – accounts (email, username, hashed password, statistics, ranking results, Premium and time-out) and friends (friend code, friends list, requests, blocks and the online status setting) and notifications (push addresses and notification settings), on servers in the EU (Stockholm, Sweden).',
           '**Railway** – the game server, in the EU region (Amsterdam, the Netherlands). Railway is a US company, so data may be transferred to the United States. The transfer is protected by the EU Standard Contractual Clauses.',
           '**Resend** – sends the email when you tap “Forgot your password?”, and receives your email address for that. Resend is a US company, so data may be transferred to the United States. The transfer is protected by the EU Standard Contractual Clauses.',
           '**RevenueCat** – verifies Premium purchases (see above). RevenueCat is a US company, so data may be transferred to the United States. The transfer is protected by the EU Standard Contractual Clauses.',
           '**Google AdMob** – ads, for players without Premium (see above).',
+          '**Google Firebase Cloud Messaging** – sends the notifications and receives the push address and the notification text to do so. Google is a US company, so data may be transferred to the United States. The transfer is protected by the EU Standard Contractual Clauses. For iPhone, the notification is passed on through **Apple Push Notification service**.',
           '**Google Play and the Apple App Store** – Premium purchases. They handle the payment as independent controllers under their own terms.',
           '**Vercel** – runs the spitakolus.com website, including this policy, the account deletion page and the link page for friend codes. Vercel keeps technical logs of visits (including IP address and the address visited – for the link page, that includes the friend code) for a limited time. Vercel is a US company, so data may be transferred to the United States. The transfer is protected by the EU Standard Contractual Clauses.',
         ],
         after: [
-          'Supabase, Railway, Resend, RevenueCat and Vercel process the data only on our behalf and may not use it for anything else. We never sell your data. Everything is sent encrypted.',
+          'Supabase, Railway, Resend, RevenueCat, Vercel and Google Firebase process the data only on our behalf and may not use it for anything else. We never sell your data. Everything is sent encrypted.',
         ],
       },
       {
@@ -649,6 +683,7 @@ const en: Texts = {
         p: [
           'Account data, statistics and ranking results are kept for as long as you keep your account. Games in progress exist only while the game is being played. When you delete your account, the account, the username, the statistics and the ranking results are deleted immediately and permanently. Technical logs (see above) are deleted automatically after a limited time.',
           'Your friend code and friends list are kept until you replace the code, remove a friend or delete your account. A friend request is kept for at most 30 days. Blocks are kept until you lift them or one of the accounts is deleted. Online status and invites are never stored.',
+          'A push address is kept until you log out or delete your account, or until Google or Apple tells us it is no longer valid. A push address that has not been used for 180 days is deleted automatically. We do not keep notifications after they have been sent.',
           'Data about Premium purchases (receipts linked to your account ID) is not deleted when you delete your account. It is kept by RevenueCat and in Google Play/the App Store for as long as needed for accounting and complaints.',
         ],
       },
@@ -662,7 +697,7 @@ const en: Texts = {
         ],
         after: [
           'The account, the username, the statistics and the ranking results are deleted immediately. This cannot be undone. Technical logs are deleted automatically after a limited time, and purchase data stays with RevenueCat and the store (see above), and a Premium subscription keeps running until you cancel it in Google Play or the App Store.',
-          'At the same time, your friend code, your friends list (you disappear from your friends’ lists), friend requests to and from you and all blocks – both yours and other players’ blocks of you – are deleted.',
+          'At the same time, your friend code, your friends list (you disappear from your friends’ lists), friend requests to and from you, all blocks – both yours and other players’ blocks of you – and your phones’ push addresses and notification settings are deleted.',
         ],
       },
       {
@@ -812,6 +847,7 @@ const en: Texts = {
       'your username,',
       'your statistics (games played and won) and your ranking results,',
       'your friend code and friends list (you disappear from your friends’ lists), friend requests and blocks,',
+      'your phones’ push addresses and your notification settings,',
       'your Premium and any time-out.',
     ],
     warning: 'This cannot be undone. Premium disappears from the account, but a subscription keeps running and costing money until you cancel it in Google Play or the App Store. If you do not want to pay any more, cancel it there. If you keep the subscription, you can move it to a new account with “Restore purchases” in the app.',
@@ -922,7 +958,7 @@ const pt: Texts = {
     metaTitle: 'Política de Privacidade do app Mesa 11 – Spitakolus AB',
     metaDescription: 'Quais dados o app Mesa 11 (o jogo de cartas Buraco) guarda, por quê, onde ficam e como excluí-los.',
     title: 'Política de Privacidade',
-    updated: 'Atualizada em 1º de outubro de 2026',
+    updated: 'Atualizada em 2 de outubro de 2026',
     intro: [
       'Esta política explica quais dados pessoais o app Mesa 11 (o jogo de cartas Buraco) e o servidor do jogo tratam, por quê, onde ficam e quais direitos você tem pelo Regulamento Geral de Proteção de Dados da UE (GDPR) e pela LGPD.',
     ],
@@ -947,6 +983,7 @@ const pt: Texts = {
           '**Código de amigo** – um código aleatório que você pode compartilhar para que outras pessoas te enviem um pedido de amizade. Você pode trocar o código quando quiser, e o antigo para de funcionar na hora. O código só é criado quando você abre Amigos no app.',
           '**Amigos, pedidos de amizade e contas bloqueadas** – de quem você é amigo, os pedidos que você enviou e recebeu e as contas que você bloqueou. Um pedido de amizade fica guardado por no máximo 30 dias.',
           '**Configuração do status online** – se os seus amigos podem ver quando você está online.',
+          '**Notificações** – se você permitir notificações: o endereço de push do celular, se o celular é Android ou iPhone, o idioma do app e quando o app se conectou pela última vez, e as suas escolhas de notificações e horas de silêncio (com o fuso horário do celular quando as horas de silêncio estão ativadas).',
         ],
         after: [
           'Não há chat no jogo. As partidas em andamento – as cartas, as jogadas e quem está na mesa – ficam só na memória do servidor do jogo e não são guardadas quando a partida termina. Depois da partida, só ficam guardados o seu resultado do ranking e as suas estatísticas (veja acima). Para enviar dados ao seu celular, o servidor precisa de dados técnicos, como o seu endereço IP, enquanto você está conectado.',
@@ -972,6 +1009,19 @@ const pt: Texts = {
           '**As partidas na mesa de amigos** só contam nas suas estatísticas e no ranking se cada time tinha pelo menos um jogador de verdade quando a partida começou. Se dois de vocês jogarem no mesmo time contra o computador, a partida não conta e nada sobre ela é guardado. Se você sair de uma partida que conta e não voltar ao seu lugar antes do fim, ela é guardada como abandono (zero pontos de ranking). Sair de uma partida na mesa de amigos nunca gera bloqueio de tempo.',
           '**Se você recusar um pedido** ou remover um amigo, a outra pessoa não é avisada. Se você bloquear alguém, essa pessoa não pode mais te mandar pedidos, te convidar nem ver o seu status. O bloqueio vale para a conta, mesmo que um de vocês troque de código.',
           '**Quando você compartilha o seu código** pelo WhatsApp ou pelo menu de compartilhamento do celular, isso acontece no app que você escolher. Não recebemos nada disso e nunca acessamos os seus contatos. A página do link em spitakolus.com mostra só o código – nunca de quem ele é.',
+        ],
+      },
+      {
+        h: 'Notificações',
+        p: [
+          'Se você permitir no celular, recebe uma notificação quando um amigo te convida para uma mesa de amigos, quando alguém te envia um pedido de amizade e quando o seu pedido é aceito. Nenhuma outra notificação e nenhum anúncio. A notificação contém um texto fixo, o nome de usuário de quem enviou e um id técnico da mesa ou do pedido – nada mais.',
+        ],
+        ul: [
+          '**O endereço de push** é um código aleatório do Google ou da Apple que faz a notificação chegar ao celular certo. Nós o guardamos ligado à sua conta, junto com a informação se o celular é Android ou iPhone e o idioma do app (para a notificação chegar no idioma certo). Ele é apagado quando você sai da conta.',
+          '**As horas de silêncio** você escolhe no app, em Amigos. Quando estão ativadas, guardamos o fuso horário do celular (por exemplo America/Sao_Paulo), para que as horas sigam o seu relógio. Os convites no app sempre chegam enquanto o app está aberto.',
+          '**Se o app está aberto** ou em segundo plano, o servidor do jogo sabe enquanto você está conectado, para não te mandar uma notificação sobre algo que você já está vendo. Isso fica só na memória do servidor e não é guardado.',
+          'Você pode desativar as notificações no app ou nas configurações do celular quando quiser.',
+          'As notificações são enviadas pelo **Firebase Cloud Messaging**, do Google, e, no iPhone, repassadas pelo serviço de notificações da Apple. Não usamos o Firebase Analytics nem nenhum outro rastreamento do Firebase.',
         ],
       },
       {
@@ -1001,22 +1051,24 @@ const pt: Texts = {
           '**Anúncios personalizados**: na UE/EEE, no Reino Unido e na Suíça, o seu consentimento (artigo 6.1 a do GDPR). Nos outros países, o nosso interesse legítimo em financiar o jogo gratuito com anúncios (artigo 6.1 f do GDPR; no Brasil, artigo 7º, IX, da LGPD). Você pode se opor a qualquer momento desativando os anúncios personalizados nas configurações do celular.',
           '**Segurança, correção de erros e combate a trapaças e abusos** (inclusive os registros técnicos): o nosso interesse legítimo em um serviço seguro, justo e que funcione bem (artigo 6.1 f do GDPR).',
           '**Amigos** (código de amigo, lista de amigos, pedidos, contas bloqueadas, status online, convites e mesas de amigos): necessário para cumprir o contrato com você (artigo 6.1 b do GDPR).',
+          '**Notificações** (endereço de push, idioma, configurações de notificações e horas de silêncio), depois que você permite as notificações: necessário para cumprir o contrato com você (artigo 6.1 b do GDPR). Você pode desativá-las quando quiser.',
           '**Limites de tentativas de código, de pedidos e de convites, e os bloqueios de contas**, para impedir abusos e proteger os jogadores: o nosso interesse legítimo em um serviço seguro (artigo 6.1 f do GDPR).',
         ],
       },
       {
         h: 'Onde ficam os dados e quem nos ajuda?',
         ul: [
-          '**Supabase** – contas (e-mail, nome de usuário, hash da senha, estatísticas, resultados do ranking, Premium e bloqueio de tempo) e amigos (código de amigo, lista de amigos, pedidos, contas bloqueadas e a configuração do status online), em servidores na UE (Estocolmo, Suécia).',
+          '**Supabase** – contas (e-mail, nome de usuário, hash da senha, estatísticas, resultados do ranking, Premium e bloqueio de tempo) e amigos (código de amigo, lista de amigos, pedidos, contas bloqueadas e a configuração do status online) e notificações (endereços de push e configurações de notificações), em servidores na UE (Estocolmo, Suécia).',
           '**Railway** – o servidor do jogo, na região da UE (Amsterdã, Holanda). A Railway é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. A transferência é protegida pelas Cláusulas Contratuais Padrão da UE.',
           '**Resend** – envia o e-mail quando você toca em “Esqueceu a senha?” e, para isso, recebe o seu e-mail. A Resend é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. A transferência é protegida pelas Cláusulas Contratuais Padrão da UE.',
           '**RevenueCat** – verifica as compras do Premium (veja acima). A RevenueCat é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. A transferência é protegida pelas Cláusulas Contratuais Padrão da UE.',
           '**Google AdMob** – anúncios, para quem não tem o Premium (veja acima).',
+          '**Google Firebase Cloud Messaging** – envia as notificações e, para isso, recebe o endereço de push e o texto da notificação. O Google é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. A transferência é protegida pelas Cláusulas Contratuais Padrão da UE. No iPhone, a notificação é repassada pelo **Apple Push Notification service**.',
           '**Google Play e Apple App Store** – compras do Premium. Eles cuidam do pagamento como controladores independentes, pelos próprios termos.',
           '**Vercel** – hospeda o site spitakolus.com, com, entre outras, esta política, a página para excluir a conta e a página do link de códigos de amigo. A Vercel guarda registros técnicos das visitas (entre eles o endereço IP e o endereço visitado – na página do link, isso inclui o código de amigo) por um período limitado. A Vercel é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. A transferência é protegida pelas Cláusulas Contratuais Padrão da UE.',
         ],
         after: [
-          'A Supabase, a Railway, a Resend, a RevenueCat e a Vercel tratam os dados só em nosso nome e não podem usá-los para mais nada. Nunca vendemos os seus dados. Tudo é enviado de forma criptografada.',
+          'A Supabase, a Railway, a Resend, a RevenueCat, a Vercel e o Google Firebase tratam os dados só em nosso nome e não podem usá-los para mais nada. Nunca vendemos os seus dados. Tudo é enviado de forma criptografada.',
         ],
       },
       {
@@ -1024,6 +1076,7 @@ const pt: Texts = {
         p: [
           'Os dados da conta, as estatísticas e os resultados do ranking ficam guardados enquanto você tiver a conta. As partidas em andamento só existem enquanto a partida está sendo jogada. Quando você exclui a conta, a conta, o nome de usuário, as estatísticas e os resultados do ranking são apagados na hora e para sempre. Os registros técnicos (veja acima) são apagados automaticamente após um período limitado.',
           'O código de amigo e a lista de amigos ficam guardados até você trocar o código, remover um amigo ou excluir a conta. Um pedido de amizade fica guardado por no máximo 30 dias. Os bloqueios de contas ficam guardados até você desfazê-los ou até uma das contas ser excluída. O status online e os convites nunca são guardados.',
+          'Um endereço de push fica guardado até você sair da conta ou excluí-la, ou até o Google ou a Apple avisarem que ele não vale mais. Um endereço de push que não é usado há 180 dias é apagado automaticamente. Não guardamos as notificações depois que são enviadas.',
           'Os dados de compras do Premium (recibos ligados ao número de identificação da sua conta) não são apagados quando você exclui a conta. Eles ficam na RevenueCat e no Google Play/na App Store pelo tempo necessário para a contabilidade e para reclamações.',
         ],
       },
@@ -1037,7 +1090,7 @@ const pt: Texts = {
         ],
         after: [
           'A conta, o nome de usuário, as estatísticas e os resultados do ranking são apagados na hora. Não dá para desfazer. Os registros técnicos são apagados automaticamente após um período limitado, e os dados de compras ficam na RevenueCat e na loja (veja acima), e uma assinatura do Premium continua até você cancelá-la no Google Play ou na App Store.',
-          'Ao mesmo tempo são apagados o seu código de amigo, a sua lista de amigos (você some das listas dos seus amigos), os pedidos de amizade enviados e recebidos e todos os bloqueios de contas – tanto os seus quanto os de outros jogadores contra você.',
+          'Ao mesmo tempo são apagados o seu código de amigo, a sua lista de amigos (você some das listas dos seus amigos), os pedidos de amizade enviados e recebidos, todos os bloqueios de contas – tanto os seus quanto os de outros jogadores contra você – e os endereços de push dos seus celulares e as suas configurações de notificações.',
         ],
       },
       {
@@ -1187,6 +1240,7 @@ const pt: Texts = {
       'o seu nome de usuário,',
       'as suas estatísticas (partidas jogadas e ganhas) e os seus resultados do ranking,',
       'o seu código de amigo e a sua lista de amigos (você some das listas dos seus amigos), os pedidos de amizade e os bloqueios de contas,',
+      'os endereços de push dos seus celulares e as suas configurações de notificações,',
       'o seu Premium e um eventual bloqueio de tempo.',
     ],
     warning: 'Não dá para desfazer. O Premium sai da conta, mas uma assinatura continua ativa e sendo cobrada até você cancelá-la no Google Play ou na App Store. Se não quiser pagar mais, cancele lá. Se mantiver a assinatura, você pode passá-la para uma conta nova com “Restaurar compras” no app.',
