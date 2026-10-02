@@ -1,10 +1,13 @@
 import type { Metadata } from 'next';
 import { Fraunces } from 'next/font/google';
+import { OG_ICON } from './texts';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://www.spitakolus.com'),
   title: 'Mesa 11 – Spitakolus AB',
   description: 'Mesa 11 – kortspelet Buraco två mot två, online.',
-  icons: { icon: '/buraco/icon.svg' },
+  icons: { icon: '/buraco/icon.svg', apple: '/buraco/apple-touch-icon.png' },
+  openGraph: { siteName: 'Mesa 11', type: 'website', images: [OG_ICON] },
 };
 
 // Samma kursiva rubrikstil som i spelet.

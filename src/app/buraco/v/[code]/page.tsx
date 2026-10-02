@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { formatFriendCode, normalizeFriendCode } from '@/lib/buraco';
 import { getLang, type SearchParams } from '../../lang';
 import { Shell } from '../../Shell';
-import { APP_NAME, t } from '../../texts';
+import { APP_NAME, OG_ICON, t } from '../../texts';
 import { Card, Eyebrow, Notice, Rich } from '../../ui';
 import CopyCode from './CopyCode';
 
@@ -16,7 +16,8 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     description: fl.metaDescription,
     robots: { index: false, follow: false },
     referrer: 'no-referrer',
-    openGraph: { title: fl.metaTitle, description: fl.metaDescription, siteName: APP_NAME, type: 'website' },
+    // Appikonen i förhandsvisningen (WhatsApp m.fl.) – annars visades webbplatsens standardikon.
+    openGraph: { title: fl.metaTitle, description: fl.metaDescription, siteName: APP_NAME, type: 'website', images: [OG_ICON] },
   };
 }
 

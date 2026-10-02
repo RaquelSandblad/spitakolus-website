@@ -7,6 +7,9 @@ import { MIN_PASSWORD_LENGTH, type Lang } from '@/lib/buraco';
 /** Appens namn (under ikonen och i butikerna, som "Mesa 11: Buraco…"). Samma på alla språk. */
 export const APP_NAME = 'Mesa 11';
 
+/** Appikonen som bild när en länk delas (WhatsApp m.fl. visar inte SVG). */
+export const OG_ICON = { url: '/buraco/mesa11-icon.png', width: 512, height: 512, alt: APP_NAME };
+
 export type Block = {
   h: string;
   p?: string[];
