@@ -5,7 +5,7 @@ import { BilingualLegal } from '../ui';
 export const metadata: Metadata = {
   title: 'Integritetspolicy / Privacy Policy – CLUCKWARDS! – Spitakolus AB',
   description:
-    'KACKLÄNGES! (CLUCKWARDS!) samlar inte in några uppgifter om dig. CLUCKWARDS! does not collect any information about you. Inget konto, ingen reklam, ingen analys och inga köp. No account, no ads, no analytics and no purchases.',
+    'Så hanterar KACKLÄNGES! (CLUCKWARDS!) uppgifter: inget konto, frivillig barnsäker reklam och köp via App Store och Google Play. How CLUCKWARDS! handles information: no account, optional child-safe ads and purchases through the App Store and Google Play.',
 };
 
 // Integritetspolicyn för CLUCKWARDS! (KACKLÄNGES!). Spelet, App Store och Google Play länkar hit, till en enda

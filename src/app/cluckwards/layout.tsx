@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'CLUCKWARDS! – Spitakolus AB',
-  description: 'Wrong way. Full speed. Eggs away. En höna som flyger baklänges och skjuter ägg.',
+  description: 'Wrong way. Full speed. Eggs away! En höna som springer baklänges och skjuter ägg.',
 };
 
 // Hönans färger: majsgul bakgrund, gräddvita kort och mörkbrun kant.
