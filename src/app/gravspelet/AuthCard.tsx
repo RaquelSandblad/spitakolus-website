@@ -19,11 +19,11 @@ export default function AuthCard({
       <div className="w-full max-w-md rounded-3xl border-[3px] border-[#0b0614] bg-[#fff4d6] p-8 text-center text-[#1b1030] shadow-[0_6px_0_#0b0614] sm:p-10">
         {top && <div className="flex justify-center">{top}</div>}
         <Image
-          src="/gravspelet/skalbagge.svg"
+          src="/gravspelet/ikon.png"
           alt="Glimmerbaggen"
           width={72}
           height={72}
-          className="mx-auto mb-4 h-[72px] w-[72px]"
+          className="mx-auto mb-4 h-[72px] w-[72px] rounded-2xl border-2 border-[#1b1030]"
           priority
         />
         <p className="text-sm font-semibold uppercase tracking-wider text-[#8a7aa0]">Glimmerbaggen</p>

@@ -58,11 +58,11 @@ export default function Gravspelet() {
         <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1fr_1.15fr]">
           <div className="text-center lg:text-left">
             <Image
-              src="/gravspelet/skalbagge.svg"
-              alt="Den lilla lila skalbaggen"
+              src="/gravspelet/ikon.png"
+              alt="Glimmerbaggen – den lilla lila skalbaggen med pannlampan"
               width={96}
               height={96}
-              className="mx-auto mb-6 h-24 w-24 rounded-3xl border-[3px] border-[#1b1030] bg-[#fff4d6] p-2 shadow-[0_6px_0_#0b0614] lg:mx-0"
+              className="mx-auto mb-6 h-24 w-24 rounded-3xl border-[3px] border-[#1b1030] shadow-[0_6px_0_#0b0614] lg:mx-0"
               priority
             />
             <span className="inline-block rounded-full border-2 border-[#ffd65a]/60 px-4 py-1 text-sm font-semibold text-[#ffd65a]">
