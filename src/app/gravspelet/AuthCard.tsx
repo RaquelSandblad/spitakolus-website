@@ -1,11 +1,23 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-// Ett kort i Glimmerbaggens stil för kontosidorna (bekräfta e-post, nytt lösenord).
-export default function AuthCard({ title, children }: { title: string; children: React.ReactNode }) {
+// Ett kort i Glimmerbaggens stil för kontosidorna (bekräfta e-post, nytt lösenord, ta bort konto).
+// `top` visas överst (t.ex. språkväljaren) och `aboutLabel` är länktexten till spelets sida.
+export default function AuthCard({
+  title,
+  children,
+  top,
+  aboutLabel = 'Om Glimmerbaggen',
+}: {
+  title: string;
+  children: React.ReactNode;
+  top?: React.ReactNode;
+  aboutLabel?: string;
+}) {
   return (
     <div className="flex min-h-[70vh] items-center justify-center px-5 py-14">
       <div className="w-full max-w-md rounded-3xl border-[3px] border-[#0b0614] bg-[#fff4d6] p-8 text-center text-[#1b1030] shadow-[0_6px_0_#0b0614] sm:p-10">
+        {top && <div className="flex justify-center">{top}</div>}
         <Image
           src="/gravspelet/skalbagge.svg"
           alt="Glimmerbaggen"
@@ -19,7 +31,7 @@ export default function AuthCard({ title, children }: { title: string; children:
         <div className="mt-5 text-left leading-relaxed text-[#4a3d5c]">{children}</div>
         <p className="mt-8 text-sm text-[#8a7aa0]">
           <Link href="/gravspelet" className="underline">
-            Om Glimmerbaggen
+            {aboutLabel}
           </Link>{' '}
           ·{' '}
           <a href="mailto:support@spitakolus.com" className="underline">
