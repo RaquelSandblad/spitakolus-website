@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import LangSwitch from '../LangSwitch';
 
 export const metadata: Metadata = {
   title: 'Integritet i Glimmerbaggen – Spitakolus AB',
@@ -14,6 +15,7 @@ export default function GravspeletIntegritet() {
   return (
     <div className="px-5 py-14">
       <article className="mx-auto max-w-3xl rounded-3xl border-[3px] border-[#0b0614] bg-[#fff4d6] p-8 text-[#1b1030] shadow-[0_6px_0_#0b0614] sm:p-10">
+        <LangSwitch page="privacy" current="sv" />
         <p className="text-sm font-semibold uppercase tracking-wider text-[#8a7aa0]">Glimmerbaggen</p>
         <h1 className="mt-1 text-3xl font-extrabold">Integritet</h1>
         <p className="mt-2 text-sm text-[#8a7aa0]">Senast ändrad 1 oktober 2026</p>
