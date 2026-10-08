@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: 'Exclua sua conta do Glimmerbaggen, o nome de usuário e o jogo salvo na nuvem.',
 };
 
-// Portugisiska (Brasilien) versionen av /gravspelet/ta-bort-konto.
+// Portugisiska (Brasilien) versionen av /glimmerbaggen/ta-bort-konto.
 export default function GravspeletExcluirConta() {
   return <DeleteAccount lang="pt" />;
 }

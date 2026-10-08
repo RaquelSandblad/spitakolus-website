@@ -45,9 +45,9 @@ const AREAS = [
 
 // Fler bilder från spelet.
 const GALLERY = [
-  { src: '/gravspelet/kristallruinen.webp', alt: 'En kristallruin där pannlampans stråle studsar i kristallerna', caption: 'Kristallruinerna: vrid kristallerna så att strålen når symbolen.' },
-  { src: '/gravspelet/dammen.webp', alt: 'Vatten väller ut i en tunnel och svampar lyser', caption: 'En gammal vägg brister – och de törstiga svamparna vaknar.' },
-  { src: '/gravspelet/hemligheten.webp', alt: 'Skalbaggen med pannlampan i en mörk ruin', caption: 'Allt syns inte i mörkret …' },
+  { src: '/glimmerbaggen/kristallruinen.webp', alt: 'En kristallruin där pannlampans stråle studsar i kristallerna', caption: 'Kristallruinerna: vrid kristallerna så att strålen når symbolen.' },
+  { src: '/glimmerbaggen/dammen.webp', alt: 'Vatten väller ut i en tunnel och svampar lyser', caption: 'En gammal vägg brister – och de törstiga svamparna vaknar.' },
+  { src: '/glimmerbaggen/hemligheten.webp', alt: 'Skalbaggen med pannlampan i en mörk ruin', caption: 'Allt syns inte i mörkret …' },
 ];
 
 export default function Gravspelet() {
@@ -58,7 +58,7 @@ export default function Gravspelet() {
         <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1fr_1.15fr]">
           <div className="text-center lg:text-left">
             <Image
-              src="/gravspelet/ikon.png"
+              src="/glimmerbaggen/ikon.png"
               alt="Glimmerbaggen – den lilla lila skalbaggen med pannlampan"
               width={96}
               height={96}
@@ -89,7 +89,7 @@ export default function Gravspelet() {
               </a>
             </div>
           </div>
-          <Screenshot src="/gravspelet/hemmet.webp" alt="Stugan på ängen med verkstad, sovrum och museum, och grannarna på gården" priority />
+          <Screenshot src="/glimmerbaggen/hemmet.webp" alt="Stugan på ängen med verkstad, sovrum och museum, och grannarna på gården" priority />
         </div>
       </section>
 
@@ -129,7 +129,7 @@ export default function Gravspelet() {
             </ul>
           </div>
           <div className="order-1 lg:order-2">
-            <Screenshot src="/gravspelet/kolskogen.webp" alt="Kolskogen: en grotta med kolstammar och flammande facklor" />
+            <Screenshot src="/glimmerbaggen/kolskogen.webp" alt="Kolskogen: en grotta med kolstammar och flammande facklor" />
           </div>
         </div>
       </section>
@@ -137,7 +137,7 @@ export default function Gravspelet() {
       {/* Ruinerna */}
       <section className="px-5 py-14">
         <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-2">
-          <Screenshot src="/gravspelet/teckningen.webp" alt="En ruin med facklor och en gammal teckning av dansen runt hjärtat" />
+          <Screenshot src="/glimmerbaggen/teckningen.webp" alt="En ruin med facklor och en gammal teckning av dansen runt hjärtat" />
           <div>
             <h2 className="text-3xl font-extrabold sm:text-4xl">Ruiner som är labyrinter</h2>
             <p className="mt-4 text-lg leading-relaxed text-[#d6cbea]">
@@ -164,7 +164,7 @@ export default function Gravspelet() {
             </p>
           </div>
           <div className="order-1 lg:order-2">
-            <Screenshot src="/gravspelet/gamla-staden.webp" alt="Den gamla staden med trappor, en maskin och lyktor som lyser" />
+            <Screenshot src="/glimmerbaggen/gamla-staden.webp" alt="Den gamla staden med trappor, en maskin och lyktor som lyser" />
           </div>
         </div>
       </section>
@@ -209,7 +209,7 @@ export default function Gravspelet() {
             </div>
           </div>
           <div className="order-1 lg:order-2">
-            <Screenshot src="/gravspelet/lagspel.webp" alt="Lagspel: det lila lagets bas med kristallkistan och ställningen" />
+            <Screenshot src="/glimmerbaggen/lagspel.webp" alt="Lagspel: det lila lagets bas med kristallkistan och ställningen" />
           </div>
         </div>
       </section>
@@ -229,7 +229,7 @@ export default function Gravspelet() {
             </li>
             <li>
               <strong>Ta bort ditt konto:</strong> Meny → Konto → Ta bort konto i spelet, eller{' '}
-              <Link href="/gravspelet/ta-bort-konto" className="font-semibold text-[#6d3ccc] underline">
+              <Link href="/glimmerbaggen/ta-bort-konto" className="font-semibold text-[#6d3ccc] underline">
                 på webben
               </Link>
               . <strong>Frågor?</strong> Mejla{' '}
@@ -241,11 +241,11 @@ export default function Gravspelet() {
           </ul>
           <p className="mt-5 text-sm text-[#8a7aa0]">
             Läs om{' '}
-            <Link href="/gravspelet/integritet" className="underline">
+            <Link href="/glimmerbaggen/integritet" className="underline">
               vilka uppgifter spelet sparar
             </Link>{' '}
             och{' '}
-            <Link href="/gravspelet/villkor" className="underline">
+            <Link href="/glimmerbaggen/villkor" className="underline">
               villkoren
             </Link>
             .

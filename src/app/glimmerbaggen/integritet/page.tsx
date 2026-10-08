@@ -122,8 +122,8 @@ export default function GravspeletIntegritet() {
           </p>
           <p>
             På webben:{' '}
-            <Link href="/gravspelet/ta-bort-konto" className={link}>
-              spitakolus.com/gravspelet/ta-bort-konto
+            <Link href="/glimmerbaggen/ta-bort-konto" className={link}>
+              spitakolus.com/glimmerbaggen/ta-bort-konto
             </Link>{' '}
             – logga in med e-post och lösenord och ta bort kontot direkt.
           </p>
@@ -151,7 +151,7 @@ export default function GravspeletIntegritet() {
           </p>
           <p className="text-sm">
             Läs också{' '}
-            <Link href="/gravspelet/villkor" className="underline">
+            <Link href="/glimmerbaggen/villkor" className="underline">
               villkoren och reglerna för Glimmerbaggen
             </Link>{' '}
             och Spitakolus AB:s{' '}

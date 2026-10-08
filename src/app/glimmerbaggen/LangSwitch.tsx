@@ -5,9 +5,9 @@ import Link from 'next/link';
 export type GravspeletLang = 'sv' | 'en' | 'pt';
 
 export const LEGAL_PAGES = {
-  privacy: { sv: '/gravspelet/integritet', en: '/gravspelet/en/privacy', pt: '/gravspelet/pt/privacidade' },
-  terms: { sv: '/gravspelet/villkor', en: '/gravspelet/en/terms', pt: '/gravspelet/pt/termos' },
-  deleteAccount: { sv: '/gravspelet/ta-bort-konto', en: '/gravspelet/en/delete-account', pt: '/gravspelet/pt/excluir-conta' },
+  privacy: { sv: '/glimmerbaggen/integritet', en: '/glimmerbaggen/en/privacy', pt: '/glimmerbaggen/pt/privacidade' },
+  terms: { sv: '/glimmerbaggen/villkor', en: '/glimmerbaggen/en/terms', pt: '/glimmerbaggen/pt/termos' },
+  deleteAccount: { sv: '/glimmerbaggen/ta-bort-konto', en: '/glimmerbaggen/en/delete-account', pt: '/glimmerbaggen/pt/excluir-conta' },
 } as const;
 
 const LABELS: Record<GravspeletLang, string> = { sv: 'Svenska', en: 'English', pt: 'Português' };

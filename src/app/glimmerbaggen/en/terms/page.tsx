@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 const link = 'font-semibold text-[#6d3ccc] underline';
 
-// Engelska versionen av /gravspelet/villkor. Samma innehåll – ändras den svenska texten ska den här ändras också.
+// Engelska versionen av /glimmerbaggen/villkor. Samma innehåll – ändras den svenska texten ska den här ändras också.
 export default function GravspeletTerms() {
   return (
     <div className="px-5 py-14" lang="en">
@@ -73,7 +73,7 @@ export default function GravspeletTerms() {
 
           <p className="text-sm">
             Also read{' '}
-            <Link href="/gravspelet/en/privacy" className="underline">
+            <Link href="/glimmerbaggen/en/privacy" className="underline">
               what data the game stores
             </Link>
             . Questions? Email{' '}

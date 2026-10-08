@@ -36,6 +36,18 @@ const nextConfig: NextConfig = {
         destination: '/',
         permanent: false,
       },
+      // Spelet heter Glimmerbaggen: de gamla adresserna /gravspelet/… (i version 1.0 av appen, i
+      // butikerna och i kontomejlen) skickas vidare till /glimmerbaggen/…
+      {
+        source: '/gravspelet',
+        destination: '/glimmerbaggen',
+        permanent: true,
+      },
+      {
+        source: '/gravspelet/:path*',
+        destination: '/glimmerbaggen/:path*',
+        permanent: true,
+      },
     ];
   },
 };
