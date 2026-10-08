@@ -76,7 +76,7 @@ export default function GravspeletVillkor() {
 
           <p className="text-sm">
             Läs också{' '}
-            <Link href="/gravspelet/integritet" className="underline">
+            <Link href="/glimmerbaggen/integritet" className="underline">
               vilka uppgifter spelet sparar
             </Link>
             . Frågor? Mejla{' '}

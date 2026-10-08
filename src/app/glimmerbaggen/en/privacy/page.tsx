@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 const link = 'font-semibold text-[#6d3ccc] underline';
 
-// Engelska versionen av /gravspelet/integritet. Samma innehåll – ändras den svenska texten ska den här ändras också.
+// Engelska versionen av /glimmerbaggen/integritet. Samma innehåll – ändras den svenska texten ska den här ändras också.
 export default function GravspeletPrivacy() {
   return (
     <div className="px-5 py-14" lang="en">
@@ -124,8 +124,8 @@ export default function GravspeletPrivacy() {
           </p>
           <p>
             On the web:{' '}
-            <Link href="/gravspelet/en/delete-account" className={link}>
-              spitakolus.com/gravspelet/en/delete-account
+            <Link href="/glimmerbaggen/en/delete-account" className={link}>
+              spitakolus.com/glimmerbaggen/en/delete-account
             </Link>{' '}
             – log in with email and password and delete the account right away.
           </p>
@@ -155,7 +155,7 @@ export default function GravspeletPrivacy() {
           </p>
           <p className="text-sm">
             Also read{' '}
-            <Link href="/gravspelet/en/terms" className="underline">
+            <Link href="/glimmerbaggen/en/terms" className="underline">
               the terms and rules for Glimmerbaggen
             </Link>{' '}
             and Spitakolus AB&apos;s{' '}

@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: 'Delete your Glimmerbaggen account, username and cloud save.',
 };
 
-// Engelska versionen av /gravspelet/ta-bort-konto.
+// Engelska versionen av /glimmerbaggen/ta-bort-konto.
 export default function GravspeletDeleteAccount() {
   return <DeleteAccount lang="en" />;
 }
