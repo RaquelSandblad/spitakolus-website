@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { type Lang, withLang } from './lang';
+import { htmlLang, type Lang, withLang } from './lang';
 import { SUPPORT_EMAIL, t, type LegalTexts } from './texts';
 
 // Byggstenar för sidorna om CLUCKWARDS! (under /cluckwards), i samma stil som Glimmerbaggens sidor
@@ -75,6 +75,7 @@ function LangSwitcher({ current, label }: { current: Lang; label: string }) {
   const langs: { lang: Lang; short: string; name: string }[] = [
     { lang: 'sv', short: 'SV', name: 'Svenska' },
     { lang: 'en', short: 'EN', name: 'English' },
+    { lang: 'pt', short: 'PT', name: 'Português' },
   ];
   return (
     <nav aria-label={label} className="flex rounded-full border-[3px] border-[#3a1f0b] bg-[#fff8e7] p-1 text-sm font-bold">
@@ -82,8 +83,8 @@ function LangSwitcher({ current, label }: { current: Lang; label: string }) {
         <a
           key={l.lang}
           href={`?lang=${l.lang}`}
-          hrefLang={l.lang}
-          lang={l.lang}
+          hrefLang={htmlLang(l.lang)}
+          lang={htmlLang(l.lang)}
           title={l.name}
           aria-label={l.name}
           aria-current={l.lang === current ? 'true' : undefined}
@@ -100,32 +101,39 @@ function LangSwitcher({ current, label }: { current: Lang; label: string }) {
 
 /**
  * Sidans ram: överst spelets namn och språkväljaren, underst länkarna.
- * `bilingual` används på integritetspolicyn, som har svenska och engelska på samma sida (spelet länkar till
- * en enda adress): då byts språkväljaren mot en länk till den engelska delen, och länkarna väljer språk
- * efter webbläsaren.
+ * `bilingual` används på integritetspolicyn, som har svenska, engelska och portugisiska på samma sida (spelet
+ * länkar till en enda adress): då byts språkväljaren mot länkar till den engelska och den portugisiska delen,
+ * och länkarna väljer språk efter webbläsaren.
  */
 export function Shell({ lang, bilingual = false, children }: { lang: Lang; bilingual?: boolean; children: React.ReactNode }) {
   const tx = t(lang);
   const c = tx.common;
   const en = t('en').common;
+  const pt = t('pt').common;
   const href = (path: string) => (bilingual ? path : withLang(path, lang));
-  const label = (sv: string, eng: string) => (bilingual ? `${sv} / ${eng}` : sv);
+  const label = (sv: string, eng: string, por: string) => (bilingual ? `${sv} / ${eng} / ${por}` : sv);
+  const anchor = lang === 'en' ? '#english' : lang === 'pt' ? '#portugues' : '';
   const links = [
-    { href: href('/cluckwards'), label: label(c.about, en.about) },
-    { href: bilingual ? '/cluckwards/integritet' : withLang(`/cluckwards/integritet${lang === 'en' ? '#english' : ''}`, lang), label: label(c.privacy, en.privacy) },
-    { href: href('/cluckwards/villkor'), label: label(c.terms, en.terms) },
+    { href: href('/cluckwards'), label: label(c.about, en.about, pt.about) },
+    { href: bilingual ? '/cluckwards/integritet' : withLang(`/cluckwards/integritet${anchor}`, lang), label: label(c.privacy, en.privacy, pt.privacy) },
+    { href: href('/cluckwards/villkor'), label: label(c.terms, en.terms, pt.terms) },
   ];
   return (
-    <div lang={lang} className="px-5 pb-14 pt-6">
+    <div lang={htmlLang(lang)} className="px-5 pb-14 pt-6">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-4">
         <Link href={href('/cluckwards')} className="flex items-center gap-3">
           <Hen className="h-11 w-11 rounded-2xl border-[3px] border-[#3a1f0b] shadow-[0_3px_0_#3a1f0b]" />
           <span className="text-xl font-extrabold tracking-tight">{tx.name}</span>
         </Link>
         {bilingual ? (
-          <a href="#english" lang="en" className="shrink-0 whitespace-nowrap rounded-full border-[3px] border-[#3a1f0b] bg-[#fff8e7] px-3 py-1.5 text-sm font-bold hover:bg-[#fff1c2]">
-            English below ↓
-          </a>
+          <nav className="flex shrink-0 flex-wrap justify-end gap-2">
+            <a href="#english" lang="en" className="whitespace-nowrap rounded-full border-[3px] border-[#3a1f0b] bg-[#fff8e7] px-3 py-1.5 text-sm font-bold hover:bg-[#fff1c2]">
+              English ↓
+            </a>
+            <a href="#portugues" lang="pt-BR" className="whitespace-nowrap rounded-full border-[3px] border-[#3a1f0b] bg-[#fff8e7] px-3 py-1.5 text-sm font-bold hover:bg-[#fff1c2]">
+              Português ↓
+            </a>
+          </nav>
         ) : (
           <LangSwitcher current={lang} label={c.languageLabel} />
         )}
@@ -139,14 +147,19 @@ export function Shell({ lang, bilingual = false, children }: { lang: Lang; bilin
             </Link>
           ))}
           <a href={`mailto:${SUPPORT_EMAIL}`} className="hover:text-[#c2311f] hover:underline">
-            {label(c.contact, en.contact)}: {SUPPORT_EMAIL}
+            {label(c.contact, en.contact, pt.contact)}: {SUPPORT_EMAIL}
           </a>
         </nav>
         <p className="mt-3">{c.company}</p>
         {bilingual && (
-          <p className="mt-1" lang="en">
-            {en.company}
-          </p>
+          <>
+            <p className="mt-1" lang="en">
+              {en.company}
+            </p>
+            <p className="mt-1" lang="pt-BR">
+              {pt.company}
+            </p>
+          </>
         )}
       </footer>
     </div>
@@ -165,7 +178,7 @@ export function Card({ children, className = '' }: { children: React.ReactNode; 
 /** En policytext: rubrik, datum, inledning och avsnitt. */
 function LegalArticle({ lang, texts, id, top }: { lang: Lang; texts: LegalTexts; id?: string; top?: React.ReactNode }) {
   return (
-    <article id={id} lang={lang} className="scroll-mt-24">
+    <article id={id} lang={htmlLang(lang)} className="scroll-mt-24">
       <p className="text-sm font-semibold uppercase tracking-wider text-[#b0761a]">{t(lang).name}</p>
       <h1 className="mt-1 text-3xl font-extrabold">{texts.title}</h1>
       <p className="mt-2 text-sm text-[#8a6a48]">{texts.updated}</p>
@@ -216,8 +229,8 @@ export function Legal({ lang, texts }: { lang: Lang; texts: LegalTexts }) {
   );
 }
 
-/** Integritetspolicyn: svenska först och engelska under, på samma sida (spelet länkar till en enda adress). */
-export function BilingualLegal({ sv, en }: { sv: LegalTexts; en: LegalTexts }) {
+/** Integritetspolicyn: svenska först, engelska och portugisiska under, på samma sida (spelet länkar till en enda adress). */
+export function BilingualLegal({ sv, en, pt }: { sv: LegalTexts; en: LegalTexts; pt: LegalTexts }) {
   return (
     <Shell lang="sv" bilingual>
       <Card className="mx-auto max-w-3xl">
@@ -225,15 +238,20 @@ export function BilingualLegal({ sv, en }: { sv: LegalTexts; en: LegalTexts }) {
           lang="sv"
           texts={sv}
           top={
-            <p className="mt-4 text-sm" lang="en">
-              <a href="#english" className={linkClass}>
+            <p className="mt-4 flex gap-4 text-sm">
+              <a href="#english" lang="en" className={linkClass}>
                 English below
+              </a>
+              <a href="#portugues" lang="pt-BR" className={linkClass}>
+                Português abaixo
               </a>
             </p>
           }
         />
         <hr className="my-10 border-t-[3px] border-dashed border-[#3a1f0b]/25" />
         <LegalArticle lang="en" texts={en} id="english" />
+        <hr className="my-10 border-t-[3px] border-dashed border-[#3a1f0b]/25" />
+        <LegalArticle lang="pt" texts={pt} id="portugues" />
       </Card>
     </Shell>
   );
