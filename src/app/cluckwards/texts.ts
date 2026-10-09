@@ -1,6 +1,6 @@
 import type { Lang } from './lang';
 
-// Alla texter för sidorna om CLUCKWARDS! (på svenska KACKLÄNGES!) på svenska och engelska.
+// Alla texter för sidorna om CLUCKWARDS! (på svenska KACKLÄNGES!) på svenska, engelska och portugisiska (Brasilien).
 // Enkel märkning: **fet**, [länktext](/cluckwards/...) eller [länktext](https://...), och e-postadresser blir länkar.
 //
 // Integritetspolicyn beskriver spelet som det blir vid lanseringen (honspelet H-022, H-023, H-025):
@@ -76,7 +76,7 @@ const sv: Texts = {
     metaTitle: 'Integritetspolicy för KACKLÄNGES! (CLUCKWARDS!) – Spitakolus AB',
     metaDescription: 'Så hanterar KACKLÄNGES! uppgifter. Inget konto, frivillig barnsäker reklam och köp via App Store och Google Play.',
     title: 'Integritetspolicy',
-    updated: 'Senast ändrad 7 oktober 2026',
+    updated: 'Senast ändrad 9 oktober 2026',
     intro: [
       'KACKLÄNGES! (CLUCKWARDS! på engelska) görs av Spitakolus AB (org.nr 559554-6101). Spitakolus AB är personuppgiftsansvarig för det som beskrivs här.',
       '**Vi vet inte vem du är.** Spelet har inget konto, och vi har ingen egen server som tar emot uppgifter om dig.',
@@ -117,7 +117,7 @@ const sv: Texts = {
           'felrapporter från reklamen.',
         ],
         after: [
-          'Google hanterar de uppgifterna enligt sina egna regler: [Så använder Google information från appar som använder Googles tjänster](https://policies.google.com/technologies/partner-sites?hl=sv). Där det behövs frågar spelet om lov innan reklam visas, och du kan alltid låta bli att titta.',
+          'Google hanterar de uppgifterna enligt sina egna regler: [Så använder Google information från appar som använder Googles tjänster](https://policies.google.com/technologies/partner-sites?hl=sv). Eftersom spelet behandlar alla spelare som barn ber Google inte om samtycke till anpassad reklam, och visar bara reklam som inte bygger på vem du är. Du kan alltid låta bli att titta.',
         ],
       },
       {
@@ -150,7 +150,7 @@ const sv: Texts = {
       {
         h: 'Varför vi får hantera uppgifterna',
         p: [
-          'Uppgifterna om köp behövs för att ge dig det du har köpt (avtal). Reklamen och skyddet mot fusk bygger på vårt berättigade intresse av att kunna erbjuda spelet gratis, och på ditt samtycke där lagen kräver det.',
+          'Uppgifterna om köp behövs för att ge dig det du har köpt (avtal). Reklamen och skyddet mot fusk bygger på vårt berättigade intresse av att kunna erbjuda spelet gratis.',
         ],
       },
       {
@@ -264,7 +264,7 @@ const en: Texts = {
     metaTitle: 'Privacy Policy for CLUCKWARDS! – Spitakolus AB',
     metaDescription: 'How CLUCKWARDS! handles information. No account, optional child-safe ads and purchases through the App Store and Google Play.',
     title: 'Privacy Policy',
-    updated: 'Last updated 7 October 2026',
+    updated: 'Last updated 9 October 2026',
     intro: [
       'CLUCKWARDS! (KACKLÄNGES! in Swedish) is made by Spitakolus AB (Swedish company reg. no. 559554-6101). Spitakolus AB is the data controller for what is described here.',
       '**We do not know who you are.** The game has no account, and we have no server of our own that receives information about you.',
@@ -305,7 +305,7 @@ const en: Texts = {
           'error reports from the ad.',
         ],
         after: [
-          'Google handles that information under its own rules: [How Google uses information from sites or apps that use its services](https://policies.google.com/technologies/partner-sites). Where needed, the game asks for permission before ads are shown, and you can always choose not to watch.',
+          'Google handles that information under its own rules: [How Google uses information from sites or apps that use its services](https://policies.google.com/technologies/partner-sites). Because the game treats every player as a child, Google does not ask for consent to personalised ads and only shows ads that are not based on who you are. You can always choose not to watch.',
         ],
       },
       {
@@ -338,7 +338,7 @@ const en: Texts = {
       {
         h: 'Why we may handle the information',
         p: [
-          'Purchase information is needed to give you what you have bought (contract). The ads and fraud prevention are based on our legitimate interest in being able to offer the game for free, and on your consent where the law requires it.',
+          'Purchase information is needed to give you what you have bought (contract). The ads and fraud prevention are based on our legitimate interest in being able to offer the game for free.',
         ],
       },
       {
@@ -417,6 +417,192 @@ const en: Texts = {
   },
 };
 
+const pt: Texts = {
+  name: 'CLUCKWARDS!',
+  common: {
+    languageLabel: 'Idioma',
+    about: 'Sobre o jogo',
+    privacy: 'Política de Privacidade',
+    terms: 'Termos de Uso',
+    contact: 'Contato',
+    company: 'CLUCKWARDS! é feito pela Spitakolus AB (empresa sueca, nº de registro 559554-6101).',
+  },
+  home: {
+    metaTitle: 'CLUCKWARDS! – Spitakolus AB',
+    metaDescription: 'Direção errada. Velocidade máxima. Ovos voando! Uma galinha que corre de ré e lança ovos. Em breve na App Store e no Google Play.',
+    badge: 'Em desenvolvimento',
+    otherName: 'Em sueco, o jogo se chama KACKLÄNGES!',
+    tagline: 'Direção errada. Velocidade máxima. Ovos voando!',
+    lead: 'Uma galinha corre de ré pela fazenda a toda velocidade e lança ovos em tudo o que estiver no caminho.',
+    stores: 'O jogo chega em breve à App Store e ao Google Play.',
+    factsTitle: 'Bom saber',
+    facts: [
+      'Grátis para jogar. Sem conta e sem login.',
+      'Anúncios só se você quiser assistir, para ganhar milho extra.',
+      'Roupas divertidas para a galinha podem ser compradas, mas dá para aproveitar tudo no jogo sem pagar nada.',
+      'Seu jogo fica salvo no seu próprio celular.',
+    ],
+    supportTitle: 'Dúvidas?',
+    support: 'Envie um e-mail para support@spitakolus.com.',
+    legal: 'Leia a [Política de Privacidade](/cluckwards/integritet#portugues) e os [Termos de Uso](/cluckwards/villkor).',
+  },
+  privacy: {
+    metaTitle: 'Política de Privacidade do CLUCKWARDS! – Spitakolus AB',
+    metaDescription: 'Como o CLUCKWARDS! trata informações. Sem conta, anúncios opcionais e seguros para crianças e compras pela App Store e pelo Google Play.',
+    title: 'Política de Privacidade',
+    updated: 'Atualizada em 9 de outubro de 2026',
+    intro: [
+      'O CLUCKWARDS! (KACKLÄNGES! em sueco) é feito pela Spitakolus AB (empresa sueca, nº de registro 559554-6101). A Spitakolus AB é a controladora dos dados descritos aqui.',
+      '**Nós não sabemos quem você é.** O jogo não tem conta, e não temos nenhum servidor próprio que receba informações sobre você.',
+    ],
+    sections: [
+      {
+        h: 'Resumindo',
+        ul: [
+          'Seu jogo fica salvo no seu próprio celular.',
+          'Anúncios só aparecem se você escolher assistir. Eles vêm do Google AdMob, são configurados para crianças e não se baseiam em quem você é.',
+          'As compras são feitas na App Store ou no Google Play. Nós nunca vemos seu nome nem os dados do seu cartão.',
+          'Nós nunca vendemos informações.',
+        ],
+      },
+      {
+        h: 'O que fica salvo no seu celular',
+        p: ['O jogo salva algumas coisas em um arquivo no seu próprio celular, para você continuar de onde parou:'],
+        ul: [
+          'sua melhor pontuação, seu melhor combo e o checkpoint mais alto que você alcançou',
+          'seu milho, quais roupas e acessórios a galinha tem e o que ela está usando',
+          'seu progresso nos desafios',
+          'quando você assistiu a um anúncio pela última vez, para que exista um limite por dia',
+          'se você já viu a introdução e se o som está ligado ou desligado.',
+        ],
+        after: ['O arquivo fica no celular. Nós não conseguimos vê-lo, e ele não é enviado para nós.'],
+      },
+      {
+        h: 'Anúncios (Google AdMob)',
+        p: [
+          'Depois de uma partida, você pode escolher assistir a um vídeo curto de anúncio e ganhar milho extra. Nenhum anúncio aparece se você não tocar no botão.',
+          'Os anúncios vêm do Google AdMob. Nós os configuramos para crianças: **eles não se baseiam em quem você é nem no que você faz em outros apps, e o jogo não usa o ID de publicidade do celular.**',
+          'Para mostrar o anúncio, contar as visualizações e evitar fraudes, o Google ainda recebe algumas informações técnicas do celular:',
+        ],
+        ul: [
+          'o endereço IP, que pode mostrar mais ou menos onde você está (país ou cidade, não a localização exata)',
+          'informações sobre o celular, como modelo, idioma e um ID que vale só para os nossos apps',
+          'como você interage com o anúncio, por exemplo se o vídeo foi assistido até o fim',
+          'relatórios de erro do anúncio.',
+        ],
+        after: [
+          'O Google trata essas informações de acordo com as próprias regras: [Como o Google usa informações de sites ou apps que usam nossos serviços](https://policies.google.com/technologies/partner-sites?hl=pt-BR). Como o jogo trata todos os jogadores como crianças, o Google não pede consentimento para anúncios personalizados e mostra apenas anúncios que não se baseiam em quem você é. Você sempre pode escolher não assistir.',
+        ],
+      },
+      {
+        h: 'Compras (App Store, Google Play e RevenueCat)',
+        p: [
+          'Você pode comprar roupas e acessórios para a galinha. A compra é feita na App Store ou no Google Play, que cuidam do pagamento. Nós nunca recebemos seu nome, seu e-mail nem os dados do seu cartão.',
+          'Para verificar as compras e poder restaurá-las se você trocar de celular, usamos um serviço chamado RevenueCat. A RevenueCat recebe um ID aleatório que não diz quem você é, quais compras foram feitas e o recibo da loja. Usamos isso para que as compras funcionem, para evitar fraudes e para ver quantas pessoas compram o quê. A RevenueCat fica nos Estados Unidos, e a transferência é protegida pelas Cláusulas Contratuais Padrão da União Europeia. Saiba mais na [Política de Privacidade da RevenueCat](https://www.revenuecat.com/privacy/).',
+          'As compras podem ser bloqueadas com o controle parental do celular, por exemplo o Pedir para Comprar da Apple ou o Family Link do Google.',
+        ],
+      },
+      {
+        h: 'Apple e Google',
+        p: [
+          'A App Store e o Google Play podem coletar informações de acordo com os próprios termos, por exemplo sobre downloads e, se você permitiu nas configurações do celular, relatórios de falhas. Nós podemos ver estatísticas agregadas e relatórios de falhas sem nomes ou dados de contato.',
+        ],
+      },
+      {
+        h: 'Por quanto tempo as informações ficam guardadas?',
+        p: [
+          'O arquivo no celular fica guardado até você apagar o jogo. Se você faz backup do celular (por exemplo no iCloud), o arquivo pode ir junto no seu próprio backup. Ele nunca chega até nós.',
+          'As informações das compras ficam na RevenueCat pelo tempo necessário para que as compras funcionem e possam ser restauradas. O Google guarda as informações dos anúncios de acordo com as próprias regras.',
+        ],
+      },
+      {
+        h: 'Crianças',
+        p: [
+          'O jogo é para todas as idades e foi feito para ser seguro para crianças. Os anúncios são configurados para crianças, não se baseiam em quem você é e não usam o ID de publicidade. O jogo não tem chat nem nenhuma forma de compartilhar algo com outros jogadores. Nunca pedimos nome, e-mail ou qualquer outra coisa que mostre quem alguém é.',
+        ],
+      },
+      {
+        h: 'Por que podemos tratar as informações',
+        p: [
+          'As informações das compras são necessárias para entregar o que você comprou (contrato). Os anúncios e a prevenção de fraudes se baseiam no nosso interesse legítimo de poder oferecer o jogo de graça.',
+        ],
+      },
+      {
+        h: 'Se algo mudar',
+        p: [
+          '**Se adicionarmos algo novo, como rankings ou salvamento na nuvem, atualizaremos esta política antes.** A nova política estará aqui e nas lojas antes de essa versão do jogo ser lançada, e pediremos permissão quando a lei exigir.',
+        ],
+      },
+      {
+        h: 'Seus direitos',
+        p: [
+          'Você tem o direito de saber quais informações existem sobre você, de corrigi-las ou apagá-las e de se opor à forma como são usadas. Como não sabemos quem você é, talvez precisemos da sua ajuda para encontrar as informações certas. Envie um e-mail para support@spitakolus.com e nós ajudaremos. Para apagar o que está salvo no celular, apague o jogo.',
+          'Você pode reclamar à autoridade sueca de proteção de dados ([imy.se](https://www.imy.se/en/)) ou à autoridade de proteção de dados do seu país (no Brasil, a [ANPD](https://www.gov.br/anpd)).',
+        ],
+      },
+      {
+        h: 'Contato',
+        p: ['Spitakolus AB, empresa sueca, nº de registro 559554-6101. E-mail: support@spitakolus.com.'],
+      },
+    ],
+  },
+  terms: {
+    metaTitle: 'Termos de Uso do CLUCKWARDS! – Spitakolus AB',
+    metaDescription: 'Os termos para jogar CLUCKWARDS!. Grátis, sem conta, anúncios opcionais e compras pelas lojas.',
+    title: 'Termos de Uso',
+    updated: 'Atualizados em 9 de outubro de 2026',
+    intro: [
+      'O CLUCKWARDS! (KACKLÄNGES! em sueco) é feito pela Spitakolus AB (empresa sueca, nº de registro 559554-6101). Ao baixar e jogar o jogo, você aceita estes termos. Leia também a [Política de Privacidade](/cluckwards/integritet#portugues).',
+    ],
+    sections: [
+      {
+        h: 'O jogo',
+        p: ['O jogo é grátis e não tem conta. Você pode escolher assistir a anúncios para ganhar milho extra, mas nunca é obrigatório.'],
+      },
+      {
+        h: 'Milho e compras',
+        ul: [
+          'Você ganha milho jogando. O milho não pode ser comprado, vendido nem trocado por dinheiro.',
+          'Roupas e acessórios para a galinha podem ser comprados na App Store ou no Google Play. Eles só mudam a aparência da galinha e não tornam o jogo mais fácil de vencer.',
+          'Os termos da loja valem para o pagamento e o reembolso. Para pedir reembolso, fale com a Apple ou o Google.',
+          'As compras pertencem à sua conta da Apple ou do Google e podem ser restauradas se você trocar de celular.',
+        ],
+      },
+      {
+        h: 'Seu jogo salvo',
+        p: [
+          'Sua melhor pontuação, seu milho e até onde você chegou ficam salvos só no seu celular. Se você apagar o jogo ou trocar de celular, isso pode se perder, e não conseguimos recuperar. O que você comprou pode ser restaurado.',
+        ],
+      },
+      {
+        h: 'O que você não pode fazer',
+        ul: [
+          'Copiar, vender ou distribuir o jogo, ou versões modificadas dele.',
+          'Modificar o jogo para trapacear, enganar outras pessoas ou fazer algo parecer que vem de nós.',
+        ],
+      },
+      {
+        h: 'App Store e Google Play',
+        p: ['Você baixa o jogo na App Store ou no Google Play. Os termos deles também valem.'],
+      },
+      {
+        h: 'O jogo pode mudar',
+        p: [
+          'Fazemos o possível para que o jogo funcione, mas não podemos prometer que ele sempre vai funcionar. O jogo pode mudar, e recursos podem ser adicionados ou removidos. Se estes termos mudarem, atualizaremos esta página antes de essa versão ser lançada.',
+        ],
+      },
+      {
+        h: 'Direitos',
+        p: ['O jogo e tudo o que há nele, como a galinha, as imagens, os sons e a música, pertencem à Spitakolus AB.'],
+      },
+      {
+        h: 'Contato',
+        p: ['Dúvidas? Envie um e-mail para support@spitakolus.com.'],
+      },
+    ],
+  },
+};
+
 export function t(lang: Lang): Texts {
-  return lang === 'sv' ? sv : en;
+  return lang === 'sv' ? sv : lang === 'pt' ? pt : en;
 }
