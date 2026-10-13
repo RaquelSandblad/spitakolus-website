@@ -1,6 +1,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
+// Spelet i butikerna och trailern.
+const STORE = {
+  ios: 'https://apps.apple.com/se/app/glimmerbaggen/id6817848684',
+  android: 'https://play.google.com/store/apps/details?id=com.spitakolus.glimmerbaggen&hl=sv',
+  trailer: 'https://www.youtube.com/watch?v=4cxO2o2VXDc',
+};
+
 // Glimmerbaggens egen sida. Färgerna är desamma som i spelet.
 const FEATURES = [
   {
@@ -56,7 +63,7 @@ export default function Gravspelet() {
       {/* Början */}
       <section className="relative overflow-hidden px-5 pb-16 pt-14 sm:pt-20">
         <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1fr_1.15fr]">
-          <div className="text-center lg:text-left">
+          <div className="min-w-0 text-center lg:text-left">
             <Image
               src="/glimmerbaggen/ikon.png"
               alt="Glimmerbaggen – den lilla lila skalbaggen med pannlampan"
@@ -66,28 +73,22 @@ export default function Gravspelet() {
               priority
             />
             <span className="inline-block rounded-full border-2 border-[#ffd65a]/60 px-4 py-1 text-sm font-semibold text-[#ffd65a]">
-              Under utveckling · snart på Android och iPhone
+              Nu på Android och iPhone · gratis att börja
             </span>
-            <h1 className="mt-5 text-5xl font-extrabold tracking-tight sm:text-6xl">Glimmerbaggen</h1>
+            <h1 className="mt-5 text-4xl font-extrabold tracking-tight min-[400px]:text-5xl sm:text-6xl">Glimmerbaggen</h1>
             <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-[#d6cbea] lg:mx-0">
               En liten lila skalbagge med pannlampa har en stuga på ängen – och under den väntar en hel värld. Gräv dig ner
               genom grottor och ruiner, hitta kartans fyra bitar och väck Den gamla staden kring Jordens hjärta, 800–1000
               meter ner.
             </p>
-            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
-              <a
-                href="#spela-ihop"
-                className="rounded-full border-[3px] border-[#1b1030] bg-[#ffd65a] px-7 py-3 text-center font-bold text-[#1b1030] shadow-[0_4px_0_#0b0614] transition-transform hover:-translate-y-0.5"
-              >
-                Spela ihop med kompisar
+            <StoreButtons />
+            <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-[#d6cbea] lg:mx-0">
+              Början är gratis. Resten av äventyret låser du upp med ett engångsköp, <strong>Hela spelet</strong> – inga
+              annonser och ingen prenumeration.{' '}
+              <a href={STORE.trailer} target="_blank" rel="noopener noreferrer" className="font-semibold text-[#ffd65a] underline">
+                Se trailern
               </a>
-              <a
-                href="#konto"
-                className="rounded-full border-[3px] border-[#fff4d6]/80 px-7 py-3 text-center font-bold text-[#fff4d6] transition-colors hover:bg-[#fff4d6] hover:text-[#1b1030]"
-              >
-                Ditt konto
-              </a>
-            </div>
+            </p>
           </div>
           <Screenshot src="/glimmerbaggen/hemmet.webp" alt="Stugan på ängen med verkstad, sovrum och museum, och grannarna på gården" priority />
         </div>
@@ -214,6 +215,17 @@ export default function Gravspelet() {
         </div>
       </section>
 
+      {/* Ladda ner */}
+      <section className="px-5 py-14">
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="text-3xl font-extrabold sm:text-4xl">Börja gräva</h2>
+          <p className="mt-4 text-lg leading-relaxed text-[#d6cbea]">
+            Glimmerbaggen finns på svenska, engelska och portugisiska – för Android och iPhone.
+          </p>
+          <StoreButtons center />
+        </div>
+      </section>
+
       {/* Konto */}
       <section id="konto" className="scroll-mt-20 px-5 py-14">
         <div className="mx-auto max-w-3xl rounded-3xl border-[3px] border-[#1b1030] bg-[#fff4d6] p-8 text-[#1b1030] shadow-[0_6px_0_#0b0614] sm:p-10">
@@ -252,6 +264,35 @@ export default function Gravspelet() {
           </p>
         </div>
       </section>
+    </div>
+  );
+}
+
+function StoreButtons({ center = false }: { center?: boolean }) {
+  return (
+    <div className={`mt-8 flex flex-col justify-center gap-3 sm:flex-row ${center ? '' : 'lg:justify-start'}`}>
+      <a
+        href={STORE.ios}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border-[3px] border-[#1b1030] bg-[#ffd65a] px-6 py-3 font-bold text-[#1b1030] shadow-[0_4px_0_#0b0614] transition-transform hover:-translate-y-0.5"
+      >
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
+        </svg>
+        Ladda ner på App Store
+      </a>
+      <a
+        href={STORE.android}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border-[3px] border-[#1b1030] bg-[#b8f07a] px-6 py-3 font-bold text-[#1b1030] shadow-[0_4px_0_#0b0614] transition-transform hover:-translate-y-0.5"
+      >
+        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M3.6 2.2c-.3.3-.4.8-.4 1.4v16.8c0 .6.1 1.1.4 1.4l.1.1 9.4-9.4v-.2L3.7 2.1l-.1.1zm12.6 12.6-3.1-3.1v-.2l3.1-3.1.1.1 3.7 2.1c1.1.6 1.1 1.6 0 2.2l-3.7 2.1-.1-.1zm.1-.1L13.1 11.5 3.6 21c.4.4.9.4 1.6.1l11.1-6.4M16.3 8.3 5.2 1.9c-.7-.4-1.2-.3-1.6.1l9.5 9.5 3.2-3.2z" />
+        </svg>
+        Ladda ner på Google Play
+      </a>
     </div>
   );
 }
