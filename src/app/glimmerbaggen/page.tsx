@@ -27,7 +27,7 @@ const FEATURES = [
   },
   {
     title: 'Ett hem som växer',
-    text: 'Bygg till stugan med verkstad, sovrum och museum. Rädda Glimmerstadens sju vilsna invånare – de flyttar hem till dig, gården vid stugan växer och grannarna berättar om den gamla staden.',
+    text: 'Bygg till stugan med verkstad, sovrum och museum. Rädda Glimmerstadens tio vilsna invånare – de flyttar hem till dig, gården vid stugan växer och grannarna berättar om den gamla staden.',
     color: '#8fd3ff',
   },
   {
