@@ -1,16 +1,30 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
+import QRCode from 'qrcode';
+import type { Lang } from '@/lib/buraco';
 import { getLang, type SearchParams } from './lang';
 import { Shell } from './Shell';
-import { APP_NAME, t } from './texts';
+import { StoreButtons } from './StoreButtons';
+import { APP_NAME, OG_ICON, t } from './texts';
 import { Card, Rich, withLang } from './ui';
 
 type Props = { searchParams: SearchParams };
 
+const OG_LOCALE: Record<Lang, string> = { sv: 'sv_SE', en: 'en_US', pt: 'pt_BR' };
+
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
-  const home = t(await getLang(searchParams)).home;
-  return { title: home.metaTitle, description: home.metaDescription };
+  const lang = await getLang(searchParams);
+  const home = t(lang).home;
+  return {
+    title: home.metaTitle,
+    description: home.metaDescription,
+    // Sidan finns på tre språk (?lang=); utan ?lang= väljer webbläsarens språk. Talar om det för sökmotorerna.
+    alternates: {
+      languages: { sv: '/buraco?lang=sv', en: '/buraco?lang=en', 'pt-BR': '/buraco?lang=pt', 'x-default': '/buraco' },
+    },
+    openGraph: { siteName: APP_NAME, type: 'website', images: [OG_ICON], locale: OG_LOCALE[lang] },
+  };
 }
 
 const ACCENTS = ['#f2b84b', '#6cb6ff', '#ff8a65', '#9be3c1'];
@@ -19,6 +33,11 @@ const ACCENTS = ['#f2b84b', '#6cb6ff', '#ff8a65', '#9be3c1'];
 export default async function Buraco({ searchParams }: Props) {
   const lang = await getLang(searchParams);
   const { home, common } = t(lang);
+  // QR-koden för den som är på datorn: mobilen öppnar /buraco/download, som skickar vidare till rätt butik.
+  const qrSvg = await QRCode.toString(
+    `https://www.spitakolus.com/buraco/download?lang=${lang}&utm_source=spitakolus.com&utm_medium=qr`,
+    { type: 'svg', margin: 0, color: { dark: '#04150f', light: '#fbf8f1' } },
+  ).catch(() => null);
   const links = [
     { href: withLang('/buraco/integritet', lang), label: common.privacy },
     { href: withLang('/buraco/villkor', lang), label: common.terms },
@@ -35,15 +54,22 @@ export default async function Buraco({ searchParams }: Props) {
           </span>
           <h1 className="mt-5 font-[family-name:var(--font-buraco-display)] text-6xl font-semibold italic tracking-tight sm:text-7xl">{APP_NAME}</h1>
           <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-[#cfe3da] lg:mx-0">{home.lead}</p>
-          {/* Appen finns på Google Play; App Store-länken läggs till när Apple har godkänt appen. */}
-          <a
-            href={home.playUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-7 inline-block rounded-full bg-[#f2b84b] px-6 py-3 text-base font-semibold text-[#04150f] shadow-[0_4px_0_#b07d22] transition-transform hover:-translate-y-0.5"
-          >
-            {home.playButton}
-          </a>
+          <StoreButtons lang={lang} className="mt-7" />
+          {/* Bara på datorn: en telefon har redan knapparna ovanför. */}
+          {qrSvg && (
+            <div className="mt-8 hidden items-center gap-4 rounded-2xl border border-[#fbf8f1]/15 bg-[#04150f]/35 p-4 text-left lg:flex">
+              <div
+                className="h-24 w-24 shrink-0 rounded-lg bg-[#fbf8f1] p-1.5 [&>svg]:h-full [&>svg]:w-full"
+                role="img"
+                aria-label={home.qrTitle}
+                dangerouslySetInnerHTML={{ __html: qrSvg }}
+              />
+              <div>
+                <p className="font-semibold">{home.qrTitle}</p>
+                <p className="mt-1 text-sm leading-relaxed text-[#cfe3da]">{home.qrText}</p>
+              </div>
+            </div>
+          )}
         </div>
         <div className="mx-auto w-56 sm:w-72">
           <Image

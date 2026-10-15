@@ -70,6 +70,12 @@ export type Texts = {
     badge: string;
     playButton: string;
     playUrl: string;
+    appStoreButton: string;
+    /** Appen i App Store: landets butik för sv och pt, för en utan land (Apple väljer besökarens land). */
+    appStoreUrl: string;
+    /** QR-koden på datorn, som öppnar /buraco/download i mobilen. */
+    qrTitle: string;
+    qrText: string;
     lead: string;
     features: { title: string; text: string }[];
     freeTitle: string;
@@ -110,7 +116,6 @@ export type Texts = {
     invalidText: string;
     stepsTitle: string;
     steps: string[];
-    appStoreSoon: string;
     note: string;
   };
 };
@@ -135,10 +140,14 @@ const sv: Texts = {
   },
   home: {
     metaTitle: 'Mesa 11 – kortspelet Buraco två mot två, online',
-    metaDescription: 'Mesa 11 är appen för Buraco, kortspelet två mot två, online. Finns på Google Play – snart även i App Store.',
-    badge: 'Nu på Google Play – snart i App Store',
+    metaDescription: 'Mesa 11 är appen för Buraco, kortspelet två mot två, online. Finns på Google Play och i App Store.',
+    badge: 'Nu på Google Play och i App Store',
     playButton: 'Ladda ner på Google Play',
     playUrl: 'https://play.google.com/store/apps/details?id=com.spitakolus.buraco&hl=sv',
+    appStoreButton: 'Ladda ner på App Store',
+    appStoreUrl: 'https://apps.apple.com/se/app/mesa-11-buraco-kortspel/id6817430182',
+    qrTitle: 'Ladda ner till mobilen',
+    qrText: 'Rikta mobilens kamera mot koden, så öppnas rätt butik – App Store på iPhone och Google Play på Android.',
     lead: 'Det klassiska kortspelet Buraco, två mot två, online. Samarbeta med din partner, lägg ut serier och bygg kanastor innan motståndarna hinner före.',
     features: [
       {
@@ -514,7 +523,6 @@ const sv: Texts = {
       'Öppna Mesa 11 → **Spela med vänner** → **Lägg till vän** och skriv koden.',
       'Skicka förfrågan. Ni blir vänner när den som gav dig koden har godkänt den – sedan kan ni bjuda in varandra till ett bord.',
     ],
-    appStoreSoon: 'App Store – kommer snart',
     note: 'Sidan visar bara koden – inte vem den tillhör. Namnet ser du i appen innan du skickar förfrågan. Lägg bara till personer du känner.',
   },
 };
@@ -531,10 +539,14 @@ const en: Texts = {
   },
   home: {
     metaTitle: 'Mesa 11 – Buraco, the two-against-two card game, online',
-    metaDescription: 'Mesa 11 is the app for Buraco, the card game played two against two, online. Available on Google Play – coming soon to the App Store.',
-    badge: 'Now on Google Play – coming soon to the App Store',
+    metaDescription: 'Mesa 11 is the app for Buraco, the card game played two against two, online. Available on Google Play and the App Store.',
+    badge: 'Now on Google Play and the App Store',
     playButton: 'Get it on Google Play',
     playUrl: 'https://play.google.com/store/apps/details?id=com.spitakolus.buraco&hl=en',
+    appStoreButton: 'Download on the App Store',
+    appStoreUrl: 'https://apps.apple.com/app/id6817430182',
+    qrTitle: 'Get it on your phone',
+    qrText: 'Point your phone camera at the code to open the right store – the App Store on iPhone, Google Play on Android.',
     lead: 'The classic card game Buraco, two against two, online. Team up with your partner, lay down melds and build canastas before your opponents do.',
     features: [
       {
@@ -907,7 +919,6 @@ const en: Texts = {
       'Open Mesa 11 → **Play with friends** → **Add friend** and type the code.',
       'Send the request. You become friends once the person who gave you the code accepts it – then you can invite each other to a table.',
     ],
-    appStoreSoon: 'App Store – coming soon',
     note: 'This page only shows the code – not whose it is. You will see the name in the app before you send the request. Only add people you know.',
   },
 };
@@ -924,10 +935,14 @@ const pt: Texts = {
   },
   home: {
     metaTitle: 'Mesa 11 – Buraco, o jogo de cartas em dupla, online',
-    metaDescription: 'Mesa 11 é o app de Buraco, o jogo de cartas em dupla, dois contra dois, online. Já no Google Play – em breve na App Store.',
-    badge: 'Já no Google Play – em breve na App Store',
+    metaDescription: 'Mesa 11 é o app de Buraco, o jogo de cartas em dupla, dois contra dois, online. Para Android e iPhone, no Google Play e na App Store.',
+    badge: 'Já no Google Play e na App Store',
     playButton: 'Baixar no Google Play',
     playUrl: 'https://play.google.com/store/apps/details?id=com.spitakolus.buraco&hl=pt_BR',
+    appStoreButton: 'Baixar na App Store',
+    appStoreUrl: 'https://apps.apple.com/br/app/mesa-11-buraco-online/id6817430182',
+    qrTitle: 'Baixe no celular',
+    qrText: 'Aponte a câmera do celular para o código e a loja certa abre – App Store no iPhone e Google Play no Android.',
     lead: 'Buraco, o clássico jogo de cartas em dupla, dois contra dois, online. Jogue junto com seu parceiro, baixe jogos e forme canastras antes dos adversários.',
     features: [
       {
@@ -1300,7 +1315,6 @@ const pt: Texts = {
       'Abra o app Mesa 11 → **Jogar com amigos** → **Adicionar amigo** e digite o código.',
       'Envie o pedido. Vocês viram amigos quando quem te deu o código aceitar – aí podem se convidar para uma mesa.',
     ],
-    appStoreSoon: 'App Store – em breve',
     note: 'Esta página mostra só o código – não de quem ele é. Você vê o nome no app antes de enviar o pedido. Adicione só pessoas que você conhece.',
   },
 };
