@@ -4,6 +4,7 @@ import { getLang, type SearchParams } from '../../lang';
 import { Shell } from '../../Shell';
 import { APP_NAME, OG_ICON, t } from '../../texts';
 import { Card, Eyebrow, Notice, Rich } from '../../ui';
+import { StoreButtons } from '../../StoreButtons';
 import CopyCode from './CopyCode';
 
 type Props = { params: Promise<{ code: string }>; searchParams: SearchParams };
@@ -37,7 +38,7 @@ function codeFromPath(raw: string): string | null {
 // koden är eller om den finns, och visar därför aldrig något användarnamn.
 export default async function BuracoVanLank({ params, searchParams }: Props) {
   const lang = await getLang(searchParams);
-  const { friendLink: fl, home } = t(lang);
+  const fl = t(lang).friendLink;
   const code = codeFromPath((await params).code);
   const shown = code ? formatFriendCode(code) : null;
 
@@ -84,20 +85,7 @@ export default async function BuracoVanLank({ params, searchParams }: Props) {
           ))}
         </ol>
 
-        {/* Appen finns på Google Play; App Store-knappen blir en länk när Apple har godkänt appen. */}
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <a
-            href={home.playUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-full bg-[#f2b84b] px-6 py-3 text-center font-bold text-[#14231e] shadow-[0_4px_0_#9a6a12] transition-transform hover:-translate-y-0.5"
-          >
-            {home.playButton}
-          </a>
-          <span className="rounded-full border-2 border-dashed border-[#c9c0ae] px-6 py-2.5 text-center font-semibold text-[#6b7a73]">
-            {fl.appStoreSoon}
-          </span>
-        </div>
+        <StoreButtons lang={lang} className="mt-8" />
 
         <p className="mt-6 border-t border-[#e4dccb] pt-4 text-sm leading-relaxed text-[#6b7a73]">{fl.note}</p>
       </Card>
