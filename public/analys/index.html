@@ -9,7 +9,7 @@
   :root {
     --bg:#15131a; --panel:#1e1b24; --panel-2:#262230; --line:#332e3d;
     --text:#ECE8F0; --muted:#A49CAF; --dim:#7B7386;
-    --flocken:#8BA45D; --nh:#D4A574; --nara:#D488A2;
+    --flocken:#8BA45D; --nh:#D4A574; --nara:#D488A2; --klenod:#E08A45;
     --ok:#7FBF8F; --warn:#E0A458; --neg:#E0796C;
   }
   * { box-sizing:border-box; margin:0; padding:0; }
@@ -111,7 +111,7 @@
 <div id="gate">
   <form class="gate-card" id="gate-form">
     <h1>Spitakolus · Analys</h1>
-    <p>Alla dashboards för Flocken, Nästa Hem och Nära på ett ställe.</p>
+    <p>Alla dashboards för Flocken, Nästa Hem, Nära och Klenod på ett ställe.</p>
     <div class="pw-wrap">
       <input id="gate-pw" type="password" placeholder="Lösenord" autocomplete="current-password" required>
       <button type="button" class="pw-visa" id="gate-visa" aria-label="Visa lösenordet">Visa</button>
@@ -134,7 +134,7 @@
     <div class="login-panel" id="login-panel" hidden>
       <h2>Logga in på databaserna</h2>
       <p class="sub">Samma uppgifter provas mot alla databaser som saknar inloggning. Har du olika
-         lösenord för Flocken och Nära: logga in en gång per uppsättning, resten står kvar.</p>
+         lösenord för apparna: logga in en gång per uppsättning, resten står kvar.</p>
       <div class="login-row">
         <div><input id="in-epost" type="email" placeholder="E-post" autocomplete="username"></div>
         <div class="pw-wrap">
@@ -165,9 +165,10 @@
 var LOSEN = 'Smilla';
 var LAS_NYCKEL = 'spitakolus_analys_ok';
 
-/* De tre Supabase-projekt som kräver inloggning. `prefix` MÅSTE matcha den
+/* De fyra Supabase-projekt som kräver inloggning. `prefix` MÅSTE matcha den
    nyckel varje dashboards egen auth-fil läser, annars hittar den ingen session:
-   Flocken använder flocken_dash_session_, Nära nara_dash_session_. */
+   Flocken använder flocken_dash_session_, Nära nara_dash_session_, Klenod
+   klenod_dash_session_. */
 var PROJEKT = {
   'flocken-eu': {
     namn: 'Flocken Sverige',
@@ -186,6 +187,12 @@ var PROJEKT = {
     url: 'https://uodsosiuyjjfxmvgttjm.supabase.co',
     anonKey: 'sb_publishable_37CPpF5PreAEvzfKSmAxLg_MXliX6IO',
     prefix: 'nara_dash_session_'
+  },
+  'klenod': {
+    namn: 'Klenod',
+    url: 'https://jikyqdagrvssvvbvxtjx.supabase.co',
+    anonKey: 'sb_publishable_rZ0CMWSKb0kCOxsLdrRLQQ_MmPp2Mte',
+    prefix: 'klenod_dash_session_'
   }
 };
 
@@ -213,6 +220,13 @@ var APPAR = [
     sidor: [
       { titel: 'Översikt', txt: 'Nedladdningar från App Store och Google Play, aktiva användare, aktiviteter och trygghet.',
         href: '/N-analises/nara-dashboard.html', kraver: ['nara'] }
+    ]
+  },
+  {
+    namn: 'Klenod', farg: 'var(--klenod)', db: 'en databas',
+    sidor: [
+      { titel: 'Översikt', txt: 'Nedladdningar, aktiva samlare, objekt per sort, hyllor, sällskap, matchningar och samtal, Plus-köp och kill-kriterierna.',
+        href: '/K-analises/klenod-dashboard.html', kraver: ['klenod'] }
     ]
   }
 ];
@@ -266,7 +280,12 @@ function epostUr(p) {
 function arAdmin(p) {
   return fetch(p.url + '/rest/v1/rpc/is_dashboard_admin', {
     method: 'POST', headers: headers(p), body: '{}'
-  }).then(function (r) { return r.ok ? r.json() : false; })
+  }).then(function (r) {
+      /* 404 = funktionen finns inte: appens dashboard-migrering är inte körd.
+         Då ska listan säga det, inte att kontot saknar behörighet. */
+      p.saknas = r.status === 404;
+      return r.ok ? r.json() : false;
+    })
     .then(function (v) { return v === true; })
     .catch(function () { return false; });
 }
@@ -391,7 +410,11 @@ $('in-btn').addEventListener('click', function () {
         .then(function (s) { sparaSession(p, s); return arAdmin(p); })
         .then(function (ok) {
           sessioner[k] = ok;
-          if (!ok) { rensaSession(p); utfall[k] = 'kontot saknar behörighet här'; }
+          if (!ok) {
+            rensaSession(p);
+            utfall[k] = p.saknas ? 'dashboard-funktionerna är inte installerade i databasen ännu'
+                                 : 'kontot saknar behörighet här';
+          }
         })
         .catch(function (e) { utfall[k] = e.message; });
     });
