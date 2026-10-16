@@ -240,9 +240,9 @@
           <div id="plus-prod" style="font-size:13px;margin-top:4px"></div>
         </div>
       </div>
-      <p class="note-box">Läget nu kommer från RevenueCat (köpt eller grundargåva). Köp, förnyelser och uppsägningar loggas
-         från och med att den nya RevenueCat-kopplingen driftsattes; sandlådeköp från tester räknas inte. Intäkten är
-         RevenueCats pris i USD före Apples och Googles avgift.</p>
+      <p class="note-box">Läget nu kommer från RevenueCat. Ett konto med giltig grundargåva räknas alltid som gåva, även om
+         någon har provat köpskärmen på det. Köp, förnyelser och uppsägningar loggas från 16 oktober 2026; testköp räknas
+         inte. Intäkten är i kronor, före Apples och Googles avgift<span id="plus-kurs"></span>.</p>
     </section>
 
     <section>
@@ -531,7 +531,7 @@ function render(o, dl, dlFel) {
 
   /* Plus */
   const p = o.plus || {};
-  const usd = v => (Number(v) || 0).toLocaleString('sv-SE', { minimumFractionDigits: 0, maximumFractionDigits: 2 }) + ' USD';
+  const kr = v => n(v) + ' kr';
   document.getElementById('plus-aside').textContent = p.loggen_sedan
     ? 'köploggen sedan ' + new Date(p.loggen_sedan).toLocaleDateString('sv-SE', { day: 'numeric', month: 'short' })
     : 'köploggen har inte fått någon händelse ännu';
@@ -539,7 +539,11 @@ function render(o, dl, dlFel) {
     metric('Plus köpt, aktivt nu', p.aktiva_kopta, 'betalande samlare', Number(p.aktiva_kopta) ? 'good' : '') +
     metric('Plus som grundargåva', p.aktiva_gava, 'aktiva gåvor') +
     metric('Nya köp senaste 30 dagarna', p.kop_30d, `${n(p.kop_totalt)} totalt · ${n(p.fornyelser_30d)} förnyelser · ${n(p.uppsagningar_30d)} uppsägningar`) +
-    metric('Intäkt senaste 30 dagarna', usd(p.intakt_usd_30d), `${usd(p.intakt_usd_totalt)} totalt, före butikens avgift`);
+    metric('Intäkt senaste 30 dagarna', kr(p.intakt_kr_30d), `${kr(p.intakt_kr_totalt)} totalt, före butikens avgift`);
+  /* Köp i annan valuta än kronor räknas om i databasen med kursen i app_settings. */
+  document.getElementById('plus-kurs').textContent = Number(p.kop_annan_valuta)
+    ? ` (${n(p.kop_annan_valuta)} köp i annan valuta omräknade med ${String(p.usd_till_sek).replace('.', ',')} kr per dollar)`
+    : '';
   drawBars('tr-plus', 'tl-plus', p.veckor || [], w => Number(w.kop) || 0, wLabel, w => `${w.vecka}: ${w.kop} köp`);
   const prod = p.per_produkt || [];
   document.getElementById('plus-prod').innerHTML = prod.length
