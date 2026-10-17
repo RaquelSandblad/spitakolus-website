@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
 <title>Nästa Hem — Översikt</title>
 <style>
   :root[data-theme="dark"] {
@@ -27,7 +28,7 @@
   .head { display:flex; align-items:baseline; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-bottom:6px; }
   .head h1 { font-size:20px; font-weight:600; letter-spacing:-.01em; }
   .head h1 em { font-style:normal; color:var(--muted); font-weight:400; }
-  .head-right { display:flex; align-items:center; gap:12px; }
+  .head-right { display:flex; align-items:center; gap:12px; margin-right:90px; }
   .stamp { color:var(--dim); font-size:12px; }
   .btn {
     background:var(--panel-2); color:var(--text); border:1px solid var(--line);
@@ -54,7 +55,7 @@
   .g6 { grid-template-columns:repeat(6,1fr); }
   @media (max-width:1000px) { .g5,.g6 { grid-template-columns:repeat(3,1fr); } }
   @media (max-width:880px) { .g3,.g4,.g5,.g6 { grid-template-columns:repeat(2,1fr); } }
-  @media (max-width:520px) { .g3,.g4,.g5,.g6 { grid-template-columns:1fr; } }
+  @media (max-width:520px) { .g3,.g4,.g5,.g6 { grid-template-columns:1fr; } .head-right { margin-right:0; } }
   .metric { background:var(--panel); padding:15px 17px 16px; min-height:94px; }
   .metric .label { font-size:12px; color:var(--muted); margin-bottom:7px; }
   .metric .value { font-size:27px; font-weight:600; line-height:1.05; letter-spacing:-.02em; }
@@ -192,12 +193,14 @@
 
   <footer>
     Nästa Hem · Supabase-projekt <span class="num">ezvkeowlqizdbfsiyyow</span> ·
-    siffrorna hämtas via <span class="num">get_dashboard_stats</span> och <span class="num">get_today_stats</span>,
-    annonslistan direkt från <span class="num">listings</span> (endast publicerade är läsbara publikt).
+    siffrorna hämtas via <span class="num">get_dashboard_stats</span>, <span class="num">get_today_stats</span> och
+    <span class="num">get_activity_stats</span>, som kräver inloggning med ett konto i <span class="num">dashboard_admins</span>.
+    Annonslistan läses direkt från <span class="num">listings</span> som en besökare ser den (endast publicerade är läsbara publikt).
     <span id="fetched"></span>
   </footer>
 </div>
 
+<script src="dashboard-auth.js"></script>
 <script>
 'use strict';
 
@@ -235,15 +238,24 @@ function delta(cur, prev) {
   return `<span class="${d > 0 ? 'pos' : 'neg'}">${d > 0 ? '+' : '−'}${n(Math.abs(d))}</span> (${pct}%) mot föregående`;
 }
 
-async function api(path, opts) {
+/* Siffrorna kräver inloggning: DashAuth.headers() skickar adminkontots token.
+   Annonslistan läses med den publika nyckeln, alltså som en besökare ser den,
+   eftersom beräkningarna nedan utgår från att bara publicerade annonser syns. */
+const PUBLIKA_HEADERS = {
+  apikey: SUPABASE_ANON_KEY,
+  Authorization: 'Bearer ' + SUPABASE_ANON_KEY,
+  'Content-Type': 'application/json',
+};
+
+async function api(path, opts, headers) {
   const res = await fetch(SUPABASE_URL + path, Object.assign({
-    headers: {
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: 'Bearer ' + SUPABASE_ANON_KEY,
-      'Content-Type': 'application/json',
-    },
+    headers: headers || DashAuth.headers(),
   }, opts || {}));
-  if (!res.ok) throw new Error(path.split('?')[0] + ' → HTTP ' + res.status);
+  if (!res.ok) {
+    let msg = path.split('?')[0] + ' → HTTP ' + res.status;
+    try { const j = await res.json(); if (j.message) msg = j.message; } catch (e) {}
+    throw new Error(msg);
+  }
   return res.json();
 }
 
@@ -257,7 +269,7 @@ async function load() {
     const [stats, today, listings, activity] = await Promise.all([
       api('/rest/v1/rpc/get_dashboard_stats', { method: 'POST', body: '{}' }),
       api('/rest/v1/rpc/get_today_stats', { method: 'POST', body: '{}' }),
-      api('/rest/v1/listings?select=id,title,municipality,price,status,created_at,published_at,expires_at&order=expires_at.asc&limit=1000'),
+      api('/rest/v1/listings?select=id,title,municipality,price,status,created_at,published_at,expires_at&order=expires_at.asc&limit=1000', null, PUBLIKA_HEADERS),
       api('/rest/v1/rpc/get_activity_stats', { method: 'POST', body: '{}' }).catch(() => null),
     ]);
     render(stats, today, listings, activity);
@@ -452,7 +464,11 @@ function render(stats, today, listings, activity) {
     : `<tbody><tr><td class="dim" style="padding:16px 14px">Inga registrerade händelser de senaste fyra veckorna.</td></tr></tbody>`;
 }
 
-load();
+DashAuth.init({
+  url: SUPABASE_URL,
+  anonKey: SUPABASE_ANON_KEY,
+  onReady: load,
+});
 </script>
 <script async src="/analys/hub-lank.js"></script>
 </body>

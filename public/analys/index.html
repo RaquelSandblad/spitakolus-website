@@ -165,10 +165,10 @@
 var LOSEN = 'Smilla';
 var LAS_NYCKEL = 'spitakolus_analys_ok';
 
-/* De fyra Supabase-projekt som kräver inloggning. `prefix` MÅSTE matcha den
+/* De fem Supabase-projekt som kräver inloggning. `prefix` MÅSTE matcha den
    nyckel varje dashboards egen auth-fil läser, annars hittar den ingen session:
-   Flocken använder flocken_dash_session_, Nära nara_dash_session_, Klenod
-   klenod_dash_session_. */
+   Flocken använder flocken_dash_session_, Nästa Hem nastahem_dash_session_,
+   Nära nara_dash_session_, Klenod klenod_dash_session_. */
 var PROJEKT = {
   'flocken-eu': {
     namn: 'Flocken Sverige',
@@ -181,6 +181,12 @@ var PROJEKT = {
     url: 'https://vdpdehoreqjlenvqumho.supabase.co',
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZkcGRlaG9yZXFqbGVudnF1bWhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0OTY0NDQsImV4cCI6MjA5NDA3MjQ0NH0.kVj5K22XGa5caJtSvzQwWYSB57C4nEY3-gapI-v_PSU',
     prefix: 'flocken_dash_session_'
+  },
+  'nastahem': {
+    namn: 'Nästa Hem',
+    url: 'https://ezvkeowlqizdbfsiyyow.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6dmtlb3dscWl6ZGJmc2l5eW93Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI2MDM3NDksImV4cCI6MjA2ODE3OTc0OX0.FsJ1tJ-jEf98OjKD57vunIVItPzN8vXwuldEl3tUBbs',
+    prefix: 'nastahem_dash_session_'
   },
   'nara': {
     namn: 'Nära',
@@ -212,7 +218,7 @@ var APPAR = [
     namn: 'Nästa Hem', farg: 'var(--nh)', db: 'en databas',
     sidor: [
       { titel: 'Översikt', txt: 'Annonsbestånd, användare, BankID och händelser i appen.',
-        href: '/NH-analises/nastahem-dashboard.html', kraver: [] }
+        href: '/NH-analises/nastahem-dashboard.html', kraver: ['nastahem'] }
     ]
   },
   {
@@ -440,11 +446,11 @@ $('in-losen').addEventListener('keydown', function (e) { if (e.key === 'Enter') 
 function oppna() {
   $('gate').hidden = true;
   $('hub').hidden = false;
-  /* Tre av sidorna har egna lösenordsgrindar som sätter en sessionsflagga och
+  /* Två av sidorna har egna lösenordsgrindar som sätter en sessionsflagga och
      annars kastar tillbaka besökaren (location.replace):
        dashboard_ok     — Flocken Sverige (grind: F-analises/index.html)
-                          och Nästa Hem (grind: NH-analises/index.html)
        dashboard_br_ok  — Flocken Brasilien (grind: F-analises/brasil.html)
+     (Nästa Hems grind är borttagen 2026-10-18 — sidan kräver nu inloggning.)
      (Skriv aldrig ut grindarnas lösenord här — filen serveras publikt, och
       att samla dem på ett ställe gör dem lättare att hitta än de var.)
      Navets lösenord ersätter dem: sätt båda flaggorna, annars studsar
