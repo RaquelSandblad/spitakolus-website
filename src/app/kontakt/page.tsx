@@ -24,8 +24,8 @@ export default function Kontakt() {
                   </svg>
                   <div>
                     <h3 className="font-semibold mb-1">E-post</h3>
-                    <a href="mailto:support@spitakolus.se" className="hover:underline">
-                      support@spitakolus.se
+                    <a href="mailto:support@spitakolus.com" className="hover:underline">
+                      support@spitakolus.com
                     </a>
                   </div>
                 </div>

@@ -167,7 +167,7 @@ Webbplatsen uppfyller alla Stripe-krav:
 ## 🆘 Support
 
 För problem eller frågor:
-- E-post: support@spitakolus.se
+- E-post: support@spitakolus.com
 - Org.nr: 559554-6101
 
 ## 📝 Licens
