@@ -120,8 +120,8 @@ export default function Integritetspolicy() {
               <div className="bg-blue-50 p-6 rounded-lg">
                 <p className="text-gray-700 mb-2">
                   <strong>E-post:</strong>{' '}
-                  <a href="mailto:support@spitakolus.se" className="text-primary hover:underline">
-                    support@spitakolus.se
+                  <a href="mailto:support@spitakolus.com" className="text-primary hover:underline">
+                    support@spitakolus.com
                   </a>
                 </p>
                 <p className="text-gray-700">

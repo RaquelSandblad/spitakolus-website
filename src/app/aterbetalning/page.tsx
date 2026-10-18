@@ -28,8 +28,8 @@ export default function Aterbetalning() {
                 </p>
                 <p className="text-gray-700">
                   Kontakta oss på:{' '}
-                  <a href="mailto:support@spitakolus.se" className="text-primary hover:underline">
-                    support@spitakolus.se
+                  <a href="mailto:support@spitakolus.com" className="text-primary hover:underline">
+                    support@spitakolus.com
                   </a>
                 </p>
               </div>
@@ -118,8 +118,8 @@ export default function Aterbetalning() {
                 <p className="text-gray-700">
                   Om du har problem med att avbryta din prenumeration, kontakta oss så
                   hjälper vi dig genom processen:{' '}
-                  <a href="mailto:support@spitakolus.se" className="text-primary hover:underline">
-                    support@spitakolus.se
+                  <a href="mailto:support@spitakolus.com" className="text-primary hover:underline">
+                    support@spitakolus.com
                   </a>
                 </p>
               </div>
@@ -152,8 +152,8 @@ export default function Aterbetalning() {
                     <h4 className="font-semibold text-gray-900 mb-1">Kontakta oss</h4>
                     <p className="text-gray-700">
                       Skicka ett e-postmeddelande till{' '}
-                      <a href="mailto:support@spitakolus.se" className="text-primary hover:underline">
-                        support@spitakolus.se
+                      <a href="mailto:support@spitakolus.com" className="text-primary hover:underline">
+                        support@spitakolus.com
                       </a>{' '}
                       med beskrivning av problemet
                     </p>
@@ -244,8 +244,8 @@ export default function Aterbetalning() {
                 </p>
                 <p className="text-gray-700">
                   <strong>E-post:</strong>{' '}
-                  <a href="mailto:support@spitakolus.se" className="text-primary hover:underline">
-                    support@spitakolus.se
+                  <a href="mailto:support@spitakolus.com" className="text-primary hover:underline">
+                    support@spitakolus.com
                   </a>
                 </p>
                 <p className="text-gray-700 mt-2">

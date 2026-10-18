@@ -107,8 +107,8 @@ export default function OmOss() {
                 <div className="space-y-3 text-gray-700">
                   <p>
                     <strong>E-post:</strong>{' '}
-                    <a href="mailto:support@spitakolus.se" className="text-primary hover:underline">
-                      support@spitakolus.se
+                    <a href="mailto:support@spitakolus.com" className="text-primary hover:underline">
+                      support@spitakolus.com
                     </a>
                   </p>
                   <p>

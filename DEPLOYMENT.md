@@ -220,6 +220,6 @@ npm run build
 - [ ] Alla sidor laddas korrekt
 - [ ] Mobil-vy fungerar
 - [ ] Stripe account information uppdaterad
-- [ ] E-post support@spitakolus.se är aktiv
+- [ ] E-post support@spitakolus.com är aktiv
 
 Lycka till! 🚀

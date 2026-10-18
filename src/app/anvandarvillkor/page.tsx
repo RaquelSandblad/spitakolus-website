@@ -38,7 +38,7 @@ export default function Anvandarvillkor() {
                 <p className="text-gray-700">
                   <strong>Spitakolus AB</strong><br />
                   Organisationsnummer: 559554-6101<br />
-                  E-post: <a href="mailto:support@spitakolus.se" className="text-primary hover:underline">support@spitakolus.se</a>
+                  E-post: <a href="mailto:support@spitakolus.com" className="text-primary hover:underline">support@spitakolus.com</a>
                 </p>
               </div>
             </section>
@@ -181,8 +181,8 @@ export default function Anvandarvillkor() {
               <div className="bg-blue-50 p-6 rounded-lg">
                 <p className="text-gray-700">
                   <strong>E-post:</strong>{' '}
-                  <a href="mailto:support@spitakolus.se" className="text-primary hover:underline">
-                    support@spitakolus.se
+                  <a href="mailto:support@spitakolus.com" className="text-primary hover:underline">
+                    support@spitakolus.com
                   </a>
                 </p>
               </div>
