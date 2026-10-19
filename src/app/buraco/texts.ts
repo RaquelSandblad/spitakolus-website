@@ -355,7 +355,7 @@ const sv: Texts = {
     metaTitle: 'Användarvillkor för Mesa 11 – Spitakolus AB',
     metaDescription: 'Reglerna för att spela Buraco i appen Mesa 11: schysst spel, användarnamn, Premium, ranking och mer.',
     title: 'Användarvillkor',
-    updated: 'Senast ändrade 1 oktober 2026',
+    updated: 'Senast ändrade 19 oktober 2026',
     intro: [
       'De här villkoren gäller när du använder appen Mesa 11 (kortspelet Buraco) från Spitakolus AB (org.nr 559554-6101). När du skapar ett konto godkänner du villkoren. Läs också vår [integritetspolicy](/buraco/integritet).',
     ],
@@ -396,7 +396,7 @@ const sv: Texts = {
       {
         h: 'Om du lämnar ett parti',
         p: [
-          'Lämnar du ett pågående onlineparti – eller tappar anslutningen i mer än två minuter – tar en datorspelare över din plats. Du får då vänta **5 minuter** innan du kan börja nästa parti, och partiet du lämnade ger 0 rankingpoäng. Det gäller alla, även den som har Premium, så att partierna inte förstörs för de andra. Vid ett vänbord blir det ingen tidsspärr: du kan ta tillbaka din plats så länge partiet pågår.',
+          'Lämnar du ett pågående onlineparti – eller tappar anslutningen i mer än två minuter – tar en datorspelare över din plats. Du får då vänta **5 minuter** innan du kan börja nästa parti, och partiet du lämnade ger 0 rankingpoäng. Det gäller alla, även den som har Premium, så att partierna inte förstörs för de andra. Vid ett vänbord blir det ingen tidsspärr: du kan ta tillbaka din plats så länge partiet pågår. Väljer ni vid vänbordet att spela med andra spelare (Riktiga spelare) gäller samma regler som i andra onlinepartier: lämnar du tar en datorspelare över, du får vänta 5 minuter och partiet ger 0 rankingpoäng. Vänner som sitter vid samma bord hamnar då alltid i olika lag.',
         ],
       },
       {
@@ -752,7 +752,7 @@ const en: Texts = {
     metaTitle: 'Mesa 11 Terms of Use – Spitakolus AB',
     metaDescription: 'The rules for playing Buraco in the Mesa 11 app: fair play, usernames, Premium, the ranking and more.',
     title: 'Terms of Use',
-    updated: 'Last updated 1 October 2026',
+    updated: 'Last updated 19 October 2026',
     intro: [
       'These terms apply when you use the Mesa 11 app (the card game Buraco) from Spitakolus AB (Swedish company reg. no. 559554-6101). By creating an account you accept these terms. Please also read our [privacy policy](/buraco/integritet).',
     ],
@@ -793,7 +793,7 @@ const en: Texts = {
       {
         h: 'If you leave a game',
         p: [
-          'If you leave an online game in progress – or lose your connection for more than two minutes – a computer player takes your seat. You then have to wait **5 minutes** before you can start your next game, and the game you left gives you 0 ranking points. This applies to everyone, including Premium players, so that games are not spoiled for the others. At a friends table there is no waiting time: you can take your seat back as long as the game is going on.',
+          'If you leave an online game in progress – or lose your connection for more than two minutes – a computer player takes your seat. You then have to wait **5 minutes** before you can start your next game, and the game you left gives you 0 ranking points. This applies to everyone, including Premium players, so that games are not spoiled for the others. At a friends table there is no waiting time: you can take your seat back as long as the game is going on. If you choose to play with other players at a friends table (Real players), the same rules apply as in other online games: if you leave, a computer player takes over, you wait 5 minutes and the game gives you 0 ranking points. Friends at the same table are then always on different teams.',
         ],
       },
       {
@@ -1148,7 +1148,7 @@ const pt: Texts = {
     metaTitle: 'Termos de Uso do app Mesa 11 – Spitakolus AB',
     metaDescription: 'As regras para jogar Buraco no app Mesa 11: jogo limpo, nomes de usuário, Premium, ranking e mais.',
     title: 'Termos de Uso',
-    updated: 'Atualizados em 1º de outubro de 2026',
+    updated: 'Atualizados em 19 de outubro de 2026',
     intro: [
       'Estes termos valem quando você usa o app Mesa 11 (o jogo de cartas Buraco) da Spitakolus AB (empresa sueca, nº de registro 559554-6101). Ao criar uma conta você aceita os termos. Leia também a nossa [política de privacidade](/buraco/integritet).',
     ],
@@ -1189,7 +1189,7 @@ const pt: Texts = {
       {
         h: 'Se você sair de uma partida',
         p: [
-          'Se você sair de uma partida online em andamento – ou perder a conexão por mais de dois minutos – um jogador do computador assume o seu lugar. Aí você precisa esperar **5 minutos** antes de começar a próxima partida, e a partida que você abandonou vale zero pontos de ranking. Isso vale para todos, inclusive quem tem o Premium, para que a partida não seja estragada para os outros. Na mesa de amigos não há tempo de espera: você pode voltar ao seu lugar enquanto a partida continuar.',
+          'Se você sair de uma partida online em andamento – ou perder a conexão por mais de dois minutos – um jogador do computador assume o seu lugar. Aí você precisa esperar **5 minutos** antes de começar a próxima partida, e a partida que você abandonou vale zero pontos de ranking. Isso vale para todos, inclusive quem tem o Premium, para que a partida não seja estragada para os outros. Na mesa de amigos não há tempo de espera: você pode voltar ao seu lugar enquanto a partida continuar. Se vocês escolherem jogar com outras pessoas na mesa de amigos (Pessoas reais), valem as mesmas regras das outras partidas online: se você sair, um jogador do computador assume, você espera 5 minutos e a partida vale zero pontos de ranking. Amigos da mesma mesa ficam sempre em duplas diferentes.',
         ],
       },
       {
