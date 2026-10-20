@@ -6,9 +6,6 @@ export default function Kontakt() {
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
             Kontakta Oss
           </h1>
-          <p className="text-xl text-gray-600">
-            Vi svarar normalt inom 24–48 timmar
-          </p>
         </div>
 
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
@@ -43,25 +40,6 @@ export default function Kontakt() {
                   </div>
                 </div>
 
-                <div className="flex items-start">
-                  <svg className="w-6 h-6 mr-3 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <div>
-                    <h3 className="font-semibold mb-1">Svarstid</h3>
-                    <p className="text-sm text-blue-100">
-                      Vi strävar efter att svara på alla förfrågningar inom 24–48 timmar på vardagar
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-8 pt-8 border-t border-blue-400">
-                <h3 className="font-semibold mb-3">Kundservice</h3>
-                <p className="text-sm text-blue-100">
-                  För frågor om våra appar, teknisk support, eller allmänna förfrågningar,
-                  vänligen kontakta oss via e-post så hjälper vi dig gärna.
-                </p>
               </div>
             </div>
 
@@ -83,13 +61,6 @@ export default function Kontakt() {
                   <h3 className="font-semibold text-gray-900 mb-2">Teknisk support</h3>
                   <p className="text-gray-600">
                     Hjälp med användning av våra appar, tekniska problem eller buggar
-                  </p>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Återbetalningar</h3>
-                  <p className="text-gray-600">
-                    Frågor om betalningar, återbetalningar eller prenumerationer
                   </p>
                 </div>
 

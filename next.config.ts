@@ -26,6 +26,11 @@ const nextConfig: NextConfig = {
         destination: '/',
         permanent: false,
       },
+      {
+        source: '/om-oss',
+        destination: '/',
+        permanent: false,
+      },
     ];
   },
 };
