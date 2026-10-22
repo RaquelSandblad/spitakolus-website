@@ -241,6 +241,8 @@
     <h2>App-events veckovis (pivoterat – en rad per vecka)</h2>
     <p class="help">Unika användare per event och vecka. Visar senaste tre fulla veckor.</p>
     <div class="table-wrap"><div id="outEvents"></div></div>
+    <p class="help" style="margin:0.75rem 0 0.25rem;"><strong>Kontakt med hundvakt inkl. låsta hundvakter</strong> (ISO-vecka mån–sön). Ett försök hos en låst hundvakt skapar inget samtal och syns därför inte i "Sitter kontaktad". De tre sista kolumnerna räknar låsta hundvakter på veckan för deras första försök; <em>kom tillbaka</em> = köp eller förnyelse inom 14 dagar efter första försöket (kan öka för de senaste två veckorna).</p>
+    <div class="table-wrap"><div id="outSitterContact"><p class="help">–</p></div></div>
     <h3 style="margin-top:1.25rem; font-size:1rem;">App-events över tid (linjediagram)</h3>
     <p class="help">Vecko-vy är exakt pivotens unika/anrop. Vid <strong>månader</strong> summeras händelsantal per månad; för <strong>unika</strong> per månad används högsta veckotal i månaden (konservativt grovuppskattning – sant månadsvärde kräver egen SQL).</p>
     <div class="chart-toolbar" id="eventsTrendToolbar"></div>
@@ -734,7 +736,7 @@
         var sitterU = currPivot.sitter_contacted_unika != null ? currPivot.sitter_contacted_unika : null;
         if (aktiva != null && sitterU != null) {
           var contactRate = (sitterU / aktiva) * 100;
-          html += '<div class="kpi-card"><div class="kpi-value">' + contactRate.toFixed(1) + '%</div><div class="kpi-label">Kontakt med hundvakt</div><div class="copy-hint">' + sitterU + ' av ' + aktiva + ' aktiva (endast sitter_contacted)</div></div>';
+          html += '<div class="kpi-card"><div class="kpi-value">' + contactRate.toFixed(1) + '%</div><div class="kpi-label">Kontakt med hundvakt</div><div class="copy-hint">' + sitterU + ' av ' + aktiva + ' aktiva (endast sitter_contacted; försök hos låsta hundvakter skapar inget samtal)</div></div>';
         }
         var bokningar = curr.bokningar != null ? curr.bokningar : 0;
         html += '<div class="kpi-card"><div class="kpi-value">' + (bokningar === 0 ? '⚠️ 0' : bokningar) + '</div><div class="kpi-label">Bokningar</div></div>';
@@ -1886,6 +1888,49 @@
         if (senaste) senaste.textContent = d.senaste_mejl ? d.senaste_mejl : 'inga än';
       }
 
+      // ─── Kontaktförsök hos låsta hundvakter (migr 430, dashboard_flocken_matfel) ─
+      // Bara kontaktfälten används. Saknas RPC:n står "–" kvar och inget annat påverkas.
+      var MANADER_KORT = ['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec'];
+      function datumKort(iso) {
+        var d = new Date(String(iso).slice(0, 10) + 'T12:00:00');
+        return isNaN(d.getTime()) ? '' : d.getDate() + ' ' + MANADER_KORT[d.getMonth()];
+      }
+      function veckoSpann(v) {
+        var a = datumKort(v.start), b = datumKort(v.slut);
+        return (a.split(' ')[1] === b.split(' ')[1] ? a.split(' ')[0] : a) + '–' + b;
+      }
+      function renderSitterContact(veckor) {
+        var out = document.getElementById('outSitterContact');
+        if (!out || !Array.isArray(veckor) || !veckor.length) return;
+        var tal = function(x) { return x != null ? x : '–'; };
+        // Kolumnerna om låsta hundvakter kommer med migr 431; med 430 visas "–".
+        var tillbaka = function(v) {
+          if (v.lasta_vakter_tillbaka_14d == null) return '–';
+          return v.lasta_vakter_tillbaka_14d + ' <small style="opacity:0.7;">(prov ' + tal(v.lasta_vakter_tillbaka_prov) + ' · betald ' + tal(v.lasta_vakter_tillbaka_betald) + ')</small>';
+        };
+        var html = '<table><thead><tr><th>Vecka</th><th class="num">Förfrågningar</th><th class="num">Kontaktförsök hos låsta</th><th class="num">Totalt</th><th class="num">Hundägare som försökte</th>'
+          + '<th class="num">Låsta hundvakter som fick försök</th><th class="num">– varav öppnade försöket</th><th class="num">– varav kom tillbaka inom 14 dagar</th></tr></thead><tbody>';
+        veckor.slice(-4).forEach(function(v) {
+          html += '<tr><td>v. ' + v.vecka_nr + ' (' + veckoSpann(v) + ')' + (v.pagaende ? ' – pågår' : '') + '</td><td class="num">' + tal(v.forfragningar)
+            + '</td><td class="num">' + tal(v.kontaktforsok_lasta) + '</td><td class="num">' + tal(v.kontaktforsok_totalt) + '</td><td class="num">' + tal(v.hundagare_forsokte)
+            + '</td><td class="num">' + tal(v.lasta_vakter_fick_forsok) + '</td><td class="num">' + tal(v.lasta_vakter_oppnade) + '</td><td class="num">' + tillbaka(v) + '</td></tr>';
+        });
+        out.innerHTML = html + '</tbody></table>';
+      }
+      function hamtaSitterContact() {
+        fetch(SUPABASE_URL + '/rest/v1/rpc/dashboard_flocken_matfel', {
+          method: 'POST',
+          headers: DashAuth.headers(SUPABASE_URL),
+          body: '{}'
+        }).then(function(r) {
+          if (!r.ok) throw new Error('dashboard_flocken_matfel: HTTP ' + r.status);
+          return r.json();
+        }).then(function(j) {
+          if (Array.isArray(j) && j.length === 1 && j[0] && j[0].dashboard_flocken_matfel) j = j[0].dashboard_flocken_matfel;
+          renderSitterContact(j && j.veckor);
+        }).catch(function(e) { console.warn(e && e.message ? e.message : e); });
+      }
+
       var cancellationsDailyChart = null;
       function renderCancellationsDaily(data) {
         if (!Array.isArray(data) || data.length === 0) return;
@@ -2554,6 +2599,7 @@
           if (savedWinback) { renderWinbackStats(JSON.parse(savedWinback)); }
         } catch (e) {}
         renderAll(main, events);
+        try { hamtaSitterContact(); } catch (eSc) { console.warn('hamtaSitterContact:', eSc); }
 
         // Auto-fetch live data from Supabase
         if (statusEl) statusEl.textContent = 'Hämtar live-data...';
