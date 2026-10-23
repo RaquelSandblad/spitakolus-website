@@ -4,14 +4,14 @@ import { headers } from 'next/headers';
 export type Lang = 'sv' | 'en' | 'pt';
 export type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
-const LANGS: Lang[] = ['sv', 'en', 'pt'];
+export const LANGS: Lang[] = ['sv', 'en', 'pt'];
 
 function first(value: string | string[] | undefined): string {
   return (Array.isArray(value) ? value[0] : value) ?? '';
 }
 
 /** Väljer språk efter webbläsarens önskemål: sv* → svenska, pt* → portugisiska, annars engelska. */
-function langFromAcceptLanguage(header: string | null): Lang {
+export function langFromAcceptLanguage(header: string | null): Lang {
   if (!header) return 'en';
   const wanted = header
     .split(',')
