@@ -56,12 +56,12 @@ const sv: Texts = {
   },
   home: {
     metaTitle: 'KACKLÄNGES! (CLUCKWARDS!) – Spitakolus AB',
-    metaDescription: 'Fel håll. Full fart. Ägg iväg! En höna som springer baklänges och skjuter ägg. Kommer snart till App Store och Google Play.',
+    metaDescription: 'Fel håll. Full fart. Ägg iväg! En höna som flyger baklänges och skjuter ägg. Finns på Google Play och kommer snart till App Store.',
     badge: 'Under utveckling',
     otherName: 'Heter CLUCKWARDS! på engelska',
     tagline: 'Fel håll. Full fart. Ägg iväg!',
-    lead: 'En höna springer baklänges över bondgården i full fart och skjuter ägg på allt som står i vägen.',
-    stores: 'Spelet kommer snart till App Store och Google Play.',
+    lead: 'En höna flyger baklänges över bondgården i full fart och skjuter ägg på allt som står i vägen.',
+    stores: 'Spelet finns på Google Play och kommer snart till App Store.',
     factsTitle: 'Bra att veta',
     facts: [
       'Gratis att spela. Inget konto och ingen inloggning.',
@@ -357,12 +357,12 @@ const en: Texts = {
   },
   home: {
     metaTitle: 'CLUCKWARDS! – Spitakolus AB',
-    metaDescription: 'Wrong way. Full speed. Eggs away! A hen that runs backwards and fires eggs. Coming soon to the App Store and Google Play.',
+    metaDescription: 'Wrong way. Full speed. Eggs away! A hen that flies backwards and fires eggs. On Google Play now, coming soon to the App Store.',
     badge: 'In development',
     otherName: 'Called KACKLÄNGES! in Swedish',
     tagline: 'Wrong way. Full speed. Eggs away!',
-    lead: 'A hen runs backwards across the farm at full speed and fires eggs at everything in her way.',
-    stores: 'The game is coming soon to the App Store and Google Play.',
+    lead: 'A hen flies backwards across the farm at full speed and fires eggs at everything in her way.',
+    stores: 'The game is on Google Play now and coming soon to the App Store.',
     factsTitle: 'Good to know',
     facts: [
       'Free to play. No account and no sign-in.',
@@ -658,12 +658,12 @@ const pt: Texts = {
   },
   home: {
     metaTitle: 'CÓ-CÓ-RÉ! (CLUCKWARDS!) – Spitakolus AB',
-    metaDescription: 'Direção errada. Velocidade máxima. Ovos voando! Uma galinha que corre de ré e lança ovos. Em breve na App Store e no Google Play.',
+    metaDescription: 'Direção errada. Velocidade máxima. Ovos voando! Uma galinha que voa de ré e lança ovos. Já no Google Play, em breve na App Store.',
     badge: 'Em desenvolvimento',
     otherName: 'Em inglês se chama CLUCKWARDS! e em sueco, KACKLÄNGES!',
     tagline: 'Direção errada. Velocidade máxima. Ovos voando!',
-    lead: 'Uma galinha corre de ré pela fazenda a toda velocidade e lança ovos em tudo o que estiver no caminho.',
-    stores: 'O jogo chega em breve à App Store e ao Google Play.',
+    lead: 'Uma galinha voa de ré pela fazenda a toda velocidade e lança ovos em tudo o que estiver no caminho.',
+    stores: 'O jogo já está no Google Play e chega em breve à App Store.',
     factsTitle: 'Bom saber',
     facts: [
       'Grátis para jogar. Sem conta e sem login.',
