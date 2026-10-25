@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Butikstavla · Spitakolus</title>
+<!--
+  Butikstavlan (2026-10-25): App Store och Google Play för alla sju appar, per app och vecka.
+  Siffrorna hämtas varje natt av edge-funktionen sync-store-board i Klenods Supabase-projekt
+  och läses här via dashboard_store_board() — bara med inloggning (dashboard-auth.js).
+  Allt om hur den slås på och vad siffrorna betyder: docs/BUTIKSTAVLA.md i klenod-repot.
+  Applistan nedan finns också i supabase/functions/sync-store-board/apps.ts — ändra båda.
+-->
+<style>
+  :root {
+    --bg:#15131a; --panel:#1e1b24; --panel-2:#262230; --line:#332e3d; --grid:#2a2633;
+    --text:#ECE8F0; --muted:#A49CAF; --dim:#7B7386;
+    --ios:#3987e5; --android:#d95926;
+    --ok:#7FBF8F; --warn:#E0A458; --neg:#E0796C;
+    color-scheme: dark;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body {
+    background:var(--bg); color:var(--text); min-height:100vh;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+    font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased;
+  }
+  .wrap { max-width:1180px; margin:0 auto; padding:32px 16px 80px; }
+  h1 { font-size:1.45rem; font-weight:650; letter-spacing:-.01em; }
+  h2 { font-size:1.05rem; font-weight:650; letter-spacing:-.01em; }
+  h3 { font-size:.82rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:.55rem; }
+  .lede { color:var(--muted); max-width:72ch; margin-top:.25rem; }
+  .meta { color:var(--dim); font-size:.82rem; margin:.6rem 0 1.4rem; }
+  .head { display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap; }
+  .ctrl { display:flex; gap:10px; flex-wrap:wrap; align-items:center; padding-right:5.5rem; }
+  .ctrl label { color:var(--muted); font-size:.82rem; display:flex; gap:.4rem; align-items:center; }
+  select, input[type=date], input[type=text] {
+    background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:.5rem;
+    padding:.4rem .55rem; font:inherit; font-size:.85rem;
+  }
+  .seg { display:inline-flex; border:1px solid var(--line); border-radius:999px; overflow:hidden; }
+  .seg button { background:transparent; color:var(--muted); border:0; font:inherit; font-size:.8rem; padding:.35rem .8rem; cursor:pointer; }
+  .seg button[aria-pressed=true] { background:var(--panel-2); color:var(--text); }
+
+  .panel { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:18px 18px 16px; }
+  .scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  table { border-collapse:collapse; width:100%; font-variant-numeric:tabular-nums; }
+  th, td { padding:.42rem .55rem; text-align:right; white-space:nowrap; border-bottom:1px solid var(--grid); }
+  th { color:var(--muted); font-weight:500; font-size:.78rem; }
+  th:first-child, td:first-child { text-align:left; }
+  /* Appen eller veckan står kvar till vänster när tabellen rullas i sidled (mobilen). */
+  .scroll th:first-child, .scroll td:first-child { position:sticky; left:0; background:var(--panel); z-index:1; }
+  thead tr.grupp th { font-size:.74rem; text-transform:uppercase; letter-spacing:.05em; border-bottom:0; padding-bottom:0; }
+  th.ios, th.android { text-align:center; }
+  th.ios { box-shadow:inset 0 -2px 0 var(--ios); }
+  th.android { box-shadow:inset 0 -2px 0 var(--android); }
+  td.sep, th.sep { border-left:1px solid var(--line); }
+  tbody tr:hover td { background:rgba(255,255,255,.02); }
+  tr.summa td { font-weight:600; border-top:1px solid var(--line); }
+  .d { display:block; font-size:.72rem; font-weight:500; line-height:1.2; }
+  .d.upp { color:var(--ok); } .d.ned { color:var(--neg); } .d.lika { color:var(--dim); }
+  .ofullst { color:var(--muted); }
+  .ofullst::after { content:'*'; color:var(--warn); margin-left:1px; }
+  .tom { color:var(--dim); }
+  .app-namn { display:inline-flex; align-items:center; gap:.5rem; font-weight:600; }
+  .prick { width:10px; height:10px; border-radius:3px; flex:0 0 auto; display:inline-block; }
+  a.app-lank { color:inherit; text-decoration:none; }
+  a.app-lank:hover { text-decoration:underline; }
+
+  .hopp { display:flex; flex-wrap:wrap; gap:8px; margin:22px 0 8px; }
+  .hopp a { color:var(--muted); text-decoration:none; border:1px solid var(--line); border-radius:999px; padding:.25rem .75rem; font-size:.82rem; display:inline-flex; gap:.4rem; align-items:center; }
+  .hopp a:hover { color:var(--text); border-color:var(--muted); }
+
+  section.app { margin-top:34px; scroll-margin-top:16px; }
+  .app-head { display:flex; align-items:center; gap:11px; margin-bottom:6px; }
+  .app-head .rule { flex:1; height:1px; background:var(--line); }
+  .app-sub { color:var(--dim); font-size:.8rem; margin-bottom:12px; }
+  .app-sub .fel { color:var(--warn); }
+  .grid2 { display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:12px; margin-top:12px; }
+
+  .chip { display:inline-block; font-size:.72rem; padding:1px 7px; border-radius:999px; background:var(--panel-2); color:var(--muted); margin:1px 2px; white-space:nowrap; }
+  .chip.version { color:var(--text); }
+  .chip.listing { color:var(--warn); }
+  .chip.manual { color:var(--ok); }
+  td.andr { text-align:left; white-space:normal; min-width:180px; }
+
+  .legend { display:flex; gap:14px; flex-wrap:wrap; font-size:.8rem; color:var(--muted); align-items:center; }
+  .legend i { display:inline-block; width:14px; height:3px; border-radius:2px; vertical-align:middle; margin-right:5px; }
+  .legend .mk { width:0; height:11px; border-left:1.5px dashed var(--dim); border-radius:0; margin-right:6px; }
+  .diagram-top { display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:8px; }
+  .diagram { position:relative; width:100%; height:220px; }
+  .diagram svg { display:block; width:100%; height:100%; overflow:visible; }
+  .tip {
+    position:fixed; z-index:1000; pointer-events:none; background:#0f0d13; border:1px solid var(--line);
+    border-radius:8px; padding:.5rem .65rem; font-size:.8rem; max-width:280px; box-shadow:0 6px 20px rgba(0,0,0,.4);
+  }
+  .tip b { font-weight:600; }
+  .tip .rad { display:flex; gap:.5rem; align-items:center; justify-content:space-between; }
+  .tip .rad span:first-child { display:inline-flex; gap:.4rem; align-items:center; color:var(--muted); }
+  .tip .m { color:var(--warn); margin-top:.3rem; }
+
+  .not { color:var(--dim); font-size:.8rem; margin-top:.5rem; }
+  .stjarnor { color:var(--warn); letter-spacing:1px; }
+  .betyg { display:flex; flex-direction:column; gap:.45rem; }
+  .betyg .rad { display:flex; justify-content:space-between; gap:12px; }
+  .betyg .rad span:first-child { color:var(--muted); }
+
+  .mark-lista { list-style:none; display:flex; flex-direction:column; gap:.3rem; font-size:.85rem; }
+  .mark-lista li { display:flex; gap:.5rem; align-items:baseline; }
+  .mark-lista .dag { color:var(--dim); font-size:.78rem; min-width:4.6rem; }
+  .mark-lista button { background:transparent; border:0; color:var(--dim); cursor:pointer; font:inherit; font-size:.8rem; }
+  .mark-lista button:hover { color:var(--neg); }
+  form.ny-mark { display:flex; gap:6px; flex-wrap:wrap; margin-top:.8rem; }
+  form.ny-mark input[type=text] { flex:1 1 180px; }
+  form.ny-mark button { background:var(--panel-2); color:var(--text); border:1px solid var(--line); border-radius:.5rem; padding:.4rem .8rem; font:inherit; font-size:.85rem; cursor:pointer; }
+
+  footer { margin-top:44px; padding-top:18px; border-top:1px solid var(--line); color:var(--dim); font-size:.82rem; line-height:1.7; }
+  footer dl { display:grid; grid-template-columns:max-content 1fr; gap:.2rem 1rem; margin:.6rem 0 1rem; }
+  footer dt { color:var(--muted); }
+  #laddar { color:var(--muted); padding:40px 0; }
+  [hidden] { display:none !important; }
+  @media (max-width:640px) {
+    .wrap { padding-top:20px; }
+    .ctrl { padding-right:0; width:100%; }
+    .grid2 { grid-template-columns:1fr; }
+    .diagram { height:190px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="head">
+    <div>
+      <h1>Butikstavla</h1>
+      <p class="lede">Hur många som ser apparna i App Store och Google Play, öppnar butikssidan och laddar ner, vecka för vecka, så att vi ser om en ändring på butikssidan hjälpte.</p>
+    </div>
+    <div class="ctrl">
+      <label for="vecka">Vecka <select id="vecka"></select></label>
+      <div class="seg" id="period" role="group" aria-label="Antal veckor">
+        <button type="button" data-v="4">4 veckor</button>
+        <button type="button" data-v="8" aria-pressed="true">8 veckor</button>
+        <button type="button" data-v="13">13 veckor</button>
+      </div>
+    </div>
+  </header>
+  <p class="meta" id="hamtat"></p>
+
+  <div id="laddar">Hämtar siffrorna…</div>
+  <div id="innehall" hidden>
+    <section class="panel">
+      <h3 id="oversikt-rubrik">Veckan</h3>
+      <div class="scroll"><table id="oversikt"></table></div>
+      <p class="not" id="oversikt-not"></p>
+    </section>
+    <nav class="hopp" id="hopp" aria-label="Till en app"></nav>
+    <div id="appar"></div>
+  </div>
+
+  <footer>
+    <strong style="color:var(--muted)">Så räknas det</strong>
+    <dl>
+      <dt>Visningar</dt><dd>Hur många gånger appen syntes i App Store (sökträffar, topplistor, Idag-fliken). Google lämnar inte ut visningar.</dd>
+      <dt>Besök</dt><dd>Hur många gånger någon öppnade butikssidan. I App Store räknas också rutan som öppnas från en annan app (till exempel en annons på Instagram).</dd>
+      <dt>Nedladdningar</dt><dd>App Store: förstagångsnedladdningar, oavsett var man tryckte på Hämta. Google Play: nya installationer.</dd>
+      <dt>Konvertering</dt><dd>Hur stor del av besöken på butikssidan som slutade med en nedladdning från sidan. Det är siffran som visar om sidans text och bilder fungerar. App Store: tryck på Hämta på sidan delat med besök. Google Play: Googles egen siffra (nedladdningar från butikssidan delat med besökare).</dd>
+      <dt>Källor</dt><dd>Sökning och bläddring inne i butiken, webb (länkar på webbsidor), länkar från appar (där hamnar Facebook och Instagram, även annonserna) och annonser i butiken. Annonsdata från Apple Ads kommer senare.</dd>
+      <dt>Ändringar</dt><dd>Ny version: dagen en ny version började laddas ner. Butikssidan: dagen nattjobbet såg att namn, beskrivning, nyckelord, kampanjtext eller bilder ändrats. Anteckningar: det någon skrivit in här.</dd>
+      <dt>* </dt><dd>Siffrorna täcker inte hela veckan. Apple ligger 1–2 dagar efter, Google ungefär en vecka, och Apple har bara levererat sedan 18–20 oktober för Klenod, Nära, Mesa 11 och Glimmerbaggen.</dd>
+    </dl>
+    Siffrorna hämtas varje natt från Apple och Google och visas bara som antal. Inga namn och inga recensionstexter.
+  </footer>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script src="dashboard-auth.js"></script>
+<script>
+'use strict';
+
+const SUPABASE_URL = 'https://jikyqdagrvssvvbvxtjx.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_rZ0CMWSKb0kCOxsLdrRLQQ_MmPp2Mte';
+
+// Samma appar som supabase/functions/sync-store-board/apps.ts i klenod-repot.
+const APPAR = [
+  { key: 'flocken', namn: 'Flocken', farg: '#8BA45D' },
+  { key: 'klenod', namn: 'Klenod', farg: '#E08A45' },
+  { key: 'nastahem', namn: 'Nästa Hem', farg: '#D4A574' },
+  { key: 'nara', namn: 'Nära', farg: '#D488A2' },
+  { key: 'mesa11', namn: 'Mesa 11', farg: '#5FB3A6' },
+  { key: 'glimmerbaggen', namn: 'Glimmerbaggen', farg: '#B79CE0' },
+  { key: 'cluckwards', namn: 'CLUCKWARDS!', farg: '#E3C35A' },
+];
+const BUTIK = { ios: 'App Store', android: 'Google Play' };
+const KALLOR = { search: 'Sökning', browse: 'Bläddring', web: 'Webb', app: 'Länkar från appar', ads: 'Annonser', other: 'Övrigt' };
+const KALLSTATUS = {
+  apple_engagement: 'visningar och besök', apple_downloads: 'nedladdningar', apple_installs: 'avinstallationer',
+  apple_analytics: 'rapporterna', apple_reviews: 'recensioner', itunes_lookup: 'betyg och butikssidan', apple: 'allt',
+  play_gcs: 'statistiken', play_installs: 'installationer', play_performance: 'besök', play_listing: 'butikssidan',
+};
+const LAND = new Intl.DisplayNames(['sv'], { type: 'region' });
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmt = (n) => (n == null ? '–' : Math.round(n).toLocaleString('sv-SE'));
+const pct = (x) => (x == null ? '–' : (x < 0.1 ? (Math.round(x * 1000) / 10).toLocaleString('sv-SE') : Math.round(x * 100)) + ' %');
+
+// ─── Datum ──────────────────────────────────────────────────────────────────
+const dag = (d) => d.toISOString().slice(0, 10);
+const plus = (s, n) => { const d = new Date(s + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return dag(d); };
+const mandag = (s) => { const d = new Date(s + 'T00:00:00Z'); return plus(s, -((d.getUTCDay() + 6) % 7)); };
+const MAN = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+const kort = (s) => `${Number(s.slice(8, 10))} ${MAN[Number(s.slice(5, 7)) - 1]}`;
+function veckonr(s) {
+  const d = new Date(s + 'T00:00:00Z');
+  d.setUTCDate(d.getUTCDate() + 3 - ((d.getUTCDay() + 6) % 7));
+  const jan4 = new Date(Date.UTC(d.getUTCFullYear(), 0, 4));
+  return 1 + Math.round(((d - jan4) / 864e5 - 3 + ((jan4.getUTCDay() + 6) % 7)) / 7);
+}
+const veckotext = (m) => `v.${veckonr(m)} · ${kort(m)}–${kort(plus(m, 6))}`;
+
+// ─── Data ───────────────────────────────────────────────────────────────────
+let D = null;            // svaret från dashboard_store_board
+let S = {};              // S[app|plat|metric] = Map(dag → antal)
+let SENAST = {};         // SENAST[app|plat|metric] = senaste dag med siffror
+let FORST = {};          // FORST[app|plat|metric] = första dagen i det hämtade underlaget
+let W = {};              // W[app|plat|metric|dim] = [[måndag, värde, antal] …]
+let antalVeckor = 8;
+let valdVecka = null;
+let idag = dag(new Date());
+
+async function rpc(name, body) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${name}`, {
+    method: 'POST', headers: DashAuth.headers(), body: JSON.stringify(body || {}),
+  });
+  const txt = await res.text();
+  if (!res.ok) {
+    let msg = txt;
+    try { msg = JSON.parse(txt).message || txt; } catch (e) {}
+    throw new Error(msg);
+  }
+  return txt ? JSON.parse(txt) : null;
+}
+
+function indexera(data) {
+  D = data; S = {}; SENAST = {}; FORST = {}; W = {};
+  for (const [app, plat, d, metric, v] of data.days) {
+    const k = `${app}|${plat}|${metric}`;
+    (S[k] || (S[k] = new Map())).set(d, Number(v));
+    if (!FORST[k] || d < FORST[k]) FORST[k] = d;
+  }
+  for (const [app, plat, metric, d] of data.latest) SENAST[`${app}|${plat}|${metric}`] = d;
+  for (const [app, plat, wk, metric, dim, val, n] of data.weeks) {
+    const k = `${app}|${plat}|${metric}|${dim}`;
+    (W[k] || (W[k] = [])).push([wk, val, Number(n)]);
+  }
+}
+
+/**
+ * Summan för en vecka: { v, klar } eller null om butiken inte har någon siffra den veckan.
+ * klar = siffrorna täcker hela veckan (butiken har levererat sista dagen, och underlaget börjar
+ * inte mitt i veckan, som när Apple började leverera för en app).
+ */
+function vecka(app, plat, metric, m) {
+  const k = `${app}|${plat}|${metric}`;
+  const serie = S[k];
+  if (!serie) return null;
+  let v = 0, finns = false;
+  for (let i = 0; i < 7; i++) {
+    const x = serie.get(plus(m, i));
+    if (x != null) { v += x; finns = true; }
+  }
+  if (!finns) return null;
+  return { v, klar: (SENAST[k] || '') >= plus(m, 6) && (FORST[k] || '') <= m };
+}
+
+/** Konvertering på butikssidan: Hämta på sidan (App Store) / nedladdningar från sidan (Google Play) delat med besök. */
+function konv(app, plat, m) {
+  const besok = vecka(app, plat, 'page_views', m);
+  const fran = vecka(app, plat, plat === 'ios' ? 'page_gets' : 'acquisitions', m);
+  if (!besok || !fran || besok.v <= 0) return null;
+  return { v: fran.v / besok.v, klar: besok.klar && fran.klar, besok: besok.v };
+}
+
+function forandring(nu, fore, sorts) {
+  if (!nu || !fore) return '';
+  if (sorts === 'andel') {
+    const diff = Math.round((nu.v - fore.v) * 100);
+    if (diff === 0) return '<span class="d lika">±0</span>';
+    return `<span class="d ${diff > 0 ? 'upp' : 'ned'}" title="Ändring i procentenheter mot veckan före">${diff > 0 ? '▲' : '▼'} ${Math.abs(diff)} %-enh.</span>`;
+  }
+  const d = nu.v - fore.v;
+  if (d === 0) return '<span class="d lika">±0</span>';
+  const battre = sorts === 'omvand' ? d < 0 : d > 0;
+  const txt = fore.v >= 10 ? `${Math.round(Math.abs(d) / fore.v * 100)} %` : Math.abs(Math.round(d));
+  return `<span class="d ${battre ? 'upp' : 'ned'}" title="Mot veckan före">${d > 0 ? '▲' : '▼'} ${txt}</span>`;
+}
+
+function cell(x, fore, sorts, format) {
+  if (!x) return '<td class="tom">–</td>';
+  const v = format === 'andel' ? pct(x.v) : fmt(x.v);
+  const title = x.klar ? '' : ' title="Siffrorna täcker inte hela veckan"';
+  return `<td><span class="${x.klar ? '' : 'ofullst'}"${title}>${v}</span>${forandring(x, fore, sorts)}</td>`;
+}
+
+const KOLUMNER = [
+  { plat: 'ios', metric: 'impressions', namn: 'Visningar' },
+  { plat: 'ios', metric: 'page_views', namn: 'Besök' },
+  { plat: 'ios', metric: 'downloads', namn: 'Nedladdningar' },
+  { plat: 'ios', metric: 'konv', namn: 'Konvertering' },
+  { plat: 'ios', metric: 'uninstalls', namn: 'Avinstallerade', sorts: 'omvand' },
+  { plat: 'android', metric: 'page_views', namn: 'Besök' },
+  { plat: 'android', metric: 'downloads', namn: 'Nedladdningar' },
+  { plat: 'android', metric: 'konv', namn: 'Konvertering' },
+  { plat: 'android', metric: 'uninstalls', namn: 'Avinstallerade', sorts: 'omvand' },
+];
+
+function kolumnhuvud(forsta) {
+  const ios = KOLUMNER.filter((k) => k.plat === 'ios').length;
+  const and = KOLUMNER.length - ios;
+  return `<thead><tr class="grupp"><th></th><th class="ios sep" colspan="${ios}">App Store</th><th class="android sep" colspan="${and}">Google Play</th></tr>` +
+    `<tr><th>${forsta}</th>${KOLUMNER.map((k, i) => `<th class="${i === 0 || i === ios ? 'sep' : ''}">${k.namn}</th>`).join('')}</tr></thead>`;
+}
+
+function rad(app, m, forsta) {
+  const fore = plus(m, -7);
+  const ios = KOLUMNER.filter((k) => k.plat === 'ios').length;
+  return KOLUMNER.map((k, i) => {
+    const nu = k.metric === 'konv' ? konv(app, k.plat, m) : vecka(app, k.plat, k.metric, m);
+    const fo = k.metric === 'konv' ? konv(app, k.plat, fore) : vecka(app, k.plat, k.metric, fore);
+    let td = cell(nu, fo, k.metric === 'konv' ? 'andel' : k.sorts, k.metric === 'konv' ? 'andel' : 'antal');
+    if (i === 0 || i === ios) td = td.replace('<td', '<td class="sep"').replace('class="sep" class="tom"', 'class="sep tom"');
+    return td;
+  }).join('');
+}
+
+// ─── Översikten ─────────────────────────────────────────────────────────────
+function ritaOversikt() {
+  const m = valdVecka;
+  $('oversikt-rubrik').textContent = `Veckan ${veckotext(m)} jämfört med veckan före`;
+  let html = kolumnhuvud('App');
+  html += '<tbody>' + APPAR.map((a) =>
+    `<tr><td><a class="app-lank" href="#app-${a.key}"><span class="app-namn"><span class="prick" style="background:${a.farg}"></span>${esc(a.namn)}</span></a></td>${rad(a.key, m)}</tr>`
+  ).join('');
+  // Alla appar tillsammans (konverteringen räknas på summorna).
+  const summa = (plat, metric, mm) => {
+    let v = 0, finns = false, klar = true;
+    for (const a of APPAR) { const x = vecka(a.key, plat, metric, mm); if (x) { v += x.v; finns = true; klar = klar && x.klar; } }
+    return finns ? { v, klar } : null;
+  };
+  const summaKonv = (plat, mm) => {
+    const b = summa(plat, 'page_views', mm), f = summa(plat, plat === 'ios' ? 'page_gets' : 'acquisitions', mm);
+    return b && f && b.v > 0 ? { v: f.v / b.v, klar: b.klar && f.klar } : null;
+  };
+  const ios = KOLUMNER.filter((k) => k.plat === 'ios').length;
+  html += '<tr class="summa"><td>Alla appar</td>' + KOLUMNER.map((k, i) => {
+    const nu = k.metric === 'konv' ? summaKonv(k.plat, m) : summa(k.plat, k.metric, m);
+    const fo = k.metric === 'konv' ? summaKonv(k.plat, plus(m, -7)) : summa(k.plat, k.metric, plus(m, -7));
+    let td = cell(nu, fo, k.metric === 'konv' ? 'andel' : k.sorts, k.metric === 'konv' ? 'andel' : 'antal');
+    if (i === 0 || i === ios) td = td.replace('<td', '<td class="sep"').replace('class="sep" class="tom"', 'class="sep tom"');
+    return td;
+  }).join('') + '</tr></tbody>';
+  $('oversikt').innerHTML = html;
+
+  const iosSenast = senastDag('ios', 'downloads'), andSenast = senastDag('android', 'page_views'), andInst = senastDag('android', 'downloads');
+  $('oversikt-not').innerHTML =
+    `Senaste dag med siffror: App Store ${iosSenast ? kort(iosSenast) : '–'}, Google Play ${andInst ? kort(andInst) : '–'} (installationer) och ${andSenast ? kort(andSenast) : '–'} (besök). ` +
+    `<span class="ofullst"></span> = siffrorna täcker inte hela veckan (butiken har inte levererat alla dagar, eller började leverera mitt i veckan). Pilen jämför med veckan före.`;
+}
+
+function senastDag(plat, metric) {
+  return APPAR.map((a) => SENAST[`${a.key}|${plat}|${metric}`]).filter(Boolean).sort().pop();
+}
+
+// ─── En app ─────────────────────────────────────────────────────────────────
+function veckorBakat() {
+  const out = [];
+  for (let i = 0; i < antalVeckor; i++) out.push(plus(valdVecka, -7 * i));
+  return out;
+}
+
+function markeringar(app, fran, till) {
+  return (D.markers || []).filter((x) => x.app === app && x.day >= fran && x.day <= till);
+}
+
+function chip(x) {
+  const butik = x.platform ? BUTIK[x.platform] + ': ' : '';
+  return `<span class="chip ${esc(x.kind)}" title="${esc(kort(x.day))} · ${esc(butik + x.note)}">${esc(butik + x.note)}</span>`;
+}
+
+function ritaApp(a) {
+  const veckor = veckorBakat();
+  const fran = veckor[veckor.length - 1], till = plus(valdVecka, 6);
+  const run = (D.runs || []).find((r) => r.app === a.key);
+  const har = (plat) => ['downloads', 'page_views', 'impressions'].some((mt) => S[`${a.key}|${plat}|${mt}`]);
+
+  // Vad som inte gick att hämta senast (bara det som saknas, inte det som fungerar).
+  const fel = (run ? run.status : []).filter((s) => !s.ok)
+    .map((s) => `${BUTIK[s.platform]} ${KALLSTATUS[s.source] || s.source}: ${esc(s.message)}`);
+  const senaste = [
+    `App Store ${SENAST[`${a.key}|ios|downloads`] ? 't.o.m. ' + kort(SENAST[`${a.key}|ios|downloads`]) : 'inga siffror än'}`,
+    `Google Play ${SENAST[`${a.key}|android|downloads`] ? 't.o.m. ' + kort(SENAST[`${a.key}|android|downloads`]) : 'inga siffror än'}`,
+  ].join(' · ');
+
+  let html = `<section class="app" id="app-${a.key}">
+    <div class="app-head"><span class="prick" style="background:${a.farg}"></span><h2>${esc(a.namn)}</h2><span class="rule"></span></div>
+    <div class="app-sub">${senaste}${run ? ` · hämtat ${new Date(run.ran_at).toLocaleString('sv-SE', { dateStyle: 'short', timeStyle: 'short' })}` : ''}
+      ${fel.length ? `<br><span class="fel">Saknas: ${fel.join(' · ')}</span>` : ''}</div>`;
+
+  if (!har('ios') && !har('android')) {
+    html += `<div class="panel"><p class="not" style="margin:0">Inga siffror från butikerna än.</p>${markeringsPanel(a, fran, till, true)}</div></section>`;
+    return html;
+  }
+
+  // Veckotabellen
+  html += `<div class="panel"><h3>Per vecka</h3><div class="scroll"><table>${kolumnhuvud('Vecka')}<tbody>` +
+    veckor.map((m) => {
+      const mk = markeringar(a.key, m, plus(m, 6));
+      return `<tr><td>${veckotext(m)}</td>${rad(a.key, m)}</tr>` +
+        (mk.length ? `<tr><td></td><td class="andr" colspan="${KOLUMNER.length}">${mk.map(chip).join('')}</td></tr>` : '');
+    }).join('') + '</tbody></table></div></div>';
+
+  // Diagrammet
+  html += `<div class="panel" style="margin-top:12px">
+    <div class="diagram-top">
+      <div class="legend"><span><i style="background:var(--ios)"></i>App Store</span><span><i style="background:var(--android)"></i>Google Play</span><span><i class="mk"></i>ändring</span></div>
+      <div class="seg" data-diagram="${a.key}" role="group" aria-label="Mått i diagrammet">
+        <button type="button" data-m="downloads" aria-pressed="true">Nedladdningar</button>
+        <button type="button" data-m="page_views">Besök</button>
+        <button type="button" data-m="impressions">Visningar</button>
+      </div>
+    </div>
+    <div class="diagram" id="diagram-${a.key}" data-metric="downloads"></div>
+  </div>`;
+
+  html += `<div class="grid2">${kallPanel(a, veckor)}${landPanel(a, veckor)}${betygPanel(a, fran, till)}${markeringsPanel(a, fran, till)}</div></section>`;
+  return html;
+}
+
+/** Summerat över perioden ur veckodatan: { värde → antal }. */
+function perDim(app, plat, metric, dim, veckor) {
+  const set = new Set(veckor);
+  const out = {};
+  for (const [wk, val, n] of W[`${app}|${plat}|${metric}|${dim}`] || []) {
+    if (!set.has(wk)) continue;
+    out[val] = (out[val] || 0) + n;
+  }
+  return out;
+}
+
+function kallPanel(a, veckor) {
+  const metrics = [['impressions', 'Visningar'], ['page_views', 'Besök'], ['downloads', 'Nedladdningar']];
+  const data = metrics.map(([mt]) => perDim(a.key, 'ios', mt, 'source', veckor));
+  const tot = data.map((d) => Object.values(d).reduce((s, x) => s + x, 0));
+  const kallor = Object.keys(KALLOR).filter((k) => data.some((d) => d[k]));
+  let html = `<div class="panel"><h3>Varifrån de kommer · App Store</h3>`;
+  if (!kallor.length) html += '<p class="not">Inga källor än.</p>';
+  else {
+    // Andelen överst, antalet under: smalt nog för en tredjedels bredd.
+    html += '<div class="scroll"><table><thead><tr><th>Källa</th>' + metrics.map(([, n]) => `<th>${n}</th>`).join('') + '</tr></thead><tbody>' +
+      kallor.map((k) => `<tr><td>${KALLOR[k]}</td>` + data.map((d, i) =>
+        `<td>${tot[i] ? Math.round((d[k] || 0) / tot[i] * 100) + ' %' : '–'}<span class="d lika">${fmt(d[k] || 0)}</span></td>`).join('') + '</tr>'
+      ).join('') + '</tbody></table></div>';
+  }
+  // Google Play: vid små volymer lägger Google allt under "Övrigt".
+  const gp = perDim(a.key, 'android', 'page_views', 'source', veckor);
+  const gpKallor = Object.keys(gp).filter((k) => gp[k] > 0);
+  if (gpKallor.length && gpKallor.every((k) => k === 'other')) {
+    html += '<p class="not">Google Play: Google delar inte upp besöken på källa vid så här få besök. Allt hamnar under "Övrigt".</p>';
+  } else if (gpKallor.length) {
+    const t = gpKallor.reduce((s, k) => s + gp[k], 0);
+    html += '<p class="not">Google Play, besök: ' + gpKallor.sort((x, y) => gp[y] - gp[x]).map((k) => `${KALLOR[k]} ${Math.round(gp[k] / t * 100)} %`).join(' · ') + '</p>';
+  }
+  return html + '</div>';
+}
+
+function landPanel(a, veckor) {
+  const lista = (plat) => {
+    const d = perDim(a.key, plat, 'downloads', 'country', veckor);
+    const t = Object.values(d).reduce((s, x) => s + x, 0);
+    const top = Object.entries(d).sort((x, y) => y[1] - x[1]).slice(0, 6);
+    if (!top.length) return '<p class="not">Inga nedladdningar per land än.</p>';
+    return '<table><tbody>' + top.map(([k, n]) => {
+      let namn = k === 'other' ? 'Övriga' : k;
+      try { if (k !== 'other') namn = LAND.of(k) || k; } catch (e) {}
+      return `<tr><td>${esc(namn)}</td><td>${fmt(n)}</td><td class="tom">${t ? Math.round(n / t * 100) + ' %' : ''}</td></tr>`;
+    }).join('') + '</tbody></table>';
+  };
+  const avinst = (plat) => {
+    let v = 0;
+    for (const m of veckor) { const x = vecka(a.key, plat, 'uninstalls', m); if (x) v += x.v; }
+    return v;
+  };
+  return `<div class="panel"><h3>Land · nedladdningar</h3>
+    <div class="grid2" style="margin-top:0;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+      <div><div class="not" style="margin:0 0 .3rem">App Store</div>${lista('ios')}</div>
+      <div><div class="not" style="margin:0 0 .3rem">Google Play</div>${lista('android')}</div>
+    </div>
+    <p class="not">Avinstallerade under perioden: App Store ${fmt(avinst('ios'))}, Google Play ${fmt(avinst('android'))}.</p></div>`;
+}
+
+function betygPanel(a, fran, till) {
+  const betyg = (D.ratings || []).filter((r) => r[0] === a.key);
+  const rader = [];
+  const iosSnitt = betyg.filter((r) => r[1] === 'ios' && r[2] === 'rating_avg');
+  const iosAntal = betyg.filter((r) => r[1] === 'ios' && r[2] === 'rating_count');
+  for (const r of iosAntal) {
+    const snitt = iosSnitt.find((s) => s[3] === r[3]);
+    let land = r[3];
+    try { land = LAND.of(r[3]) || r[3]; } catch (e) {}
+    rader.push([`App Store, ${land}`, Number(r[4]) > 0 && snitt ? `<span class="stjarnor">★</span> ${Number(snitt[4]).toLocaleString('sv-SE', { maximumFractionDigits: 2 })} · ${fmt(r[4])} betyg` : 'inga betyg än']);
+  }
+  const gp = betyg.find((r) => r[1] === 'android' && r[2] === 'rating_avg');
+  rader.push(['Google Play, alla länder', gp ? `<span class="stjarnor">★</span> ${Number(gp[4]).toLocaleString('sv-SE', { maximumFractionDigits: 2 })}` : 'inga betyg än']);
+  const rec = (plat) => {
+    let n = 0, st = 0;
+    for (let d = fran; d <= till; d = plus(d, 1)) {
+      n += (S[`${a.key}|${plat}|reviews`] || new Map()).get(d) || 0;
+      st += (S[`${a.key}|${plat}|review_stars`] || new Map()).get(d) || 0;
+    }
+    return n ? `${fmt(n)} st, snitt ${(Math.round(st / n * 10) / 10).toLocaleString('sv-SE')} <span class="stjarnor">★</span>` : 'inga';
+  };
+  rader.push(['Nya recensioner, App Store', rec('ios')]);
+  rader.push(['Nya recensioner, Google Play', rec('android')]);
+  return `<div class="panel"><h3>Betyg och recensioner</h3><div class="betyg">` +
+    rader.map(([k, v]) => `<div class="rad"><span>${esc(k)}</span><span>${v}</span></div>`).join('') +
+    `</div><p class="not">Recensionerna gäller perioden. Texterna visas inte här.</p></div>`;
+}
+
+function markeringsPanel(a, fran, till, inbaddad) {
+  const lista = markeringar(a.key, fran, till).slice().reverse();
+  const inner = `<h3${inbaddad ? ' style="margin-top:1rem"' : ''}>Ändringar och anteckningar</h3>
+    ${lista.length ? '<ul class="mark-lista">' + lista.map((x) =>
+      `<li><span class="dag">${kort(x.day)}</span><span>${x.platform ? esc(BUTIK[x.platform]) + ': ' : ''}${esc(x.note)}</span>` +
+      (x.kind === 'manual' ? ` <button type="button" data-ta-bort="${Number(x.id)}" aria-label="Ta bort anteckningen">ta bort</button>` : '') + '</li>').join('') + '</ul>'
+      : '<p class="not" style="margin:0">Inga ändringar under perioden.</p>'}
+    <form class="ny-mark" data-app="${a.key}">
+      <input type="date" name="dag" value="${idag}" max="${idag}" aria-label="Datum">
+      <select name="butik" aria-label="Butik"><option value="">Båda butikerna</option><option value="ios">App Store</option><option value="android">Google Play</option></select>
+      <input type="text" name="text" maxlength="200" placeholder="T.ex. ny första bild, annons startade" aria-label="Anteckning" required>
+      <button type="submit">Lägg till</button>
+    </form>`;
+  return inbaddad ? inner : `<div class="panel">${inner}</div>`;
+}
+
+// ─── Diagram: en linje per butik, en dag per punkt ──────────────────────────
+const NS = 'http://www.w3.org/2000/svg';
+function ritaDiagram(el) {
+  const app = el.id.replace('diagram-', '');
+  const metric = el.dataset.metric;
+  const veckor = veckorBakat();
+  const fran = veckor[veckor.length - 1];
+  const till = [plus(valdVecka, 6), plus(idag, -1)].sort()[0];
+  const dagar = [];
+  for (let d = fran; d <= till; d = plus(d, 1)) dagar.push(d);
+  const serier = ['ios', 'android'].map((plat) => ({ plat, m: S[`${app}|${plat}|${metric}`] || new Map() }))
+    .filter((s) => s.m.size > 0);
+  const W0 = el.clientWidth || 600, H0 = el.clientHeight || 220;
+  const pad = { l: 34, r: 74, t: 10, b: 24 };
+  const w = W0 - pad.l - pad.r, h = H0 - pad.t - pad.b;
+  let max = 1;
+  for (const s of serier) for (const d of dagar) max = Math.max(max, s.m.get(d) || 0);
+  const steg = [1, 2, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 5000].find((x) => max / x <= 4) || 10000;
+  const topp = Math.ceil(max / steg) * steg;
+  const x = (i) => pad.l + (dagar.length <= 1 ? w / 2 : (i / (dagar.length - 1)) * w);
+  const y = (v) => pad.t + h - (v / topp) * h;
+
+  let svg = `<svg xmlns="${NS}" viewBox="0 0 ${W0} ${H0}" role="img" aria-label="${esc(metric)} per dag">`;
+  for (let v = 0; v <= topp; v += steg) {
+    svg += `<line x1="${pad.l}" x2="${pad.l + w}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)" stroke-width="1"/>` +
+      `<text x="${pad.l - 6}" y="${y(v) + 4}" text-anchor="end" font-size="10" fill="var(--dim)">${v.toLocaleString('sv-SE')}</text>`;
+  }
+  dagar.forEach((d, i) => {
+    if (new Date(d + 'T00:00:00Z').getUTCDay() === 1) {
+      svg += `<text x="${x(i)}" y="${H0 - 6}" text-anchor="middle" font-size="10" fill="var(--dim)">${kort(d)}</text>`;
+    }
+  });
+  const mk = markeringar(app, fran, till);
+  for (const d of [...new Set(mk.map((m) => m.day))]) {
+    const i = dagar.indexOf(d);
+    if (i >= 0) svg += `<line x1="${x(i)}" x2="${x(i)}" y1="${pad.t}" y2="${pad.t + h}" stroke="var(--dim)" stroke-width="1.5" stroke-dasharray="3 3"/>`;
+  }
+  const slut = [];
+  for (const s of serier) {
+    let path = '', penna = false, sista = null;
+    dagar.forEach((d, i) => {
+      const v = s.m.get(d);
+      if (v == null) { penna = false; return; }
+      path += `${penna ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`;
+      penna = true; sista = [i, v];
+    });
+    svg += `<path d="${path}" fill="none" stroke="var(--${s.plat})" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+    if (sista) slut.push({ plat: s.plat, i: sista[0], v: sista[1], y: y(sista[1]) });
+  }
+  // Direkta etiketter vid linjernas slut, isär om de krockar.
+  slut.sort((p, q) => p.y - q.y);
+  for (let i = 1; i < slut.length; i++) if (slut[i].y - slut[i - 1].y < 13) slut[i].y = slut[i - 1].y + 13;
+  for (const p of slut) {
+    svg += `<circle cx="${x(p.i)}" cy="${y(p.v)}" r="3" fill="var(--${p.plat})" stroke="var(--panel)" stroke-width="2"/>` +
+      `<text x="${x(p.i) + 8}" y="${p.y + 4}" font-size="10.5" fill="var(--muted)">${BUTIK[p.plat]} ${fmt(p.v)}</text>`;
+  }
+  if (!serier.length) svg += `<text x="${pad.l + w / 2}" y="${pad.t + h / 2}" text-anchor="middle" font-size="12" fill="var(--dim)">Inga siffror för det här måttet</text>`;
+  svg += `<line class="hår" x1="0" x2="0" y1="${pad.t}" y2="${pad.t + h}" stroke="var(--muted)" stroke-width="1" visibility="hidden"/>`;
+  svg += `<rect class="yta" x="${pad.l}" y="0" width="${w}" height="${H0}" fill="transparent"/></svg>`;
+  el.innerHTML = svg;
+
+  const yta = el.querySelector('.yta'), har = el.querySelector('.hår'), tip = $('tip');
+  const visa = (ev) => {
+    const r = el.getBoundingClientRect();
+    const px = (ev.clientX - r.left) * (W0 / r.width);
+    const i = Math.max(0, Math.min(dagar.length - 1, Math.round((px - pad.l) / (w / Math.max(1, dagar.length - 1)))));
+    const d = dagar[i];
+    har.setAttribute('x1', x(i)); har.setAttribute('x2', x(i)); har.setAttribute('visibility', 'visible');
+    const rader = ['ios', 'android'].map((plat) => {
+      const v = (S[`${app}|${plat}|${metric}`] || new Map()).get(d);
+      return `<div class="rad"><span><i class="prick" style="background:var(--${plat});width:8px;height:8px"></i>${BUTIK[plat]}</span><b>${v == null ? '–' : fmt(v)}</b></div>`;
+    }).join('');
+    const mm = mk.filter((m) => m.day === d).map((m) => `<div class="m">${m.platform ? esc(BUTIK[m.platform]) + ': ' : ''}${esc(m.note)}</div>`).join('');
+    tip.innerHTML = `<b>${kort(d)}</b>${rader}${mm}`;
+    tip.hidden = false;
+    const tx = Math.min(window.innerWidth - tip.offsetWidth - 8, ev.clientX + 14);
+    tip.style.left = tx + 'px';
+    tip.style.top = Math.max(8, ev.clientY - tip.offsetHeight - 10) + 'px';
+  };
+  yta.addEventListener('mousemove', visa);
+  yta.addEventListener('touchstart', (ev) => visa(ev.touches[0]), { passive: true });
+  yta.addEventListener('mouseleave', () => { har.setAttribute('visibility', 'hidden'); tip.hidden = true; });
+}
+
+// ─── Allt ───────────────────────────────────────────────────────────────────
+function ritaAllt() {
+  ritaOversikt();
+  $('hopp').innerHTML = APPAR.map((a) => `<a href="#app-${a.key}"><span class="prick" style="background:${a.farg}"></span>${esc(a.namn)}</a>`).join('');
+  $('appar').innerHTML = APPAR.map(ritaApp).join('');
+  document.querySelectorAll('.diagram').forEach(ritaDiagram);
+}
+
+function veckoval() {
+  // Senaste vecka där App Store hunnit leverera alla dagar, annars den senaste med siffror.
+  const iosSenast = senastDag('ios', 'downloads') || plus(idag, -1);
+  let m = mandag(iosSenast);
+  if (plus(m, 6) > iosSenast) m = plus(m, -7);
+  const alla = [];
+  for (let i = 0; i < 13; i++) alla.push(plus(mandag(idag), -7 * i));
+  $('vecka').innerHTML = alla.map((x) => `<option value="${x}"${x === m ? ' selected' : ''}>${veckotext(x)}${plus(x, 6) >= idag ? ' (pågår)' : ''}</option>`).join('');
+  valdVecka = m;
+}
+
+async function ladda() {
+  const data = await rpc('dashboard_store_board', { p_days: 7 * 15 });
+  idag = dag(new Date());
+  indexera(data);
+  const korningar = (data.runs || []).map((r) => r.ran_at).sort();
+  $('hamtat').textContent = korningar.length
+    ? `Hämtat från Apple och Google ${new Date(korningar[korningar.length - 1]).toLocaleString('sv-SE', { dateStyle: 'long', timeStyle: 'short' })}.`
+    : 'Nattjobbet har inte hämtat några siffror än.';
+  if (!valdVecka) veckoval();
+  $('laddar').hidden = true;
+  $('innehall').hidden = false;
+  ritaAllt();
+}
+
+function start() {
+  ladda().catch((e) => {
+    $('laddar').textContent = 'Kunde inte hämta siffrorna: ' + e.message;
+  });
+}
+
+// Händelser
+$('vecka').addEventListener('change', (e) => { valdVecka = e.target.value; ritaAllt(); });
+$('period').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  antalVeckor = Number(b.dataset.v);
+  $('period').querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+  ritaAllt();
+});
+$('appar').addEventListener('click', async (e) => {
+  const knapp = e.target.closest('.seg[data-diagram] button');
+  if (knapp) {
+    const seg = knapp.parentElement;
+    seg.querySelectorAll('button').forEach((x) => x.setAttribute('aria-pressed', String(x === knapp)));
+    const el = $('diagram-' + seg.dataset.diagram);
+    el.dataset.metric = knapp.dataset.m;
+    ritaDiagram(el);
+    return;
+  }
+  const bort = e.target.closest('button[data-ta-bort]');
+  if (bort && confirm('Ta bort anteckningen?')) {
+    try { await rpc('store_board_delete_marker', { p_id: Number(bort.dataset.taBort) }); await ladda(); }
+    catch (err) { alert('Gick inte: ' + err.message); }
+  }
+});
+$('appar').addEventListener('submit', async (e) => {
+  const f = e.target.closest('form.ny-mark'); if (!f) return;
+  e.preventDefault();
+  const knapp = f.querySelector('button');
+  knapp.disabled = true;
+  try {
+    await rpc('store_board_add_marker', {
+      p_app: f.dataset.app, p_platform: f.butik.value || null, p_day: f.dag.value, p_note: f.text.value.trim(),
+    });
+    await ladda();
+  } catch (err) {
+    alert('Gick inte: ' + err.message);
+    knapp.disabled = false;
+  }
+});
+let storlek = 0;
+window.addEventListener('resize', () => {
+  clearTimeout(storlek);
+  storlek = setTimeout(() => document.querySelectorAll('.diagram').forEach(ritaDiagram), 150);
+});
+
+DashAuth.init({ url: SUPABASE_URL, anonKey: SUPABASE_KEY, onReady: start });
+</script>
+<script src="/analys/hub-lank.js"></script>
+</body>
+</html>
