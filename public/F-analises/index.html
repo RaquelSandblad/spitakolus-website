@@ -3,7 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Logga in – Flocken dashboard</title>
+  <meta name="robots" content="noindex, nofollow">
+  <title>Flocken dashboard</title>
+  <!-- Lösenordsrutan är borttagen (2026-10-18): lösenordet stod i sidans kod
+       och skyddade ingenting. Dashboarderna kräver inloggning med ett konto
+       som står i dashboard_admins i respektive databas. -->
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -24,68 +28,26 @@
       width: 100%;
     }
     h1 { font-size: 1.25rem; margin: 0 0 1rem 0; color: #2d5a27; }
-    label { display: block; font-size: 0.9rem; color: #555; margin-bottom: 0.35rem; }
-    input[type="password"] {
-      width: 100%;
-      padding: 0.6rem 0.75rem;
-      border: 1px solid #dee2e6;
-      border-radius: 8px;
-      font-size: 1rem;
-      box-sizing: border-box;
-    }
-    button {
-      width: 100%;
+    a.knapp {
+      display: block;
+      text-align: center;
+      text-decoration: none;
       margin-top: 1rem;
       padding: 0.65rem;
       background: #2d5a27;
       color: #fff;
-      border: none;
       border-radius: 8px;
       font-size: 1rem;
-      cursor: pointer;
     }
-    button:hover { opacity: 0.9; }
-    .error { color: #b02a37; font-size: 0.9rem; margin-top: 0.75rem; }
+    a.knapp:hover { opacity: 0.9; }
   </style>
 </head>
 <body>
   <div class="box">
     <h1>Flocken dashboard</h1>
-    <p style="color:#6c757d; font-size:0.9rem; margin:0 0 1rem 0;">Ange lösenord för att öppna veckodashboarden (Europa eller Brasilien).</p>
-    <form id="form" method="get" action="flocken-veckodashboard.html">
-      <label for="pw">Lösenord</label>
-      <input type="password" id="pw" name="pw" autocomplete="current-password" placeholder="Lösenord">
-      <button type="submit" formaction="flocken-veckodashboard.html">Öppna dashboard (Europa)</button>
-      <button type="submit" formaction="flocken-veckodashboard-brasilien.html">Öppna dashboard (Brasilien)</button>
-    </form>
-    <p id="err" class="error" style="display:none;" aria-live="polite">Fel lösenord. Försök igen.</p>
+    <p style="color:#6c757d; font-size:0.9rem; margin:0 0 1rem 0;">Välj region. Du loggar in med ditt Flocken-konto på dashboarden.</p>
+    <a class="knapp" href="flocken-veckodashboard.html">Öppna dashboard (Europa)</a>
+    <a class="knapp" href="flocken-veckodashboard-brasilien.html">Öppna dashboard (Brasilien)</a>
   </div>
-  <script>
-    (function() {
-      // Byt till ett eget starkt lösenord och spara filen. Dela bara med de som ska ha åtkomst.
-      var RATT_LOSENORD = 'Mingau';
-
-      var form = document.getElementById('form');
-      var pw = document.getElementById('pw');
-      var err = document.getElementById('err');
-
-      form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        err.style.display = 'none';
-        if (pw.value === RATT_LOSENORD) {
-          // Denna sida är Raquels ingång och ger åtkomst till båda dashboards.
-          // Den brasilianska kollegan loggar in via brasil.html (eget lösenord,
-          // sätter bara dashboard_br_ok → ingen åtkomst till Europa-siffrorna).
-          sessionStorage.setItem('dashboard_ok', '1');
-          sessionStorage.setItem('dashboard_br_ok', '1');
-          var target = (e.submitter && e.submitter.getAttribute('formaction')) || 'flocken-veckodashboard.html';
-          window.location.href = target;
-        } else {
-          err.style.display = 'block';
-          pw.focus();
-        }
-      });
-    })();
-  </script>
 </body>
 </html>
