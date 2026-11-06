@@ -20,14 +20,7 @@
   }
   .wrap { max-width:1080px; margin:0 auto; padding:36px 24px 72px; }
 
-  /* ---------- Lösenordsgrind ---------- */
-  #gate { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
-  .gate-card {
-    background:var(--panel); border:1px solid var(--line); border-radius:16px;
-    padding:32px; max-width:23rem; width:100%;
-  }
-  .gate-card h1 { font-size:1.35rem; margin-bottom:.3rem; letter-spacing:-.01em; }
-  .gate-card p { color:var(--muted); font-size:.9rem; margin-bottom:1.4rem; }
+  /* ---------- Inloggningsfält ---------- */
   .pw-wrap { position:relative; }
   input[type=password], input[type=text], input[type=email] {
     width:100%; padding:.72rem .8rem; border-radius:.6rem; font:inherit;
@@ -107,26 +100,12 @@
 </head>
 <body>
 
-<!-- ---------- Lösenordsgrind ---------- -->
-<div id="gate">
-  <form class="gate-card" id="gate-form">
-    <h1>Spitakolus · Analys</h1>
-    <p>Alla dashboards för Flocken, Nästa Hem, Nära och Klenod på ett ställe.</p>
-    <div class="pw-wrap">
-      <input id="gate-pw" type="password" placeholder="Lösenord" autocomplete="current-password" required>
-      <button type="button" class="pw-visa" id="gate-visa" aria-label="Visa lösenordet">Visa</button>
-    </div>
-    <button type="submit" class="knapp">Öppna</button>
-    <p class="fel" id="gate-fel"></p>
-  </form>
-</div>
-
 <!-- ---------- Navet ---------- -->
-<div id="hub" hidden>
+<div id="hub">
   <div class="wrap">
     <div class="head">
       <h1>Spitakolus <em>· Analys</em></h1>
-      <button class="lank" id="las-btn">Lås</button>
+      <button class="lank" id="ut-btn">Logga ut</button>
     </div>
     <p class="lede">Välj dashboard nedan. Logga in en gång här, så följer sessionen med till alla
        sidor — du behöver inte logga in på varje dashboard för sig.</p>
@@ -153,8 +132,7 @@
 
     <footer>
       Sidan hämtar ingen extern kod. Inloggningen sker mot varje apps egen Supabase-databas och
-      ger bara åtkomst till konton som står som administratörer där — lösenordet till den här sidan
-      öppnar bara menyn, aldrig siffrorna.
+      ger bara åtkomst till konton som står som administratörer där.
     </footer>
   </div>
 </div>
@@ -162,8 +140,10 @@
 <script>
 'use strict';
 
-var LOSEN = 'Smilla';
-var LAS_NYCKEL = 'spitakolus_analys_ok';
+/* Sätts när navet öppnas. hub-lank.js visar länken "Alla dashboards" bara för
+   den som varit här. Ingen behörighet hänger på den: siffrorna kräver alltid
+   inloggning mot appens databas. */
+var NAV_FLAGGA = 'spitakolus_analys_ok';
 
 /* De fem Supabase-projekt som kräver inloggning. `prefix` MÅSTE matcha den
    nyckel varje dashboards egen auth-fil läser, annars hittar den ingen session:
@@ -259,7 +239,6 @@ function kopplaVisa(knappId, faltId) {
     p.focus();
   });
 }
-kopplaVisa('gate-visa', 'gate-pw');
 kopplaVisa('in-visa', 'in-losen');
 
 /* ---------- Sessioner (delas med dashboardernas egna auth-filer) ---------- */
@@ -449,49 +428,18 @@ $('in-btn').addEventListener('click', function () {
 
 $('in-losen').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('in-btn').click(); });
 
-/* ---------- Grind ---------- */
-function oppna() {
-  $('gate').hidden = true;
-  $('hub').hidden = false;
-  /* Två av sidorna har egna lösenordsgrindar som sätter en sessionsflagga och
-     annars kastar tillbaka besökaren (location.replace):
-       dashboard_ok     — Flocken Sverige (grind: F-analises/index.html)
-       dashboard_br_ok  — Flocken Brasilien (grind: F-analises/brasil.html)
-     (Nästa Hems grind är borttagen 2026-10-18 — sidan kräver nu inloggning.)
-     (Skriv aldrig ut grindarnas lösenord här — filen serveras publikt, och
-      att samla dem på ett ställe gör dem lättare att hitta än de var.)
-     Navets lösenord ersätter dem: sätt båda flaggorna, annars studsar
-     Brasilien-kortet till den portugisiska rutan. sessionStorage följer med
-     vid navigering i samma flik.
-     OBS: finans-dashboarden hör INTE hit (privat, inget med Spitakolus att
-     göra) — dess flagga ska aldrig sättas härifrån. */
-  try {
-    sessionStorage.setItem('dashboard_ok', '1');
-    sessionStorage.setItem('dashboard_br_ok', '1');
-  } catch (e) {}
-  rita();
-  kollaAlla();
-}
-
-$('gate-form').addEventListener('submit', function (ev) {
-  ev.preventDefault();
-  if ($('gate-pw').value === LOSEN) {
-    try { localStorage.setItem(LAS_NYCKEL, '1'); } catch (e) {}
-    oppna();
-  } else {
-    $('gate-fel').textContent = 'Fel lösenord.';
-    $('gate-pw').select();
-  }
-});
-
-$('las-btn').addEventListener('click', function () {
-  try { localStorage.removeItem(LAS_NYCKEL); } catch (e) {}
+/* ---------- Start ----------
+   Ingen lösenordsgrind (borttagen 2026-10-18, S4): ett lösenord i sidans kod
+   skyddar ingenting, filen ligger i ett publikt repo. Siffrorna skyddas av
+   inloggningen mot varje databas och admin-kontrollen där. */
+$('ut-btn').addEventListener('click', function () {
+  Object.keys(PROJEKT).forEach(function (k) { rensaSession(PROJEKT[k]); });
   location.reload();
 });
 
-try {
-  if (localStorage.getItem(LAS_NYCKEL) === '1') oppna();
-} catch (e) {}
+try { localStorage.setItem(NAV_FLAGGA, '1'); } catch (e) {}
+rita();
+kollaAlla();
 </script>
 </body>
 </html>
