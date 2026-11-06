@@ -355,7 +355,7 @@ const sv: Texts = {
     metaTitle: 'Användarvillkor för Mesa 11 – Spitakolus AB',
     metaDescription: 'Reglerna för att spela Buraco i appen Mesa 11: schysst spel, användarnamn, Premium, ranking och mer.',
     title: 'Användarvillkor',
-    updated: 'Senast ändrade 19 oktober 2026',
+    updated: 'Senast ändrade 6 november 2026',
     intro: [
       'De här villkoren gäller när du använder appen Mesa 11 (kortspelet Buraco) från Spitakolus AB (org.nr 559554-6101). När du skapar ett konto godkänner du villkoren. Läs också vår [integritetspolicy](/buraco/integritet).',
     ],
@@ -363,7 +363,7 @@ const sv: Texts = {
       {
         h: 'Tjänsten',
         p: [
-          'I Mesa 11 spelar du kortspelet Buraco online, två mot två. Är en plats tom efter 10 sekunder tar en datorspelare den. Du kan också öva mot datorn. Du väljer nivå (Nybörjarbord eller Mästarbord) och spelsätt (Öppen, Stängd eller Strikt).',
+          'I Mesa 11 spelar du kortspelet Buraco två mot två, mot riktiga spelare eller datorspelare. Med Spela nu letar vi efter riktiga spelare online åt dig; är en plats fortfarande tom efter 10 sekunder tar en datorspelare den. Vid ett vänbord spelar du med dina vänner, och platser som ingen vän sitter på tas av datorspelare. Du kan också öva mot datorspelare. Datorspelarna visas med en robot (från version 1.3 också med ordet DATOR), så att du ser vem som är en riktig spelare och vem som är en datorspelare. Du väljer spelsätt (Öppen, Stängd eller Strikt).',
         ],
       },
       {
@@ -752,7 +752,7 @@ const en: Texts = {
     metaTitle: 'Mesa 11 Terms of Use – Spitakolus AB',
     metaDescription: 'The rules for playing Buraco in the Mesa 11 app: fair play, usernames, Premium, the ranking and more.',
     title: 'Terms of Use',
-    updated: 'Last updated 19 October 2026',
+    updated: 'Last updated 6 November 2026',
     intro: [
       'These terms apply when you use the Mesa 11 app (the card game Buraco) from Spitakolus AB (Swedish company reg. no. 559554-6101). By creating an account you accept these terms. Please also read our [privacy policy](/buraco/integritet).',
     ],
@@ -760,7 +760,7 @@ const en: Texts = {
       {
         h: 'The service',
         p: [
-          'In Mesa 11 you play the card game Buraco online, two against two. If a seat is empty after 10 seconds, a computer player takes it. You can also practise against the computer. You choose a level (Beginner table or Master table) and a mode (Open, Closed or Strict).',
+          'In Mesa 11 you play the card game Buraco two against two, against real players or computer players. With Play now we look for real players online for you; if a seat is still empty after 10 seconds, a computer player takes it. At a friends table you play with your friends, and seats that no friend takes go to computer players. You can also practise against computer players. Computer players are shown with a robot (from version 1.3 also with the word BOT), so you can see who is a real player and who is a computer player. You choose a mode (Open, Closed or Strict).',
         ],
       },
       {
@@ -1148,7 +1148,7 @@ const pt: Texts = {
     metaTitle: 'Termos de Uso do app Mesa 11 – Spitakolus AB',
     metaDescription: 'As regras para jogar Buraco no app Mesa 11: jogo limpo, nomes de usuário, Premium, ranking e mais.',
     title: 'Termos de Uso',
-    updated: 'Atualizados em 19 de outubro de 2026',
+    updated: 'Atualizados em 6 de novembro de 2026',
     intro: [
       'Estes termos valem quando você usa o app Mesa 11 (o jogo de cartas Buraco) da Spitakolus AB (empresa sueca, nº de registro 559554-6101). Ao criar uma conta você aceita os termos. Leia também a nossa [política de privacidade](/buraco/integritet).',
     ],
@@ -1156,7 +1156,7 @@ const pt: Texts = {
       {
         h: 'O serviço',
         p: [
-          'No app Mesa 11 você joga Buraco online, dois contra dois. Se um lugar ficar vazio por 10 segundos, um jogador do computador ocupa o lugar. Você também pode treinar contra o computador. Você escolhe o nível (Mesa de iniciantes ou Mesa de mestres) e o modo (Aberto, Fechado ou Rigoroso).',
+          'No app Mesa 11 você joga Buraco dois contra dois, contra jogadores de verdade ou jogadores do computador. Em Jogar agora, procuramos jogadores de verdade online para você; se um lugar continuar vazio depois de 10 segundos, um jogador do computador ocupa o lugar. Na mesa de amigos você joga com seus amigos, e os lugares que nenhum amigo ocupa ficam com jogadores do computador. Você também pode treinar contra jogadores do computador. Os jogadores do computador aparecem com um robô (a partir da versão 1.3, também com a palavra ROBÔ), para você ver quem é jogador de verdade e quem é do computador. Você escolhe o modo (Aberto, Fechado ou Rigoroso).',
         ],
       },
       {
