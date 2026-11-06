@@ -4,7 +4,8 @@ import type { Lang } from './lang';
 // Enkel märkning: **fet**, [länktext](/cluckwards/...) eller [länktext](https://...), och e-postadresser blir länkar.
 //
 // Integritetspolicyn och villkoren är juristens texter (9 okt 2026, via Raquel) på svenska, med trogna
-// översättningar till engelska och portugisiska. Policyn beskriver spelet som det blir vid lanseringen (honspelet H-022, H-023, H-025):
+// översättningar till engelska och portugisiska. Policyn ändrad 2 nov 2026 (Raquel): spelet frågar aldrig om
+// samtycke till reklam, reklam bara när spelaren själv väljer att titta, och skyddet hos Google och RevenueCat. Policyn beskriver spelet som det blir vid lanseringen (honspelet H-022, H-023, H-025):
 // inget konto och ingen egen server, sparfilen på telefonen, frivillig barnsäker reklam via Google AdMob
 // (ingen anpassad reklam, inget annonserings-id) och köp av kosmetik via App Store/Google Play och RevenueCat.
 // Den ska stämma med Google Plays Datasäkerhet och Apples App Privacy. Ändras något av det måste texten
@@ -29,7 +30,7 @@ export type Texts = {
   home: {
     metaTitle: string;
     metaDescription: string;
-    badge: string;
+    badge?: string;
     otherName: string;
     tagline: string;
     lead: string;
@@ -57,7 +58,6 @@ const sv: Texts = {
   home: {
     metaTitle: 'KACKLÄNGES! (CLUCKWARDS!) – Spitakolus AB',
     metaDescription: 'Fel håll. Full fart. Ägg iväg! En höna som flyger baklänges och skjuter ägg. Finns på Google Play och kommer snart till App Store.',
-    badge: 'Under utveckling',
     otherName: 'Heter CLUCKWARDS! på engelska',
     tagline: 'Fel håll. Full fart. Ägg iväg!',
     lead: 'En höna flyger baklänges över bondgården i full fart och skjuter ägg på allt som står i vägen.',
@@ -77,7 +77,7 @@ const sv: Texts = {
     metaTitle: "Integritetspolicy för KACKLÄNGES! (CLUCKWARDS!) – Spitakolus AB",
     metaDescription: "Så hanterar KACKLÄNGES! uppgifter. Inget konto, frivillig barnsäker reklam och köp via App Store och Google Play.",
     title: "Integritetspolicy",
-    updated: "Senast uppdaterad 9 oktober 2026",
+    updated: "Senast uppdaterad 2 november 2026",
     intro: [
       "KACKLÄNGES! (CLUCKWARDS! på engelska) görs av Spitakolus AB, org.nr 559554-6101. Spitakolus AB är personuppgiftsansvarigt för den behandling som beskrivs här.",
       "Spelet har inget användarkonto och ingen egen spelserver. Vi ber inte om ditt namn eller din e-postadress när du spelar och kan normalt inte koppla spelets tekniska uppgifter till dig som person.",
@@ -127,7 +127,7 @@ const sv: Texts = {
         ],
         after: [
           "Uppgifterna används för att visa annonsen, kontrollera att spelaren ska få sin belöning, räkna annonsvisningar och motverka fusk.",
-          "Där lagen kräver det frågar spelet om lov innan relevant information lagras eller läses på telefonen. Spelet följer det val du gör. Du kan alltid avstå från reklam och fortsätta spela utan annonsbelöningen.",
+          "Reklamen visas bara när du själv aktivt väljer att titta. Spelet behandlar alla spelare som barn, och därför ber Google inte om samtycke och annonserna blir aldrig personanpassade. Du kan alltid avstå från reklam och fortsätta spela utan annonsbelöningen.",
           "Google behandlar också uppgifter enligt sina egna regler. Läs mer i [Så använder Google information från appar som använder Googles tjänster](https://policies.google.com/technologies/partner-sites?hl=sv).",
         ],
       },
@@ -174,7 +174,8 @@ const sv: Texts = {
         h: "Varför uppgifterna får behandlas",
         p: [
           "Köpuppgifter behandlas för att genomföra, kontrollera och återställa köp.",
-          "Tekniska annonsuppgifter, säkerhetsuppgifter och supportuppgifter behandlas eftersom vi har ett berättigat intresse av att finansiera, skydda och ge support för spelet. När lagen kräver samtycke använder vi samtycke i stället.",
+          "Tekniska annonsuppgifter, säkerhetsuppgifter och supportuppgifter behandlas eftersom vi har ett berättigat intresse av att finansiera, skydda och ge support för spelet.",
+          "Google och RevenueCat, som vi delar uppgifter med, följer GDPR och skyddar uppgifterna minst lika väl som den här policyn beskriver, enligt sina villkor och integritetspolicyer.",
           "Google och RevenueCat kan behandla uppgifter utanför EU och EES. Skyddet för sådana överföringar beskrivs i deras länkade integritetspolicyer.",
         ],
       },
@@ -358,7 +359,6 @@ const en: Texts = {
   home: {
     metaTitle: 'CLUCKWARDS! – Spitakolus AB',
     metaDescription: 'Wrong way. Full speed. Eggs away! A hen that flies backwards and fires eggs. On Google Play now, coming soon to the App Store.',
-    badge: 'In development',
     otherName: 'Called KACKLÄNGES! in Swedish',
     tagline: 'Wrong way. Full speed. Eggs away!',
     lead: 'A hen flies backwards across the farm at full speed and fires eggs at everything in her way.',
@@ -378,7 +378,7 @@ const en: Texts = {
     metaTitle: "Privacy Policy for CLUCKWARDS! – Spitakolus AB",
     metaDescription: "How CLUCKWARDS! handles information. No account, optional child-safe ads and purchases through the App Store and Google Play.",
     title: "Privacy Policy",
-    updated: "Last updated 9 October 2026",
+    updated: "Last updated 2 November 2026",
     intro: [
       "CLUCKWARDS! (KACKLÄNGES! in Swedish) is made by Spitakolus AB, Swedish company registration number 559554-6101. Spitakolus AB is the data controller for the processing described here.",
       "The game has no user account and no game server of its own. We do not ask for your name or email address when you play, and we normally cannot link the game's technical information to you as a person.",
@@ -428,7 +428,7 @@ const en: Texts = {
         ],
         after: [
           "The information is used to show the ad, check that the player should get their reward, count ad views and prevent fraud.",
-          "Where the law requires it, the game asks for permission before relevant information is stored on or read from the phone. The game follows the choice you make. You can always skip ads and keep playing without the ad reward.",
+          "Ads are only shown when you actively choose to watch one. The game treats every player as a child, so Google does not ask for consent and the ads are never personalised. You can always skip ads and keep playing without the ad reward.",
           "Google also processes information under its own rules. Read more in [How Google uses information from sites or apps that use its services](https://policies.google.com/technologies/partner-sites).",
         ],
       },
@@ -475,7 +475,8 @@ const en: Texts = {
         h: "Why the information may be processed",
         p: [
           "Purchase information is processed to complete, check and restore purchases.",
-          "Technical ad information, security information and support information are processed because we have a legitimate interest in funding, protecting and supporting the game. Where the law requires consent, we use consent instead.",
+          "Technical ad information, security information and support information are processed because we have a legitimate interest in funding, protecting and supporting the game.",
+          "Google and RevenueCat, with whom we share information, comply with the GDPR and protect the information at least as well as this policy describes, under their terms and privacy policies.",
           "Google and RevenueCat may process data outside the EU and the EEA. The safeguards for such transfers are described in their linked privacy policies.",
         ],
       },
@@ -659,7 +660,6 @@ const pt: Texts = {
   home: {
     metaTitle: 'CÓ-CÓ-RÉ! (CLUCKWARDS!) – Spitakolus AB',
     metaDescription: 'Direção errada. Velocidade máxima. Ovos voando! Uma galinha que voa de ré e lança ovos. Já no Google Play, em breve na App Store.',
-    badge: 'Em desenvolvimento',
     otherName: 'Em inglês se chama CLUCKWARDS! e em sueco, KACKLÄNGES!',
     tagline: 'Direção errada. Velocidade máxima. Ovos voando!',
     lead: 'Uma galinha voa de ré pela fazenda a toda velocidade e lança ovos em tudo o que estiver no caminho.',
@@ -679,7 +679,7 @@ const pt: Texts = {
     metaTitle: "Política de Privacidade do CÓ-CÓ-RÉ! (CLUCKWARDS!) – Spitakolus AB",
     metaDescription: "Como o CLUCKWARDS! trata informações. Sem conta, anúncios opcionais e seguros para crianças e compras pela App Store e pelo Google Play.",
     title: "Política de Privacidade",
-    updated: "Atualizada em 9 de outubro de 2026",
+    updated: "Atualizada em 2 de novembro de 2026",
     intro: [
       "O CÓ-CÓ-RÉ! (CLUCKWARDS! em inglês, KACKLÄNGES! em sueco) é feito pela Spitakolus AB, empresa sueca, número de registro 559554-6101. A Spitakolus AB é a controladora do tratamento de dados descrito aqui.",
       "O jogo não tem conta de usuário nem servidor de jogo próprio. Não pedimos seu nome nem seu e-mail quando você joga e, normalmente, não conseguimos associar as informações técnicas do jogo a você como pessoa.",
@@ -729,7 +729,7 @@ const pt: Texts = {
         ],
         after: [
           "As informações são usadas para mostrar o anúncio, verificar se o jogador deve receber sua recompensa, contar as visualizações de anúncios e evitar fraudes.",
-          "Quando a lei exige, o jogo pede permissão antes que informações relevantes sejam armazenadas no celular ou lidas dele. O jogo respeita a escolha que você fizer. Você sempre pode recusar os anúncios e continuar jogando sem a recompensa do anúncio.",
+          "Os anúncios só aparecem quando você mesmo escolhe assistir. O jogo trata todos os jogadores como crianças, por isso o Google não pede consentimento e os anúncios nunca são personalizados. Você sempre pode recusar os anúncios e continuar jogando sem a recompensa do anúncio.",
           "O Google também trata informações de acordo com as próprias regras. Saiba mais em [Como o Google usa informações de sites ou apps que usam nossos serviços](https://policies.google.com/technologies/partner-sites?hl=pt-BR).",
         ],
       },
@@ -776,7 +776,8 @@ const pt: Texts = {
         h: "Por que as informações podem ser tratadas",
         p: [
           "As informações de compra são tratadas para realizar, verificar e restaurar compras.",
-          "Informações técnicas de anúncios, informações de segurança e informações de suporte são tratadas porque temos um interesse legítimo em financiar, proteger e dar suporte ao jogo. Quando a lei exige consentimento, usamos o consentimento.",
+          "Informações técnicas de anúncios, informações de segurança e informações de suporte são tratadas porque temos um interesse legítimo em financiar, proteger e dar suporte ao jogo.",
+          "O Google e a RevenueCat, com quem compartilhamos informações, seguem o GDPR e protegem as informações pelo menos tanto quanto esta política descreve, de acordo com seus termos e políticas de privacidade.",
           "O Google e a RevenueCat podem tratar dados fora da União Europeia e do Espaço Econômico Europeu. A proteção dessas transferências é descrita nas políticas de privacidade deles, indicadas acima.",
         ],
       },
