@@ -185,7 +185,7 @@ const sv: Texts = {
     updated: 'Senast ändrad [publiceringsdagen]',
     intro: [
       'Här beskriver vi vilka personuppgifter appen Mesa 11 (kortspelet Buraco) och dess spelserver behandlar, varför, var de finns och vilka rättigheter du har enligt dataskyddsförordningen (GDPR).',
-      'Nytt [publiceringsdagen]: avsnitt 8 om anmälningar och mejl till oss, avsnitt 9 om appen och uppdateringar, mer om vad Google får för annonserna (avsnitt 6 och 11), Loopia (avsnitt 11) och hur länge vi sparar kvitton och mejl (avsnitt 12).',
+      'Nytt [publiceringsdagen]: avsnitt 8 om anmälningar och mejl till oss, avsnitt 9 om appen och uppdateringar, mer om vilka uppgifter Google får genom annonserna (avsnitt 6 och 11), Loopia (avsnitt 11) och hur länge vi sparar kvitton och mejl (avsnitt 12).',
     ],
     sections: [
       {
@@ -208,7 +208,7 @@ const sv: Texts = {
           '**Vänkod** – en slumpad kod som du kan dela, så att andra kan skicka en vänförfrågan till dig. Du kan byta koden när du vill, och då slutar den gamla att fungera direkt. Koden skapas först när du öppnar Vänner i appen.',
           '**Vänner, vänförfrågningar och blockeringar** – vilka du är vän med, förfrågningar som du har skickat och fått, och konton som du har blockerat. En vänförfrågan sparas i högst 30 dagar.',
           '**Inställning för onlinestatus** – om dina vänner får se när du är online.',
-          '**Notiser** – om du tillåter notiser: telefonens push-adress, om telefonen är Android eller iPhone, appens språk och när appen senast hörde av sig, och dina val för notiser och tysta timmar (med telefonens tidszon när tysta timmar är på).',
+          '**Notiser** – om du tillåter notiser: telefonens push-adress, om det är en Android-enhet, en iPhone eller en iPad, appens språk och när appen senast hörde av sig, och dina val för notiser och tysta timmar (med telefonens tidszon när tysta timmar är på).',
         ],
         after: [
           'Det finns ingen chatt i spelet. Pågående partier – korten, dragen och vilka som sitter vid bordet – finns bara i spelserverns minne och sparas inte när partiet är slut. Det enda som sparas efter partiet är din statistik och ditt rankingresultat (se ovan). För att spelet ska kunna skicka data till din telefon behöver spelservern tekniska uppgifter som din IP-adress medan du är ansluten.',
@@ -242,7 +242,7 @@ const sv: Texts = {
           'Om du tillåter det i telefonen får du en notis när en vän bjuder in dig till ett vänbord, när någon skickar en vänförfrågan till dig och när din förfrågan har godkänts. Inga andra notiser och ingen reklam, utom en testnotis om du själv trycker på ”Skicka en testnotis”. Notisen innehåller en fast text, avsändarens användarnamn, ditt kontos id-nummer och tekniska id:n – vid en inbjudan inbjudans och bordets id, vid en vänförfrågan eller ett godkännande avsändarens kontos id-nummer. Inget annat.',
         ],
         ul: [
-          '**Push-adressen** är en slumpad kod från Google eller Apple som gör att notisen hittar rätt telefon. Vi sparar den kopplad till ditt konto, tillsammans med om telefonen är Android eller iPhone och appens språk (så att notisen kommer på rätt språk). Loggar du ut tas den bort.',
+          '**Push-adressen** är en slumpad kod från Google eller Apple som gör att notisen hittar rätt telefon. Vi sparar den kopplad till ditt konto, tillsammans med om det är en Android-enhet, en iPhone eller en iPad, och appens språk (så att notisen kommer på rätt språk). Loggar du ut tas den bort.',
           '**Tysta timmar** väljer du själv i appen under Vänner. När de är på sparas telefonens tidszon (till exempel Europe/Stockholm), så att timmarna följer din klocka. Inbjudningar i appen kommer alltid fram medan appen är öppen.',
           '**Om appen är öppen** eller i bakgrunden vet spelservern medan du är ansluten, så att du inte får en notis om något du redan ser. Det finns bara i serverns minne och sparas inte.',
           'Du kan stänga av notiserna i appen eller i telefonens inställningar när du vill.',
@@ -291,7 +291,7 @@ const sv: Texts = {
           '**Vänner** (vänkod, vänlista, förfrågningar, blockeringar, onlinestatus, inbjudningar och vänbord): det behövs för att uppfylla avtalet med dig (artikel 6.1 b GDPR).',
           '**Notiser** (push-adress, språk, notisinställningar och tysta timmar), när du har tillåtit notiser: det behövs för att uppfylla avtalet med dig (artikel 6.1 b GDPR). Du kan stänga av dem när du vill.',
           '**Gränser för kodförsök, förfrågningar och inbjudningar, och blockeringar**, för att stoppa missbruk och skydda spelarna: vårt berättigade intresse av en trygg tjänst (artikel 6.1 f GDPR).',
-          '**Anmälningar och mejl till supporten**: vårt berättigade intresse av en trygg tjänst och av att kunna svara dig (artikel 6.1 f GDPR).',
+          '**Anmälningar och mejl till supporten**: vårt berättigade intresse av en trygg tjänst och av att kunna svara dig (artikel 6.1 f GDPR, och i Brasilien artikel 7 IX LGPD).',
         ],
       },
       {
@@ -376,7 +376,7 @@ const sv: Texts = {
     updated: 'Senast ändrade [publiceringsdagen]',
     intro: [
       'De här villkoren gäller när du använder appen Mesa 11 (kortspelet Buraco) från Spitakolus AB (org.nr 559554-6101). När du skapar ett konto godkänner du villkoren. Läs också vår [integritetspolicy](/buraco/integritet).',
-      'Nytt [publiceringsdagen]: hur du anmäler ett användarnamn (avsnitt 3) och en annons (avsnitt 6), annonsen efter partiet och Premium (avsnitt 6) och att funktioner ändras i nya versioner av appen (avsnitt 9).',
+      'Nytt [publiceringsdagen]: hur du anmäler ett användarnamn (avsnitt 3) och en annons (avsnitt 6), annonsen efter partiet och Premium (avsnitt 6) och att vi kan ändra funktioner i nya versioner av appen (avsnitt 9).',
     ],
     sections: [
       {
@@ -607,7 +607,7 @@ const en: Texts = {
     updated: 'Last updated [publication date]',
     intro: [
       'This policy explains what personal data the Mesa 11 app (the card game Buraco) and its game server process, why, where it is kept and what rights you have under the General Data Protection Regulation (GDPR).',
-      'New on [publication date]: section 8 on reports and emails to us, section 9 on the app and updates, more about what Google receives for the ads (sections 6 and 11), Loopia (section 11) and how long we keep receipts and emails (section 12).',
+      'New on [publication date]: section 8 on reports and emails to us, section 9 on the app and updates, more about what data Google receives through the ads (sections 6 and 11), Loopia (section 11) and how long we keep receipts and emails (section 12).',
     ],
     sections: [
       {
@@ -630,7 +630,7 @@ const en: Texts = {
           '**Friend code** – a random code you can share so that others can send you a friend request. You can replace it at any time, and the old code stops working immediately. The code is only created when you open Friends in the app.',
           '**Friends, friend requests and blocks** – who you are friends with, requests you have sent and received, and accounts you have blocked. A friend request is kept for at most 30 days.',
           '**Online status setting** – whether your friends may see when you are online.',
-          '**Notifications** – if you allow notifications: your phone’s push address, whether the phone is Android or iPhone, the app language and when the app last checked in, and your notification and quiet hours settings (with your phone’s time zone when quiet hours are on).',
+          '**Notifications** – if you allow notifications: your phone’s push address, whether it is an Android device, an iPhone or an iPad, the app language and when the app last checked in, and your notification and quiet hours settings (with your phone’s time zone when quiet hours are on).',
         ],
         after: [
           'There is no chat in the game. Games in progress – the cards, the moves and who is at the table – exist only in the game server’s memory and are not stored once the game is over. The only things kept afterwards are your statistics and your ranking result (see above). To send data to your phone, the game server needs technical data such as your IP address while you are connected.',
@@ -664,7 +664,7 @@ const en: Texts = {
           'If you allow it on your phone, you get a notification when a friend invites you to a friends table, when someone sends you a friend request and when your request has been accepted. No other notifications and no ads, except a test notification if you tap “Send a test notification” yourself. A notification contains a fixed text, the sender’s username, your account ID and technical IDs – for an invite, the invite and table ID; for a friend request or an accepted request, the sender’s account ID. Nothing else.',
         ],
         ul: [
-          '**The push address** is a random code from Google or Apple that lets the notification reach the right phone. We store it linked to your account, together with whether the phone is Android or iPhone and the app language (so the notification arrives in the right language). It is removed when you log out.',
+          '**The push address** is a random code from Google or Apple that lets the notification reach the right phone. We store it linked to your account, together with whether it is an Android device, an iPhone or an iPad, and the app language (so the notification arrives in the right language). It is removed when you log out.',
           '**Quiet hours** are your own choice in the app under Friends. When they are on, your phone’s time zone (for example Europe/Stockholm) is stored so that the hours follow your clock. Invites in the app always arrive while the app is open.',
           '**Whether the app is open** or in the background is known to the game server while you are connected, so that you are not notified about something you can already see. It exists only in the server’s memory and is not stored.',
           'You can turn notifications off in the app or in your phone’s settings at any time.',
@@ -713,7 +713,7 @@ const en: Texts = {
           '**Friends** (friend code, friends list, requests, blocks, online status, invites and friends tables): necessary to perform our contract with you (Article 6(1)(b) GDPR).',
           '**Notifications** (push address, language, notification settings and quiet hours), once you have allowed notifications: necessary to perform our contract with you (Article 6(1)(b) GDPR). You can turn them off at any time.',
           '**Limits on code lookups, requests and invites, and blocks**, to stop abuse and protect players: our legitimate interest in a safe service (Article 6(1)(f) GDPR).',
-          '**Reports and emails to support**: our legitimate interest in a safe service and in being able to answer you (Article 6(1)(f) GDPR).',
+          '**Reports and emails to support**: our legitimate interest in a safe service and in being able to answer you (Article 6(1)(f) GDPR; in Brazil, Article 7(IX) LGPD).',
         ],
       },
       {
@@ -796,7 +796,7 @@ const en: Texts = {
     updated: 'Last updated [publication date]',
     intro: [
       'These terms apply when you use the Mesa 11 app (the card game Buraco) from Spitakolus AB (Swedish company reg. no. 559554-6101). By creating an account you accept these terms. Please also read our [privacy policy](/buraco/integritet).',
-      'New on [publication date]: how to report a username (section 3) and an ad (section 6), the ad after a game and Premium (section 6), and that features are changed in new versions of the app (section 9).',
+      'New on [publication date]: how to report a username (section 3) and an ad (section 6), the ad after a game and Premium (section 6), and that we may change features in new versions of the app (section 9).',
     ],
     sections: [
       {
@@ -1026,7 +1026,7 @@ const pt: Texts = {
     updated: 'Atualizada em [data da publicação]',
     intro: [
       'Esta política explica quais dados pessoais o app Mesa 11 (o jogo de cartas Buraco) e o servidor do jogo tratam, por quê, onde ficam e quais direitos você tem pelo Regulamento Geral de Proteção de Dados da UE (GDPR) e pela LGPD.',
-      'Novo em [data da publicação]: a seção 8 sobre denúncias e e-mails para nós, a seção 9 sobre o app e as atualizações, mais sobre o que o Google recebe com os anúncios (seções 6 e 11), a Loopia (seção 11) e por quanto tempo guardamos recibos e e-mails (seção 12).',
+      'Novo em [data da publicação]: a seção 8 sobre denúncias e e-mails para nós, a seção 9 sobre o app e as atualizações, mais sobre quais dados o Google recebe por meio dos anúncios (seções 6 e 11), a Loopia (seção 11) e por quanto tempo guardamos recibos e e-mails (seção 12).',
     ],
     sections: [
       {
@@ -1049,7 +1049,7 @@ const pt: Texts = {
           '**Código de amigo** – um código aleatório que você pode compartilhar para que outras pessoas te enviem um pedido de amizade. Você pode trocar o código quando quiser, e o antigo para de funcionar na hora. O código só é criado quando você abre Amigos no app.',
           '**Amigos, pedidos de amizade e contas bloqueadas** – de quem você é amigo, os pedidos que você enviou e recebeu e as contas que você bloqueou. Um pedido de amizade fica guardado por no máximo 30 dias.',
           '**Configuração do status online** – se os seus amigos podem ver quando você está online.',
-          '**Notificações** – se você permitir notificações: o endereço de push do celular, se o celular é Android ou iPhone, o idioma do app e quando o app se conectou pela última vez, e as suas escolhas de notificações e horas de silêncio (com o fuso horário do celular quando as horas de silêncio estão ativadas).',
+          '**Notificações** – se você permitir notificações: o endereço de push do celular, se é um aparelho Android, um iPhone ou um iPad, o idioma do app e quando o app se conectou pela última vez, e as suas escolhas de notificações e horas de silêncio (com o fuso horário do celular quando as horas de silêncio estão ativadas).',
         ],
         after: [
           'Não há chat no jogo. As partidas em andamento – as cartas, as jogadas e quem está na mesa – ficam só na memória do servidor do jogo e não são guardadas quando a partida termina. Depois da partida, só ficam guardados o seu resultado do ranking e as suas estatísticas (veja acima). Para enviar dados ao seu celular, o servidor precisa de dados técnicos, como o seu endereço IP, enquanto você está conectado.',
@@ -1083,7 +1083,7 @@ const pt: Texts = {
           'Se você permitir no celular, recebe uma notificação quando um amigo te convida para uma mesa de amigos, quando alguém te envia um pedido de amizade e quando o seu pedido é aceito. Nenhuma outra notificação e nenhum anúncio, a não ser uma notificação de teste se você mesmo tocar em “Enviar uma notificação de teste”. A notificação contém um texto fixo, o nome de usuário de quem enviou, o número de identificação da sua conta e ids técnicos – no convite, o id do convite e da mesa; no pedido de amizade ou no pedido aceito, o número de identificação da conta de quem enviou. Nada mais.',
         ],
         ul: [
-          '**O endereço de push** é um código aleatório do Google ou da Apple que faz a notificação chegar ao celular certo. Nós o guardamos ligado à sua conta, junto com a informação se o celular é Android ou iPhone e o idioma do app (para a notificação chegar no idioma certo). Ele é apagado quando você sai da conta.',
+          '**O endereço de push** é um código aleatório do Google ou da Apple que faz a notificação chegar ao celular certo. Nós o guardamos ligado à sua conta, junto com a informação se é um aparelho Android, um iPhone ou um iPad, e o idioma do app (para a notificação chegar no idioma certo). Ele é apagado quando você sai da conta.',
           '**As horas de silêncio** você escolhe no app, em Amigos. Quando estão ativadas, guardamos o fuso horário do celular (por exemplo America/Sao_Paulo), para que as horas sigam o seu relógio. Os convites no app sempre chegam enquanto o app está aberto.',
           '**Se o app está aberto** ou em segundo plano, o servidor do jogo sabe enquanto você está conectado, para não te mandar uma notificação sobre algo que você já está vendo. Isso fica só na memória do servidor e não é guardado.',
           'Você pode desativar as notificações no app ou nas configurações do celular quando quiser.',
@@ -1132,7 +1132,7 @@ const pt: Texts = {
           '**Amigos** (código de amigo, lista de amigos, pedidos, contas bloqueadas, status online, convites e mesas de amigos): necessário para cumprir o contrato com você (artigo 6.1 b do GDPR).',
           '**Notificações** (endereço de push, idioma, configurações de notificações e horas de silêncio), depois que você permite as notificações: necessário para cumprir o contrato com você (artigo 6.1 b do GDPR). Você pode desativá-las quando quiser.',
           '**Limites de tentativas de código, de pedidos e de convites, e os bloqueios de contas**, para impedir abusos e proteger os jogadores: o nosso interesse legítimo em um serviço seguro (artigo 6.1 f do GDPR).',
-          '**Denúncias e e-mails para o suporte**: o nosso interesse legítimo em um serviço seguro e em poder responder a você (artigo 6.1 f do GDPR).',
+          '**Denúncias e e-mails para o suporte**: o nosso interesse legítimo em um serviço seguro e em poder responder a você (artigo 6.1 f do GDPR; no Brasil, artigo 7º, IX, da LGPD).',
         ],
       },
       {
@@ -1215,7 +1215,7 @@ const pt: Texts = {
     updated: 'Atualizados em [data da publicação]',
     intro: [
       'Estes termos valem quando você usa o app Mesa 11 (o jogo de cartas Buraco) da Spitakolus AB (empresa sueca, nº de registro 559554-6101). Ao criar uma conta você aceita os termos. Leia também a nossa [política de privacidade](/buraco/integritet).',
-      'Novo em [data da publicação]: como denunciar um nome de usuário (seção 3) e um anúncio (seção 6), o anúncio depois da partida e o Premium (seção 6) e que as funções mudam em novas versões do app (seção 9).',
+      'Novo em [data da publicação]: como denunciar um nome de usuário (seção 3) e um anúncio (seção 6), o anúncio depois da partida e o Premium (seção 6) e que podemos mudar funções em novas versões do app (seção 9).',
     ],
     sections: [
       {
