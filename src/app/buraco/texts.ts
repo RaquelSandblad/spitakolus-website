@@ -182,10 +182,10 @@ const sv: Texts = {
     metaTitle: 'Integritetspolicy för Mesa 11 – Spitakolus AB',
     metaDescription: 'Vilka uppgifter appen Mesa 11 (kortspelet Buraco) sparar, varför, var de finns och hur du tar bort dem.',
     title: 'Integritetspolicy',
-    updated: 'Senast ändrad [publiceringsdagen]',
+    updated: 'Senast ändrad 8 november 2026',
     intro: [
       'Här beskriver vi vilka personuppgifter appen Mesa 11 (kortspelet Buraco) och dess spelserver behandlar, varför, var de finns och vilka rättigheter du har enligt dataskyddsförordningen (GDPR).',
-      'Nytt [publiceringsdagen]: avsnitt 8 om anmälningar och mejl till oss, avsnitt 9 om appen och uppdateringar, mer om vilka uppgifter Google får genom annonserna (avsnitt 6 och 11), Loopia (avsnitt 11) och hur länge vi sparar kvitton och mejl (avsnitt 12).',
+      'Nytt 8 november 2026: avsnitt 8 om anmälningar och mejl till oss, avsnitt 9 om appen och uppdateringar, mer om vilka uppgifter Google får genom annonserna (avsnitt 6 och 11), Loopia (avsnitt 11) och hur länge vi sparar kvitton och mejl (avsnitt 12).',
     ],
     sections: [
       {
@@ -373,10 +373,10 @@ const sv: Texts = {
     metaTitle: 'Användarvillkor för Mesa 11 – Spitakolus AB',
     metaDescription: 'Reglerna för att spela Buraco i appen Mesa 11: schysst spel, användarnamn, Premium, ranking och mer.',
     title: 'Användarvillkor',
-    updated: 'Senast ändrade [publiceringsdagen]',
+    updated: 'Senast ändrade 8 november 2026',
     intro: [
       'De här villkoren gäller när du använder appen Mesa 11 (kortspelet Buraco) från Spitakolus AB (org.nr 559554-6101). När du skapar ett konto godkänner du villkoren. Läs också vår [integritetspolicy](/buraco/integritet).',
-      'Nytt [publiceringsdagen]: hur du anmäler ett användarnamn (avsnitt 3) och en annons (avsnitt 6), annonsen efter partiet och Premium (avsnitt 6) och att vi kan ändra funktioner i nya versioner av appen (avsnitt 9).',
+      'Nytt 8 november 2026: hur du anmäler ett användarnamn (avsnitt 3) och en annons (avsnitt 6), annonsen efter partiet och Premium (avsnitt 6) och att vi kan ändra funktioner i nya versioner av appen (avsnitt 9).',
     ],
     sections: [
       {
@@ -604,10 +604,10 @@ const en: Texts = {
     metaTitle: 'Mesa 11 Privacy Policy – Spitakolus AB',
     metaDescription: 'What data the Mesa 11 app (the card game Buraco) stores, why, where it is kept and how to delete it.',
     title: 'Privacy Policy',
-    updated: 'Last updated [publication date]',
+    updated: 'Last updated 8 November 2026',
     intro: [
       'This policy explains what personal data the Mesa 11 app (the card game Buraco) and its game server process, why, where it is kept and what rights you have under the General Data Protection Regulation (GDPR).',
-      'New on [publication date]: section 8 on reports and emails to us, section 9 on the app and updates, more about what data Google receives through the ads (sections 6 and 11), Loopia (section 11) and how long we keep receipts and emails (section 12).',
+      'New on 8 November 2026: section 8 on reports and emails to us, section 9 on the app and updates, more about what data Google receives through the ads (sections 6 and 11), Loopia (section 11) and how long we keep receipts and emails (section 12).',
     ],
     sections: [
       {
@@ -793,10 +793,10 @@ const en: Texts = {
     metaTitle: 'Mesa 11 Terms of Use – Spitakolus AB',
     metaDescription: 'The rules for playing Buraco in the Mesa 11 app: fair play, usernames, Premium, the ranking and more.',
     title: 'Terms of Use',
-    updated: 'Last updated [publication date]',
+    updated: 'Last updated 8 November 2026',
     intro: [
       'These terms apply when you use the Mesa 11 app (the card game Buraco) from Spitakolus AB (Swedish company reg. no. 559554-6101). By creating an account you accept these terms. Please also read our [privacy policy](/buraco/integritet).',
-      'New on [publication date]: how to report a username (section 3) and an ad (section 6), the ad after a game and Premium (section 6), and that we may change features in new versions of the app (section 9).',
+      'New on 8 November 2026: how to report a username (section 3) and an ad (section 6), the ad after a game and Premium (section 6), and that we may change features in new versions of the app (section 9).',
     ],
     sections: [
       {
@@ -1023,10 +1023,10 @@ const pt: Texts = {
     metaTitle: 'Política de Privacidade do app Mesa 11 – Spitakolus AB',
     metaDescription: 'Quais dados o app Mesa 11 (o jogo de cartas Buraco) guarda, por quê, onde ficam e como excluí-los.',
     title: 'Política de Privacidade',
-    updated: 'Atualizada em [data da publicação]',
+    updated: 'Atualizada em 8 de novembro de 2026',
     intro: [
       'Esta política explica quais dados pessoais o app Mesa 11 (o jogo de cartas Buraco) e o servidor do jogo tratam, por quê, onde ficam e quais direitos você tem pelo Regulamento Geral de Proteção de Dados da UE (GDPR) e pela LGPD.',
-      'Novo em [data da publicação]: a seção 8 sobre denúncias e e-mails para nós, a seção 9 sobre o app e as atualizações, mais sobre quais dados o Google recebe por meio dos anúncios (seções 6 e 11), a Loopia (seção 11) e por quanto tempo guardamos recibos e e-mails (seção 12).',
+      'Novo em 8 de novembro de 2026: a seção 8 sobre denúncias e e-mails para nós, a seção 9 sobre o app e as atualizações, mais sobre quais dados o Google recebe por meio dos anúncios (seções 6 e 11), a Loopia (seção 11) e por quanto tempo guardamos recibos e e-mails (seção 12).',
     ],
     sections: [
       {
@@ -1212,10 +1212,10 @@ const pt: Texts = {
     metaTitle: 'Termos de Uso do app Mesa 11 – Spitakolus AB',
     metaDescription: 'As regras para jogar Buraco no app Mesa 11: jogo limpo, nomes de usuário, Premium, ranking e mais.',
     title: 'Termos de Uso',
-    updated: 'Atualizados em [data da publicação]',
+    updated: 'Atualizados em 8 de novembro de 2026',
     intro: [
       'Estes termos valem quando você usa o app Mesa 11 (o jogo de cartas Buraco) da Spitakolus AB (empresa sueca, nº de registro 559554-6101). Ao criar uma conta você aceita os termos. Leia também a nossa [política de privacidade](/buraco/integritet).',
-      'Novo em [data da publicação]: como denunciar um nome de usuário (seção 3) e um anúncio (seção 6), o anúncio depois da partida e o Premium (seção 6) e que podemos mudar funções em novas versões do app (seção 9).',
+      'Novo em 8 de novembro de 2026: como denunciar um nome de usuário (seção 3) e um anúncio (seção 6), o anúncio depois da partida e o Premium (seção 6) e que podemos mudar funções em novas versões do app (seção 9).',
     ],
     sections: [
       {
