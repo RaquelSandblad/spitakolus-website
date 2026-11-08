@@ -159,8 +159,8 @@ const sv: Texts = {
         text: 'Spela mot datorspelare när du vill lära dig spelet eller bara spela i lugn och ro.',
       },
       {
-        title: 'Nybörjarbord och Mästarbord',
-        text: 'Välj Nybörjarbord om du är ny, eller Mästarbord om du är van – så hamnar du med spelare på din nivå.',
+        title: 'Spela med vänner',
+        text: 'Lägg till vänner med en vänkod och bjud in dem till ett vänbord. Det finns ingen chatt, bara kortspelet.',
       },
       {
         title: 'Öppen, Stängd eller Strikt',
@@ -174,6 +174,7 @@ const sv: Texts = {
       'Du skapar ett konto i appen med e-post, användarnamn och lösenord. Användarnamnet syns för de andra vid bordet – och i rankingen om du har Premium.',
       '**Glömt lösenordet?** Tryck på ”Glömt lösenordet?” i appen, så får du ett mejl med en länk där du väljer ett nytt.',
       '**Ta bort kontot:** i appen under profilmenyn → Ta bort konto, eller [här på webben](/buraco/ta-bort-konto).',
+      '**Anmäl en annons eller ett namn:** i appen under profilmenyn → Anmäl en annons, eller i spelets meny → Anmäl ett användarnamn (från version 1.3 på iPhone och iPad och version 0.1.20 på Android). Då öppnas ett mejl till support@spitakolus.com.',
     ],
     linksTitle: 'Mer om Mesa 11',
   },
@@ -181,9 +182,10 @@ const sv: Texts = {
     metaTitle: 'Integritetspolicy för Mesa 11 – Spitakolus AB',
     metaDescription: 'Vilka uppgifter appen Mesa 11 (kortspelet Buraco) sparar, varför, var de finns och hur du tar bort dem.',
     title: 'Integritetspolicy',
-    updated: 'Senast ändrad 2 oktober 2026',
+    updated: 'Senast ändrad 8 november 2026',
     intro: [
       'Här beskriver vi vilka personuppgifter appen Mesa 11 (kortspelet Buraco) och dess spelserver behandlar, varför, var de finns och vilka rättigheter du har enligt dataskyddsförordningen (GDPR).',
+      'Nytt 8 november 2026: avsnitt 8 om anmälningar och mejl till oss, avsnitt 9 om appen och uppdateringar, mer om vilka uppgifter Google får genom annonserna (avsnitt 6 och 11), Loopia (avsnitt 11) och hur länge vi sparar kvitton och mejl (avsnitt 12).',
     ],
     sections: [
       {
@@ -206,7 +208,7 @@ const sv: Texts = {
           '**Vänkod** – en slumpad kod som du kan dela, så att andra kan skicka en vänförfrågan till dig. Du kan byta koden när du vill, och då slutar den gamla att fungera direkt. Koden skapas först när du öppnar Vänner i appen.',
           '**Vänner, vänförfrågningar och blockeringar** – vilka du är vän med, förfrågningar som du har skickat och fått, och konton som du har blockerat. En vänförfrågan sparas i högst 30 dagar.',
           '**Inställning för onlinestatus** – om dina vänner får se när du är online.',
-          '**Notiser** – om du tillåter notiser: telefonens push-adress, om telefonen är Android eller iPhone, appens språk och när appen senast hörde av sig, och dina val för notiser och tysta timmar (med telefonens tidszon när tysta timmar är på).',
+          '**Notiser** – om du tillåter notiser: telefonens push-adress, om det är en Android-enhet eller en Apple-enhet (iPhone eller iPad), appens språk och när appen senast hörde av sig, och dina val för notiser och tysta timmar (med telefonens tidszon när tysta timmar är på).',
         ],
         after: [
           'Det finns ingen chatt i spelet. Pågående partier – korten, dragen och vilka som sitter vid bordet – finns bara i spelserverns minne och sparas inte när partiet är slut. Det enda som sparas efter partiet är din statistik och ditt rankingresultat (se ovan). För att spelet ska kunna skicka data till din telefon behöver spelservern tekniska uppgifter som din IP-adress medan du är ansluten.',
@@ -237,21 +239,23 @@ const sv: Texts = {
       {
         h: 'Notiser',
         p: [
-          'Om du tillåter det i telefonen får du en notis när en vän bjuder in dig till ett vänbord, när någon skickar en vänförfrågan till dig och när din förfrågan har godkänts. Inga andra notiser och ingen reklam. Notisen innehåller en fast text, avsändarens användarnamn och ett tekniskt id för bordet eller förfrågan – inget annat.',
+          'Om du tillåter det i telefonen får du en notis när en vän bjuder in dig till ett vänbord, när någon skickar en vänförfrågan till dig och när din förfrågan har godkänts. Inga andra notiser och ingen reklam, utom en testnotis om du själv trycker på ”Skicka en testnotis”. Notisen innehåller en fast text, avsändarens användarnamn, ditt kontos id-nummer och tekniska id:n – vid en inbjudan inbjudans och bordets id, vid en vänförfrågan eller ett godkännande avsändarens kontos id-nummer. Inget annat.',
         ],
         ul: [
-          '**Push-adressen** är en slumpad kod från Google eller Apple som gör att notisen hittar rätt telefon. Vi sparar den kopplad till ditt konto, tillsammans med om telefonen är Android eller iPhone och appens språk (så att notisen kommer på rätt språk). Loggar du ut tas den bort.',
+          '**Push-adressen** är en slumpad kod från Google eller Apple som gör att notisen hittar rätt telefon. Vi sparar den kopplad till ditt konto, tillsammans med om det är en Android-enhet eller en Apple-enhet (iPhone eller iPad), och appens språk (så att notisen kommer på rätt språk). Loggar du ut tas den bort.',
           '**Tysta timmar** väljer du själv i appen under Vänner. När de är på sparas telefonens tidszon (till exempel Europe/Stockholm), så att timmarna följer din klocka. Inbjudningar i appen kommer alltid fram medan appen är öppen.',
           '**Om appen är öppen** eller i bakgrunden vet spelservern medan du är ansluten, så att du inte får en notis om något du redan ser. Det finns bara i serverns minne och sparas inte.',
           'Du kan stänga av notiserna i appen eller i telefonens inställningar när du vill.',
-          'Notiserna skickas via **Firebase Cloud Messaging** från Google och, till iPhone, vidare via Apples tjänst för notiser. Vi använder inte Firebase Analytics eller någon annan spårning från Firebase.',
+          'Notiserna skickas via **Firebase Cloud Messaging** från Google och, till iPhone och iPad, vidare via Apples tjänst för notiser. Vi använder inte Firebase Analytics eller någon annan spårning från Firebase.',
         ],
       },
       {
         h: 'Annonser',
         p: [
-          'Om du inte har Premium visas en reklamrad och en helskärmsannons efter varje parti. Annonserna kommer från **Google AdMob**. I EU/EES, Storbritannien och Schweiz frågar appen först om ditt samtycke. Om du samtycker kan Google använda telefonens annons-id och din ungefärliga plats för att visa och mäta annonser. Om du inte samtycker visas ändå annonser, men de anpassas inte efter dig.',
-          'I andra länder, till exempel Brasilien, frågar appen inte om samtycke, och Google kan visa anpassade annonser med hjälp av telefonens annons-id och din ungefärliga plats. Du kan stänga av det i telefonens inställningar – på Android genom att ta bort annons-id:t. På iPhone frågar appen först om den får spåra dig (Apples fråga om spårning), och annons-id:t används bara om du tillåter det. Svaret kan du ändra under Inställningar → Integritet och säkerhet → Spårning.',
+          'Om du inte har Premium visas en reklamrad och en helskärmsannons efter varje parti. Annonserna kommer från **Google AdMob**. Appen ber Google bara om annonser som passar från 13 år (Googles nivå Teen).',
+          'I EU/EES, Storbritannien och Schweiz visar appen först Googles fråga om samtycke. Om du samtycker kan Google använda telefonens annons-id och din ungefärliga plats för att visa och mäta annonser. Om du inte samtycker visas ändå annonser, men de anpassas inte efter dig. Google får ändå telefonens IP-adress och uppgifter om telefonen, för att visa annonsen, räkna visningar och stoppa bedrägerier. Du kan ändra ditt val i appen: profilmenyn → Annonsinställningar (samtycke).',
+          'I andra länder, till exempel Brasilien, visar appen inte Googles fråga, och Google kan visa anpassade annonser med hjälp av telefonens annons-id och din ungefärliga plats. På Android kan du stänga av det genom att ta bort annons-id:t i telefonens inställningar.',
+          'På iPhone och iPad frågar appen också, i alla länder, om den får spåra dig (Apples fråga om spårning). I EU/EES, Storbritannien och Schweiz kommer den efter Googles fråga. Annons-id:t används bara om du tillåter det. Svaret kan du ändra under Inställningar → Integritet och säkerhet → Spårning.',
           'Har du gett ditt samtycke kan du när som helst ta tillbaka det. Hittar du inte valet i appen, mejla support@spitakolus.com. Läs mer om hur Google använder uppgifter på [policies.google.com/technologies/partner-sites](https://policies.google.com/technologies/partner-sites).',
         ],
       },
@@ -262,36 +266,49 @@ const sv: Texts = {
         ],
       },
       {
-        h: 'Uppdateringar av appen',
+        h: 'Anmälningar och mejl till oss',
         p: [
-          'Appen kan hämta uppdaterad spelkod – till exempel nya texter, nytt utseende och rättade fel – direkt från vår egen spelserver, utan att gå via Google Play eller App Store. Uppdateringen kommer från samma server som spelet, och inga personuppgifter skickas till någon annan för det.',
+          'I appen kan du anmäla en annons (profilmenyn → Anmäl en annons, eller efter helskärmsannonsen) och ett användarnamn vid bordet (spelets meny → Anmäl ett användarnamn, när andra riktiga spelare sitter vid bordet). Det finns från version 1.3 på iPhone och iPad och version 0.1.20 på Android.',
+          'Appen skickar inget själv. Den öppnar ett färdigt mejl i din egen e-postapp, till support@spitakolus.com, och du bestämmer om du vill skicka det. Mejlet innehåller det du skriver, appens versionsnummer och, när du anmäler ett namn, det användarnamnet. Vi får också din e-postadress och det avsändarnamn som din e-postapp visar.',
+          'Vi använder anmälan för att gå igenom den: vi spärrar olämpliga annonser hos Google AdMob och byter eller tar bort användarnamn som bryter mot användarvillkoren. Anmäler någon ditt användarnamn får vi alltså ditt användarnamn i ett mejl. Mejl som du skickar till support@spitakolus.com av andra skäl använder vi bara för att svara dig.',
+        ],
+      },
+      {
+        h: 'Appen och uppdateringar',
+        p: [
+          'Från version 1.3 på iPhone och iPad och version 0.1.20 på Android finns hela spelet i appen, också typsnitten. Appen hämtar ingen kod för spelet eller appens funktioner, varken från oss eller från någon annan. Annonserna och Googles fråga om samtycke hämtas från Google (se Annonser). Nya versioner kommer bara via App Store och Google Play.',
+          'Äldre versioner (1.0–1.2 på iPhone och iPad och versioner före 0.1.20 på Android) har en funktion som hämtar spelets kod från vår egen spelserver. Sedan 3 november 2026 kan de därifrån som mest få samma kod som i version 1.2 på iPhone och iPad, aldrig ny kod. Inga personuppgifter skickas till någon annan för det. De äldre versionerna hämtar också typsnitten från Google Fonts, och då får Google telefonens IP-adress. Google är ett amerikanskt bolag, så IP-adressen kan föras över till USA. Google omfattas av EU:s och USA:s ramverk för dataskydd (EU-U.S. Data Privacy Framework). Hämtningen av typsnitten sker med stöd av vårt berättigade intresse av att de äldre versionerna ska fungera (artikel 6.1 f GDPR, och i Brasilien artikel 7 IX LGPD). Från version 1.3 på iPhone och iPad och version 0.1.20 på Android hämtar spelet inga typsnitt från Google.',
         ],
       },
       {
         h: 'Varför och med vilken rätt?',
         ul: [
-          '**För att ge dig spelet** (konto, inloggning, användarnamn, partier, statistik, ranking, tidsspärr, Premium och uppdateringar av appen): det behövs för att uppfylla avtalet med dig, alltså användarvillkoren (artikel 6.1 b GDPR).',
+          '**För att ge dig spelet** (konto, inloggning, användarnamn, partier, statistik, ranking, tidsspärr, Premium och, i äldre versioner av appen, hämtningen av spelets kod): det behövs för att uppfylla avtalet med dig, alltså användarvillkoren (artikel 6.1 b GDPR).',
+          '**Kvitton för köp av Premium när du har tagit bort kontot**, som vi behåller i högst ett år efter att prenumerationen har upphört: vårt berättigade intresse av att kunna svara på frågor om köpet och hantera återbetalningar (artikel 6.1 f GDPR, och i Brasilien artikel 7 IX LGPD).',
           '**Anpassade annonser**: i EU/EES, Storbritannien och Schweiz ditt samtycke (artikel 6.1 a GDPR). I andra länder vårt berättigade intresse av att finansiera det kostnadsfria spelet med reklam (artikel 6.1 f GDPR, och i Brasilien artikel 7 IX LGPD). Du kan när som helst invända genom att stänga av anpassade annonser i telefonens inställningar.',
+          '**Annonser som inte är anpassade** (för dig som inte har Premium): vårt berättigade intresse av att finansiera det kostnadsfria spelet med reklam (artikel 6.1 f GDPR, och i Brasilien artikel 7 IX LGPD).',
           '**Säkerhet, felsökning och att stoppa fusk och missbruk** (bland annat tekniska loggar): vårt berättigade intresse av en trygg, fungerande och schysst tjänst (artikel 6.1 f GDPR).',
           '**Vänner** (vänkod, vänlista, förfrågningar, blockeringar, onlinestatus, inbjudningar och vänbord): det behövs för att uppfylla avtalet med dig (artikel 6.1 b GDPR).',
           '**Notiser** (push-adress, språk, notisinställningar och tysta timmar), när du har tillåtit notiser: det behövs för att uppfylla avtalet med dig (artikel 6.1 b GDPR). Du kan stänga av dem när du vill.',
           '**Gränser för kodförsök, förfrågningar och inbjudningar, och blockeringar**, för att stoppa missbruk och skydda spelarna: vårt berättigade intresse av en trygg tjänst (artikel 6.1 f GDPR).',
+          '**Anmälningar och mejl till supporten**: vårt berättigade intresse av en trygg tjänst och av att kunna svara dig (artikel 6.1 f GDPR, och i Brasilien artikel 7 IX LGPD).',
         ],
       },
       {
         h: 'Var finns uppgifterna och vilka hjälper oss?',
         ul: [
-          '**Supabase** – konton (e-post, användarnamn, hashat lösenord, statistik, rankingresultat, Premium och tidsspärr) och vänner (vänkod, vänlista, förfrågningar, blockeringar och inställningen för onlinestatus) och notiser (push-adresser och notisinställningar), på servrar i EU (Stockholm, Sverige).',
+          '**Supabase** – konton (e-post, användarnamn, hashat lösenord, statistik, rankingresultat, Premium och tidsspärr) och vänner (vänkod, vänlista, förfrågningar, blockeringar och inställningen för onlinestatus) och notiser (push-adresser och notisinställningar), på servrar i EU (Stockholm, Sverige). Supabase är ett bolag i Singapore, och uppgifter kan föras över till länder utanför EU, till exempel Singapore och USA, vid support och drift. Överföringen skyddas med EU:s standardavtalsklausuler.',
           '**Railway** – spelservern, i EU-regionen (Amsterdam, Nederländerna). Railway är ett amerikanskt bolag, så uppgifter kan föras över till USA. Överföringen skyddas med EU:s standardavtalsklausuler.',
           '**Resend** – skickar mejlet när du har tryckt på ”Glömt lösenordet?” och får då din e-postadress. Resend är ett amerikanskt bolag, så uppgifter kan föras över till USA. Överföringen skyddas med EU:s standardavtalsklausuler.',
           '**RevenueCat** – kontrollerar köp av Premium (se ovan). RevenueCat är ett amerikanskt bolag, så uppgifter kan föras över till USA. Överföringen skyddas med EU:s standardavtalsklausuler.',
-          '**Google AdMob** – annonser, för dig som inte har Premium (se ovan).',
-          '**Google Firebase Cloud Messaging** – skickar notiserna och får då push-adressen och notisens text. Google är ett amerikanskt bolag, så uppgifter kan föras över till USA. Överföringen skyddas med EU:s standardavtalsklausuler. Till iPhone går notisen vidare via **Apple Push Notification service**.',
+          '**Google AdMob** – annonser, för dig som inte har Premium (se avsnitt 6). Google får då telefonens IP-adress, uppgifter om telefonen och appen (till exempel modell, operativsystem och språk), vilka annonser som visas och om du trycker på dem, felrapporter från annonsdelen och, när det är tillåtet, telefonens annons-id. Google använder uppgifterna som självständigt personuppgiftsansvarig enligt Googles villkor för annonser. Google är ett amerikanskt bolag, så uppgifter kan föras över till USA. Google omfattas av EU:s och USA:s ramverk för dataskydd (EU-U.S. Data Privacy Framework).',
+          '**Google Firebase Cloud Messaging** – skickar notiserna och får då push-adressen, notisens text och id-numren i den. Google är ett amerikanskt bolag, så uppgifter kan föras över till USA. Överföringen skyddas med EU:s standardavtalsklausuler. Till iPhone och iPad går notisen vidare via **Apple Push Notification service**.',
           '**Google Play och Apple App Store** – köp av Premium. De hanterar betalningen som egna personuppgiftsansvariga enligt sina egna villkor.',
           '**Vercel** – driver webbplatsen spitakolus.com, med bland annat den här policyn, sidan för att ta bort kontot och länksidan för vänkoder. Vercel sparar tekniska loggar över besöken (bland annat IP-adress och besökt adress – för länksidan alltså vänkoden) en begränsad tid. Vercel är ett amerikanskt bolag, så uppgifter kan föras över till USA. Överföringen skyddas med EU:s standardavtalsklausuler.',
+          '**Loopia** – tar emot och lagrar mejl till support@spitakolus.com, också anmälningar, på servrar i Sverige.',
         ],
         after: [
-          'Supabase, Railway, Resend, RevenueCat, Vercel och Google Firebase behandlar uppgifterna bara för vår räkning och får inte använda dem till något annat. Vi säljer aldrig dina uppgifter. Allt skickas krypterat.',
+          'Supabase, Railway, Resend, RevenueCat, Vercel, Loopia och Google Firebase behandlar uppgifterna bara för vår räkning och får inte använda dem till något annat. Alla som vi delar uppgifter med ska skydda dem minst lika väl som den här policyn beskriver: biträdena ovan enligt sina avtal med oss och Google enligt Googles villkor för annonser. Vi säljer aldrig dina uppgifter. Allt som appen, spelservern och webbplatsen skickar går krypterat.',
         ],
       },
       {
@@ -300,7 +317,8 @@ const sv: Texts = {
           'Kontouppgifterna, statistiken och rankingresultaten sparas så länge du har kvar ditt konto. Pågående partier finns bara kvar medan partiet pågår. När du tar bort ditt konto raderas kontot, användarnamnet, statistiken och rankingresultaten direkt och för alltid. Tekniska loggar (se ovan) sparas bara en begränsad tid och raderas sedan automatiskt.',
           'Vänkoden och vänlistan sparas tills du byter kod, tar bort en vän eller tar bort kontot. En vänförfrågan sparas i högst 30 dagar. Blockeringar sparas tills du häver dem eller tills något av kontona tas bort. Onlinestatus och inbjudningar sparas aldrig.',
           'En push-adress sparas tills du loggar ut eller tar bort kontot, eller tills Google eller Apple meddelar att den inte gäller längre. En push-adress som inte har använts på 180 dagar raderas automatiskt. Notiserna sparas inte hos oss när de har skickats.',
-          'Uppgifter om köp av Premium (kvitton kopplade till kontots id-nummer) raderas inte när du tar bort kontot. De finns kvar hos RevenueCat och i Google Play/App Store så länge det behövs för bokföring och reklamationer.',
+          'Uppgifter om köp av Premium (kvitton kopplade till kontots id-nummer) raderas inte direkt när du tar bort kontot. Vi behåller dem hos RevenueCat i högst ett år efter att prenumerationen har upphört, för att kunna svara på frågor om köpet och hantera återbetalningar (vårt berättigade intresse, artikel 6.1 f GDPR). Sedan raderar vi dem. Google Play och App Store sparar köpet enligt sina egna villkor.',
+          'Mejl till support@spitakolus.com, också anmälningar, sparar vi så länge ärendet pågår och därefter i högst 12 månader, så att vi kan se tidigare frågor om du hör av dig igen. Sedan raderar vi dem, också våra egna kopior.',
         ],
       },
       {
@@ -332,17 +350,17 @@ const sv: Texts = {
       {
         h: 'Klagomål',
         p: [
-          'Tycker du att vi behandlar dina uppgifter fel får du gärna höra av dig till oss först. Du har också rätt att klaga hos Integritetsskyddsmyndigheten (IMY), [www.imy.se](https://www.imy.se).',
+          'Tycker du att vi behandlar dina uppgifter fel får du gärna höra av dig till oss först. Du har också rätt att klaga hos Integritetsskyddsmyndigheten (IMY), [www.imy.se](https://www.imy.se), eller hos dataskyddsmyndigheten i ditt eget land.',
         ],
       },
       {
         h: 'Ålder',
-        p: ['Mesa 11 är till för dig som är 13 år eller äldre.'],
+        p: ['Mesa 11 är till för dig som är 13 år eller äldre. Appen frågar inte efter din ålder. Är du under 16 år, fråga en förälder innan du svarar ja till anpassade annonser i Googles fråga.'],
       },
       {
         h: 'Ändringar',
         p: [
-          'Om vi ändrar den här policyn uppdaterar vi datumet överst. Vid större ändringar berättar vi det också i appen.',
+          'Om vi ändrar den här policyn uppdaterar vi datumet överst. Vid större ändringar skriver vi också överst på sidan vad som är nytt.',
         ],
       },
       {
@@ -355,15 +373,16 @@ const sv: Texts = {
     metaTitle: 'Användarvillkor för Mesa 11 – Spitakolus AB',
     metaDescription: 'Reglerna för att spela Buraco i appen Mesa 11: schysst spel, användarnamn, Premium, ranking och mer.',
     title: 'Användarvillkor',
-    updated: 'Senast ändrade 6 november 2026',
+    updated: 'Senast ändrade 8 november 2026',
     intro: [
       'De här villkoren gäller när du använder appen Mesa 11 (kortspelet Buraco) från Spitakolus AB (org.nr 559554-6101). När du skapar ett konto godkänner du villkoren. Läs också vår [integritetspolicy](/buraco/integritet).',
+      'Nytt 8 november 2026: hur du anmäler ett användarnamn (avsnitt 3) och en annons (avsnitt 6), annonsen efter partiet och Premium (avsnitt 6) och att vi kan ändra funktioner i nya versioner av appen (avsnitt 9).',
     ],
     sections: [
       {
         h: 'Tjänsten',
         p: [
-          'I Mesa 11 spelar du kortspelet Buraco två mot två, mot riktiga spelare eller datorspelare. Med Spela nu letar vi efter riktiga spelare online åt dig; är en plats fortfarande tom efter 10 sekunder tar en datorspelare den. Vid ett vänbord spelar du med dina vänner, och platser som ingen vän sitter på tas av datorspelare. Du kan också öva mot datorspelare. Datorspelarna visas med en robot (från version 1.3 också med ordet DATOR), så att du ser vem som är en riktig spelare och vem som är en datorspelare. Du väljer spelsätt (Öppen, Stängd eller Strikt).',
+          'I Mesa 11 spelar du kortspelet Buraco två mot två, mot riktiga spelare eller datorspelare. Med Spela nu letar vi efter riktiga spelare online åt dig; är en plats fortfarande tom efter 10 sekunder tar en datorspelare den. Vid ett vänbord spelar du med dina vänner, och platser som ingen vän sitter på tas av datorspelare. Du kan också öva mot datorspelare. Datorspelarna visas med en robot (från version 1.3 på iPhone och iPad och version 0.1.20 på Android, också med ordet DATOR), så att du ser vem som är en riktig spelare och vem som är en datorspelare. Du väljer spelsätt (Öppen, Stängd eller Strikt).',
         ],
       },
       {
@@ -382,7 +401,10 @@ const sv: Texts = {
           'utge sig för att vara någon annan, till exempel en annan spelare eller Spitakolus,',
           'innehålla personuppgifter, reklam eller länkar.',
         ],
-        after: ['Vi kan ändra eller ta bort ett användarnamn som bryter mot det här.'],
+        after: [
+          'Vi kan ändra eller ta bort ett användarnamn som bryter mot det här.',
+          'Ser du ett sådant namn vid bordet kan du anmäla det i appen (spelets meny → Anmäl ett användarnamn, från version 1.3 på iPhone och iPad och version 0.1.20 på Android). Då öppnas ett mejl till support@spitakolus.com. Vi går igenom varje anmälan.',
+        ],
       },
       {
         h: 'Schysst spel',
@@ -403,7 +425,8 @@ const sv: Texts = {
         h: 'Reklam och Premium',
         ul: [
           'Mesa 11 är gratis och har reklam: en reklamrad och en helskärmsannons efter varje parti.',
-          '**Premium** tar bort all reklam och ger dig en plats i rankingen. Det ger inga fördelar i själva spelet – reglerna, borden och väntetiden är desamma för alla.',
+          'Annonserna kommer från Google AdMob, och appen ber bara om annonser som passar från 13 år. Ser du en olämplig annons kan du anmäla den i appen (profilmenyn → Anmäl en annons, eller efter helskärmsannonsen, från version 1.3 på iPhone och iPad och version 0.1.20 på Android). Då öppnas ett mejl till support@spitakolus.com, och vi spärrar olämpliga annonser hos Google.',
+          '**Premium** tar bort all reklam och ger dig en plats i rankingen. Det ger inga fördelar i själva spelet – reglerna, borden och de 5 minuterna när man lämnar ett parti är desamma för alla. Med Premium slipper du också vänta på annonsen efter partiet.',
           'Premium är en prenumeration som köps via Google Play eller App Store och förnyas automatiskt tills du avslutar den där. Priset visas i butiken innan du köper. Betalning, kvitton, uppsägning och återbetalningar sköts av butiken enligt dess villkor.',
         ],
       },
@@ -425,7 +448,7 @@ const sv: Texts = {
       {
         h: 'Ändringar av tjänsten',
         p: [
-          'Vi utvecklar spelet hela tiden och kan ändra, lägga till eller ta bort funktioner, göra uppehåll eller avsluta tjänsten. Om vi ändrar villkoren uppdaterar vi datumet överst, och vid större ändringar berättar vi det i appen.',
+          'Vi utvecklar spelet och kan ändra, lägga till eller ta bort funktioner i nya versioner av appen. Vi kan också göra uppehåll i tjänsten eller avsluta den. Om vi ändrar villkoren uppdaterar vi datumet överst, och vid större ändringar skriver vi också där vad som är nytt.',
         ],
       },
       {
@@ -558,8 +581,8 @@ const en: Texts = {
         text: 'Play against computer players when you want to learn the game or just play at your own pace.',
       },
       {
-        title: 'Beginner table and Master table',
-        text: 'Choose the Beginner table if you are new, or the Master table if you are experienced – and play with people at your level.',
+        title: 'Play with friends',
+        text: 'Add friends with a friend code and invite them to a friends table. There is no chat, just the card game.',
       },
       {
         title: 'Open, Closed or Strict',
@@ -573,6 +596,7 @@ const en: Texts = {
       'You create an account in the app with an email address, a username and a password. Your username is shown to the other players at the table – and in the ranking if you have Premium.',
       '**Forgot your password?** Tap “Forgot your password?” in the app and we will email you a link where you can choose a new one.',
       '**Delete your account:** in the app via the profile menu → Delete account, or [here on the web](/buraco/ta-bort-konto).',
+      '**Report an ad or a name:** in the app via the profile menu → Report an ad, or the game menu → Report a username (from version 1.3 on iPhone and iPad and version 0.1.20 on Android). This opens an email to support@spitakolus.com.',
     ],
     linksTitle: 'More about Mesa 11',
   },
@@ -580,9 +604,10 @@ const en: Texts = {
     metaTitle: 'Mesa 11 Privacy Policy – Spitakolus AB',
     metaDescription: 'What data the Mesa 11 app (the card game Buraco) stores, why, where it is kept and how to delete it.',
     title: 'Privacy Policy',
-    updated: 'Last updated 2 October 2026',
+    updated: 'Last updated 8 November 2026',
     intro: [
       'This policy explains what personal data the Mesa 11 app (the card game Buraco) and its game server process, why, where it is kept and what rights you have under the General Data Protection Regulation (GDPR).',
+      'New on 8 November 2026: section 8 on reports and emails to us, section 9 on the app and updates, more about what data Google receives through the ads (sections 6 and 11), Loopia (section 11) and how long we keep receipts and emails (section 12).',
     ],
     sections: [
       {
@@ -605,7 +630,7 @@ const en: Texts = {
           '**Friend code** – a random code you can share so that others can send you a friend request. You can replace it at any time, and the old code stops working immediately. The code is only created when you open Friends in the app.',
           '**Friends, friend requests and blocks** – who you are friends with, requests you have sent and received, and accounts you have blocked. A friend request is kept for at most 30 days.',
           '**Online status setting** – whether your friends may see when you are online.',
-          '**Notifications** – if you allow notifications: your phone’s push address, whether the phone is Android or iPhone, the app language and when the app last checked in, and your notification and quiet hours settings (with your phone’s time zone when quiet hours are on).',
+          '**Notifications** – if you allow notifications: your phone’s push address, whether it is an Android device or an Apple device (iPhone or iPad), the app language and when the app last checked in, and your notification and quiet hours settings (with your phone’s time zone when quiet hours are on).',
         ],
         after: [
           'There is no chat in the game. Games in progress – the cards, the moves and who is at the table – exist only in the game server’s memory and are not stored once the game is over. The only things kept afterwards are your statistics and your ranking result (see above). To send data to your phone, the game server needs technical data such as your IP address while you are connected.',
@@ -636,21 +661,23 @@ const en: Texts = {
       {
         h: 'Notifications',
         p: [
-          'If you allow it on your phone, you get a notification when a friend invites you to a friends table, when someone sends you a friend request and when your request has been accepted. No other notifications and no ads. A notification contains a fixed text, the sender’s username and a technical id for the table or request – nothing else.',
+          'If you allow it on your phone, you get a notification when a friend invites you to a friends table, when someone sends you a friend request and when your request has been accepted. No other notifications and no ads, except a test notification if you tap “Send a test notification” yourself. A notification contains a fixed text, the sender’s username, your account ID and technical IDs – for an invite, the invite and table ID; for a friend request or an accepted request, the sender’s account ID. Nothing else.',
         ],
         ul: [
-          '**The push address** is a random code from Google or Apple that lets the notification reach the right phone. We store it linked to your account, together with whether the phone is Android or iPhone and the app language (so the notification arrives in the right language). It is removed when you log out.',
+          '**The push address** is a random code from Google or Apple that lets the notification reach the right phone. We store it linked to your account, together with whether it is an Android device or an Apple device (iPhone or iPad), and the app language (so the notification arrives in the right language). It is removed when you log out.',
           '**Quiet hours** are your own choice in the app under Friends. When they are on, your phone’s time zone (for example Europe/Stockholm) is stored so that the hours follow your clock. Invites in the app always arrive while the app is open.',
           '**Whether the app is open** or in the background is known to the game server while you are connected, so that you are not notified about something you can already see. It exists only in the server’s memory and is not stored.',
           'You can turn notifications off in the app or in your phone’s settings at any time.',
-          'Notifications are sent through **Firebase Cloud Messaging** from Google and, for iPhone, passed on through Apple’s notification service. We do not use Firebase Analytics or any other tracking from Firebase.',
+          'Notifications are sent through **Firebase Cloud Messaging** from Google and, for iPhone and iPad, passed on through Apple’s notification service. We do not use Firebase Analytics or any other tracking from Firebase.',
         ],
       },
       {
         h: 'Ads',
         p: [
-          'If you do not have Premium, a banner ad is shown and a full-screen ad appears after each game. The ads come from **Google AdMob**. In the EU/EEA, the UK and Switzerland the app asks for your consent first. If you consent, Google may use your device’s advertising ID and your approximate location to show and measure ads. If you do not consent, ads are still shown, but they are not personalised.',
-          'In other countries, such as Brazil, the app does not ask for consent, and Google may show personalised ads using your device’s advertising ID and your approximate location. You can turn this off in your phone’s settings – on Android by deleting the advertising ID. On iPhone the app first asks whether it may track you (Apple’s tracking prompt), and the advertising ID is only used if you allow it. You can change your answer under Settings → Privacy & Security → Tracking.',
+          'If you do not have Premium, a banner ad is shown and a full-screen ad appears after each game. The ads come from **Google AdMob**. The app asks Google only for ads suitable from age 13 (Google’s Teen level).',
+          'In the EU/EEA, the UK and Switzerland the app first shows Google’s consent form. If you consent, Google may use your device’s advertising ID and your approximate location to show and measure ads. If you do not consent, ads are still shown, but they are not personalised. Google still receives your device’s IP address and information about the device, to show the ad, count views and prevent fraud. You can change your choice in the app: profile menu → Ad settings (consent).',
+          'In other countries, such as Brazil, the app does not show Google’s consent form, and Google may show personalised ads using your device’s advertising ID and your approximate location. On Android you can turn this off by deleting the advertising ID in your phone’s settings.',
+          'On iPhone and iPad the app also asks, in every country, whether it may track you (Apple’s tracking prompt). In the EU/EEA, the UK and Switzerland it comes after Google’s consent form. The advertising ID is only used if you allow it. You can change your answer under Settings → Privacy & Security → Tracking.',
           'If you have given your consent, you can withdraw it at any time. If you cannot find the option in the app, email support@spitakolus.com. Read more about how Google uses data at [policies.google.com/technologies/partner-sites](https://policies.google.com/technologies/partner-sites).',
         ],
       },
@@ -661,36 +688,49 @@ const en: Texts = {
         ],
       },
       {
-        h: 'App updates',
+        h: 'Reports and emails to us',
         p: [
-          'The app can download updated game code – for example new texts, a new look and bug fixes – directly from our own game server, without going through Google Play or the App Store. The update comes from the same server as the game, and no personal data is sent to anyone else for it.',
+          'In the app you can report an ad (profile menu → Report an ad, or after the full-screen ad) and a username at the table (game menu → Report a username, when other real players are at the table). This is available from version 1.3 on iPhone and iPad and version 0.1.20 on Android.',
+          'The app sends nothing by itself. It opens a ready-made email in your own email app, addressed to support@spitakolus.com, and you decide whether to send it. The email contains what you write, the app’s version number and, when you report a name, that username. We also receive your email address and the sender name your email app shows.',
+          'We use a report to review it: we block unsuitable ads in Google AdMob and change or remove usernames that break the terms of use. So if someone reports your username, we receive your username in an email. Emails you send to support@spitakolus.com for other reasons are used only to answer you.',
+        ],
+      },
+      {
+        h: 'The app and updates',
+        p: [
+          'From version 1.3 on iPhone and iPad and version 0.1.20 on Android, the whole game is inside the app, including the fonts. The app does not download any code for the game or the app’s features, either from us or from anyone else. The ads and Google’s consent form are loaded from Google (see Ads). New versions come only through the App Store and Google Play.',
+          'Older versions (1.0–1.2 on iPhone and iPad, and versions before 0.1.20 on Android) have a feature that downloads the game’s code from our own game server. Since 3 November 2026 the most they can get from there is the same code as in version 1.2 on iPhone and iPad, never new code. No personal data is sent to anyone else for it. The older versions also load the fonts from Google Fonts, which means Google receives the phone’s IP address. Google is a US company, so the IP address may be transferred to the United States. Google is covered by the EU-U.S. Data Privacy Framework. Loading the fonts is based on our legitimate interest in keeping the older versions working (Article 6(1)(f) GDPR; in Brazil, Article 7(IX) LGPD). From version 1.3 on iPhone and iPad and version 0.1.20 on Android, the game loads no fonts from Google.',
         ],
       },
       {
         h: 'Why, and on what legal basis?',
         ul: [
-          '**To provide the game** (account, login, username, games, statistics, ranking, time-out, Premium and app updates): necessary to perform our contract with you, i.e. the terms of use (Article 6(1)(b) GDPR).',
+          '**To provide the game** (account, login, username, games, statistics, ranking, time-out, Premium and, in older versions of the app, downloading the game’s code): necessary to perform our contract with you, i.e. the terms of use (Article 6(1)(b) GDPR).',
+          '**Receipts for Premium purchases after you delete your account**, which we keep for at most one year after the subscription has ended: our legitimate interest in being able to answer questions about the purchase and handle refunds (Article 6(1)(f) GDPR; in Brazil, Article 7(IX) LGPD).',
           '**Personalised ads**: in the EU/EEA, the UK and Switzerland, your consent (Article 6(1)(a) GDPR). In other countries, our legitimate interest in funding the free game with ads (Article 6(1)(f) GDPR; in Brazil, Article 7(IX) LGPD). You can object at any time by turning off personalised ads in your phone’s settings.',
+          '**Non-personalised ads** (for players without Premium): our legitimate interest in funding the free game with ads (Article 6(1)(f) GDPR; in Brazil, Article 7(IX) LGPD).',
           '**Security, troubleshooting and stopping cheating and abuse** (including technical logs): our legitimate interest in a safe, reliable and fair service (Article 6(1)(f) GDPR).',
           '**Friends** (friend code, friends list, requests, blocks, online status, invites and friends tables): necessary to perform our contract with you (Article 6(1)(b) GDPR).',
           '**Notifications** (push address, language, notification settings and quiet hours), once you have allowed notifications: necessary to perform our contract with you (Article 6(1)(b) GDPR). You can turn them off at any time.',
           '**Limits on code lookups, requests and invites, and blocks**, to stop abuse and protect players: our legitimate interest in a safe service (Article 6(1)(f) GDPR).',
+          '**Reports and emails to support**: our legitimate interest in a safe service and in being able to answer you (Article 6(1)(f) GDPR; in Brazil, Article 7(IX) LGPD).',
         ],
       },
       {
         h: 'Where is the data kept, and who helps us?',
         ul: [
-          '**Supabase** – accounts (email, username, hashed password, statistics, ranking results, Premium and time-out) and friends (friend code, friends list, requests, blocks and the online status setting) and notifications (push addresses and notification settings), on servers in the EU (Stockholm, Sweden).',
+          '**Supabase** – accounts (email, username, hashed password, statistics, ranking results, Premium and time-out) and friends (friend code, friends list, requests, blocks and the online status setting) and notifications (push addresses and notification settings), on servers in the EU (Stockholm, Sweden). Supabase is a company in Singapore, and data may be transferred to countries outside the EU, such as Singapore and the United States, for support and operations. The transfer is protected by the EU Standard Contractual Clauses.',
           '**Railway** – the game server, in the EU region (Amsterdam, the Netherlands). Railway is a US company, so data may be transferred to the United States. The transfer is protected by the EU Standard Contractual Clauses.',
           '**Resend** – sends the email when you tap “Forgot your password?”, and receives your email address for that. Resend is a US company, so data may be transferred to the United States. The transfer is protected by the EU Standard Contractual Clauses.',
           '**RevenueCat** – verifies Premium purchases (see above). RevenueCat is a US company, so data may be transferred to the United States. The transfer is protected by the EU Standard Contractual Clauses.',
-          '**Google AdMob** – ads, for players without Premium (see above).',
-          '**Google Firebase Cloud Messaging** – sends the notifications and receives the push address and the notification text to do so. Google is a US company, so data may be transferred to the United States. The transfer is protected by the EU Standard Contractual Clauses. For iPhone, the notification is passed on through **Apple Push Notification service**.',
+          '**Google AdMob** – ads, for players without Premium (see section 6). Google then receives your device’s IP address, information about the device and the app (such as model, operating system and language), which ads are shown and whether you tap them, error reports from the ad component and, where allowed, your device’s advertising ID. Google uses the data as an independent controller under Google’s advertising terms. Google is a US company, so data may be transferred to the United States. Google is covered by the EU-U.S. Data Privacy Framework.',
+          '**Google Firebase Cloud Messaging** – sends the notifications and, to do so, receives the push address, the notification text and the IDs in it. Google is a US company, so data may be transferred to the United States. The transfer is protected by the EU Standard Contractual Clauses. For iPhone and iPad, the notification is passed on through **Apple Push Notification service**.',
           '**Google Play and the Apple App Store** – Premium purchases. They handle the payment as independent controllers under their own terms.',
           '**Vercel** – runs the spitakolus.com website, including this policy, the account deletion page and the link page for friend codes. Vercel keeps technical logs of visits (including IP address and the address visited – for the link page, that includes the friend code) for a limited time. Vercel is a US company, so data may be transferred to the United States. The transfer is protected by the EU Standard Contractual Clauses.',
+          '**Loopia** – receives and stores emails to support@spitakolus.com, including reports, on servers in Sweden.',
         ],
         after: [
-          'Supabase, Railway, Resend, RevenueCat, Vercel and Google Firebase process the data only on our behalf and may not use it for anything else. We never sell your data. Everything is sent encrypted.',
+          'Supabase, Railway, Resend, RevenueCat, Vercel, Loopia and Google Firebase process the data only on our behalf and may not use it for anything else. Everyone we share data with must protect it at least as well as this policy describes: the processors above under their agreements with us, and Google under Google’s advertising terms. We never sell your data. Everything the app, the game server and the website send is encrypted.',
         ],
       },
       {
@@ -699,7 +739,8 @@ const en: Texts = {
           'Account data, statistics and ranking results are kept for as long as you keep your account. Games in progress exist only while the game is being played. When you delete your account, the account, the username, the statistics and the ranking results are deleted immediately and permanently. Technical logs (see above) are deleted automatically after a limited time.',
           'Your friend code and friends list are kept until you replace the code, remove a friend or delete your account. A friend request is kept for at most 30 days. Blocks are kept until you lift them or one of the accounts is deleted. Online status and invites are never stored.',
           'A push address is kept until you log out or delete your account, or until Google or Apple tells us it is no longer valid. A push address that has not been used for 180 days is deleted automatically. We do not keep notifications after they have been sent.',
-          'Data about Premium purchases (receipts linked to your account ID) is not deleted when you delete your account. It is kept by RevenueCat and in Google Play/the App Store for as long as needed for accounting and complaints.',
+          'Data about Premium purchases (receipts linked to your account ID) is not deleted immediately when you delete your account. We keep it with RevenueCat for at most one year after the subscription has ended, so that we can answer questions about the purchase and handle refunds (our legitimate interest, Article 6(1)(f) GDPR). Then we delete it. Google Play and the App Store keep the purchase under their own terms.',
+          'Emails to support@spitakolus.com, including reports, are kept for as long as the matter is ongoing and then for at most 12 months, so that we can see earlier questions if you contact us again. Then we delete them, including our own copies.',
         ],
       },
       {
@@ -736,11 +777,11 @@ const en: Texts = {
       },
       {
         h: 'Age',
-        p: ['Mesa 11 is for people aged 13 or older.'],
+        p: ['Mesa 11 is for people aged 13 or older. The app does not ask for your age. If you are under 16, ask a parent before you say yes to personalised ads in Google’s consent form.'],
       },
       {
         h: 'Changes',
-        p: ['If we change this policy we update the date at the top. For bigger changes we also tell you in the app.'],
+        p: ['If we change this policy we update the date at the top. For bigger changes we also write what is new at the top of the page.'],
       },
       {
         h: 'Contact',
@@ -752,15 +793,16 @@ const en: Texts = {
     metaTitle: 'Mesa 11 Terms of Use – Spitakolus AB',
     metaDescription: 'The rules for playing Buraco in the Mesa 11 app: fair play, usernames, Premium, the ranking and more.',
     title: 'Terms of Use',
-    updated: 'Last updated 6 November 2026',
+    updated: 'Last updated 8 November 2026',
     intro: [
       'These terms apply when you use the Mesa 11 app (the card game Buraco) from Spitakolus AB (Swedish company reg. no. 559554-6101). By creating an account you accept these terms. Please also read our [privacy policy](/buraco/integritet).',
+      'New on 8 November 2026: how to report a username (section 3) and an ad (section 6), the ad after a game and Premium (section 6), and that we may change features in new versions of the app (section 9).',
     ],
     sections: [
       {
         h: 'The service',
         p: [
-          'In Mesa 11 you play the card game Buraco two against two, against real players or computer players. With Play now we look for real players online for you; if a seat is still empty after 10 seconds, a computer player takes it. At a friends table you play with your friends, and seats that no friend takes go to computer players. You can also practise against computer players. Computer players are shown with a robot (from version 1.3 also with the word BOT), so you can see who is a real player and who is a computer player. You choose a mode (Open, Closed or Strict).',
+          'In Mesa 11 you play the card game Buraco two against two, against real players or computer players. With Play now we look for real players online for you; if a seat is still empty after 10 seconds, a computer player takes it. At a friends table you play with your friends, and seats that no friend takes go to computer players. You can also practise against computer players. Computer players are shown with a robot (from version 1.3 on iPhone and iPad and version 0.1.20 on Android, also with the word BOT), so you can see who is a real player and who is a computer player. You choose a mode (Open, Closed or Strict).',
         ],
       },
       {
@@ -779,7 +821,10 @@ const en: Texts = {
           'pretend to be someone else, such as another player or Spitakolus,',
           'contain personal data, advertising or links.',
         ],
-        after: ['We may change or remove a username that breaks these rules.'],
+        after: [
+          'We may change or remove a username that breaks these rules.',
+          'If you see such a name at the table, you can report it in the app (game menu → Report a username, from version 1.3 on iPhone and iPad and version 0.1.20 on Android). This opens an email to support@spitakolus.com. We go through every report.',
+        ],
       },
       {
         h: 'Fair play',
@@ -800,7 +845,8 @@ const en: Texts = {
         h: 'Ads and Premium',
         ul: [
           'Mesa 11 is free and shows ads: a banner ad and a full-screen ad after each game.',
-          '**Premium** removes all ads and gives you a place in the ranking. It gives no advantage in the game itself – the rules, the tables and the wait are the same for everyone.',
+          'The ads come from Google AdMob, and the app asks only for ads suitable from age 13. If you see an unsuitable ad, you can report it in the app (profile menu → Report an ad, or after the full-screen ad, from version 1.3 on iPhone and iPad and version 0.1.20 on Android). This opens an email to support@spitakolus.com, and we block unsuitable ads with Google.',
+          '**Premium** removes all ads and gives you a place in the ranking. It gives no advantage in the game itself – the rules, the tables and the 5-minute wait after leaving a game are the same for everyone. With Premium you also skip waiting for the ad after a game.',
           'Premium is a subscription bought through Google Play or the App Store, and it renews automatically until you cancel it there. The price is shown in the store before you buy. Payment, receipts, cancellation and refunds are handled by the store under its own terms.',
         ],
       },
@@ -822,7 +868,7 @@ const en: Texts = {
       {
         h: 'Changes to the service',
         p: [
-          'We keep developing the game and may change, add or remove features, pause the service or end it. If we change these terms we update the date at the top, and for bigger changes we tell you in the app.',
+          'We develop the game and may change, add or remove features in new versions of the app. We may also pause the service or end it. If we change these terms we update the date at the top, and for bigger changes we also write what is new there.',
         ],
       },
       {
@@ -954,8 +1000,8 @@ const pt: Texts = {
         text: 'Jogue contra o computador quando quiser aprender o jogo ou só jogar com calma.',
       },
       {
-        title: 'Mesa de iniciantes e Mesa de mestres',
-        text: 'Escolha a Mesa de iniciantes se você está começando, ou a Mesa de mestres se já tem experiência – e jogue com gente do seu nível.',
+        title: 'Jogue com amigos',
+        text: 'Adicione amigos com um código de amigo e convide-os para uma mesa de amigos. Não há chat, só o jogo de cartas.',
       },
       {
         title: 'Aberto, Fechado ou Rigoroso',
@@ -969,6 +1015,7 @@ const pt: Texts = {
       'Você cria uma conta no app com e-mail, nome de usuário e senha. O nome de usuário aparece para os outros jogadores na mesa – e no ranking, se você tiver o Premium.',
       '**Esqueceu a senha?** Toque em “Esqueceu a senha?” no app e você recebe um e-mail com um link para escolher uma nova.',
       '**Excluir a conta:** no app, pelo menu do perfil → Excluir conta, ou [aqui na web](/buraco/ta-bort-konto).',
+      '**Denunciar um anúncio ou um nome:** no app, pelo menu do perfil → Denunciar um anúncio, ou pelo menu do jogo → Denunciar um nome de usuário (a partir da versão 1.3 no iPhone e no iPad e da versão 0.1.20 no Android). Isso abre um e-mail para support@spitakolus.com.',
     ],
     linksTitle: 'Mais sobre o app Mesa 11',
   },
@@ -976,9 +1023,10 @@ const pt: Texts = {
     metaTitle: 'Política de Privacidade do app Mesa 11 – Spitakolus AB',
     metaDescription: 'Quais dados o app Mesa 11 (o jogo de cartas Buraco) guarda, por quê, onde ficam e como excluí-los.',
     title: 'Política de Privacidade',
-    updated: 'Atualizada em 2 de outubro de 2026',
+    updated: 'Atualizada em 8 de novembro de 2026',
     intro: [
       'Esta política explica quais dados pessoais o app Mesa 11 (o jogo de cartas Buraco) e o servidor do jogo tratam, por quê, onde ficam e quais direitos você tem pelo Regulamento Geral de Proteção de Dados da UE (GDPR) e pela LGPD.',
+      'Novo em 8 de novembro de 2026: a seção 8 sobre denúncias e e-mails para nós, a seção 9 sobre o app e as atualizações, mais sobre quais dados o Google recebe por meio dos anúncios (seções 6 e 11), a Loopia (seção 11) e por quanto tempo guardamos recibos e e-mails (seção 12).',
     ],
     sections: [
       {
@@ -1001,7 +1049,7 @@ const pt: Texts = {
           '**Código de amigo** – um código aleatório que você pode compartilhar para que outras pessoas te enviem um pedido de amizade. Você pode trocar o código quando quiser, e o antigo para de funcionar na hora. O código só é criado quando você abre Amigos no app.',
           '**Amigos, pedidos de amizade e contas bloqueadas** – de quem você é amigo, os pedidos que você enviou e recebeu e as contas que você bloqueou. Um pedido de amizade fica guardado por no máximo 30 dias.',
           '**Configuração do status online** – se os seus amigos podem ver quando você está online.',
-          '**Notificações** – se você permitir notificações: o endereço de push do celular, se o celular é Android ou iPhone, o idioma do app e quando o app se conectou pela última vez, e as suas escolhas de notificações e horas de silêncio (com o fuso horário do celular quando as horas de silêncio estão ativadas).',
+          '**Notificações** – se você permitir notificações: o endereço de push do celular, se é um aparelho Android ou um aparelho Apple (iPhone ou iPad), o idioma do app e quando o app se conectou pela última vez, e as suas escolhas de notificações e horas de silêncio (com o fuso horário do celular quando as horas de silêncio estão ativadas).',
         ],
         after: [
           'Não há chat no jogo. As partidas em andamento – as cartas, as jogadas e quem está na mesa – ficam só na memória do servidor do jogo e não são guardadas quando a partida termina. Depois da partida, só ficam guardados o seu resultado do ranking e as suas estatísticas (veja acima). Para enviar dados ao seu celular, o servidor precisa de dados técnicos, como o seu endereço IP, enquanto você está conectado.',
@@ -1032,21 +1080,23 @@ const pt: Texts = {
       {
         h: 'Notificações',
         p: [
-          'Se você permitir no celular, recebe uma notificação quando um amigo te convida para uma mesa de amigos, quando alguém te envia um pedido de amizade e quando o seu pedido é aceito. Nenhuma outra notificação e nenhum anúncio. A notificação contém um texto fixo, o nome de usuário de quem enviou e um id técnico da mesa ou do pedido – nada mais.',
+          'Se você permitir no celular, recebe uma notificação quando um amigo te convida para uma mesa de amigos, quando alguém te envia um pedido de amizade e quando o seu pedido é aceito. Nenhuma outra notificação e nenhum anúncio, a não ser uma notificação de teste se você mesmo tocar em “Enviar uma notificação de teste”. A notificação contém um texto fixo, o nome de usuário de quem enviou, o número de identificação da sua conta e ids técnicos – no convite, o id do convite e da mesa; no pedido de amizade ou no pedido aceito, o número de identificação da conta de quem enviou. Nada mais.',
         ],
         ul: [
-          '**O endereço de push** é um código aleatório do Google ou da Apple que faz a notificação chegar ao celular certo. Nós o guardamos ligado à sua conta, junto com a informação se o celular é Android ou iPhone e o idioma do app (para a notificação chegar no idioma certo). Ele é apagado quando você sai da conta.',
+          '**O endereço de push** é um código aleatório do Google ou da Apple que faz a notificação chegar ao celular certo. Nós o guardamos ligado à sua conta, junto com a informação se é um aparelho Android ou um aparelho Apple (iPhone ou iPad), e o idioma do app (para a notificação chegar no idioma certo). Ele é apagado quando você sai da conta.',
           '**As horas de silêncio** você escolhe no app, em Amigos. Quando estão ativadas, guardamos o fuso horário do celular (por exemplo America/Sao_Paulo), para que as horas sigam o seu relógio. Os convites no app sempre chegam enquanto o app está aberto.',
           '**Se o app está aberto** ou em segundo plano, o servidor do jogo sabe enquanto você está conectado, para não te mandar uma notificação sobre algo que você já está vendo. Isso fica só na memória do servidor e não é guardado.',
           'Você pode desativar as notificações no app ou nas configurações do celular quando quiser.',
-          'As notificações são enviadas pelo **Firebase Cloud Messaging**, do Google, e, no iPhone, repassadas pelo serviço de notificações da Apple. Não usamos o Firebase Analytics nem nenhum outro rastreamento do Firebase.',
+          'As notificações são enviadas pelo **Firebase Cloud Messaging**, do Google, e, no iPhone e no iPad, repassadas pelo serviço de notificações da Apple. Não usamos o Firebase Analytics nem nenhum outro rastreamento do Firebase.',
         ],
       },
       {
         h: 'Anúncios',
         p: [
-          'Se você não tem o Premium, aparece uma faixa de anúncio e um anúncio em tela cheia depois de cada partida. Os anúncios vêm do **Google AdMob**. Na UE/EEE, no Reino Unido e na Suíça o app pede o seu consentimento primeiro. Se você consentir, o Google pode usar o ID de publicidade do aparelho e a sua localização aproximada para mostrar e medir anúncios. Se você não consentir, os anúncios continuam aparecendo, mas não são personalizados.',
-          'Nos outros países, como o Brasil, o app não pede consentimento, e o Google pode mostrar anúncios personalizados usando o ID de publicidade do aparelho e a sua localização aproximada. Você pode desativar isso nas configurações do celular – no Android, excluindo o ID de publicidade. No iPhone, o app pergunta primeiro se pode rastrear você (o aviso de rastreamento da Apple), e o ID de publicidade só é usado se você permitir. Você pode mudar a resposta em Ajustes → Privacidade e Segurança → Rastreamento.',
+          'Se você não tem o Premium, aparece uma faixa de anúncio e um anúncio em tela cheia depois de cada partida. Os anúncios vêm do **Google AdMob**. O app pede ao Google só anúncios adequados a partir de 13 anos (o nível Teen do Google).',
+          'Na UE/EEE, no Reino Unido e na Suíça, o app mostra primeiro o pedido de consentimento do Google. Se você consentir, o Google pode usar o ID de publicidade do aparelho e a sua localização aproximada para mostrar e medir anúncios. Se você não consentir, os anúncios continuam aparecendo, mas não são personalizados. Mesmo assim, o Google recebe o endereço IP do celular e dados sobre o celular, para mostrar o anúncio, contar as visualizações e impedir fraudes. Você pode mudar a sua escolha no app: menu do perfil → Configurações de anúncios (consentimento).',
+          'Nos outros países, como o Brasil, o app não mostra o pedido do Google, e o Google pode mostrar anúncios personalizados usando o ID de publicidade do aparelho e a sua localização aproximada. No Android, você pode desativar isso excluindo o ID de publicidade nas configurações do celular.',
+          'No iPhone e no iPad, o app também pergunta, em todos os países, se pode rastrear você (o aviso de rastreamento da Apple). Na UE/EEE, no Reino Unido e na Suíça, essa pergunta vem depois do pedido do Google. O ID de publicidade só é usado se você permitir. Você pode mudar a resposta em Ajustes → Privacidade e Segurança → Rastreamento.',
           'Se você deu o consentimento, pode retirá-lo a qualquer momento. Se não encontrar a opção no app, envie um e-mail para support@spitakolus.com. Saiba mais sobre como o Google usa dados em [policies.google.com/technologies/partner-sites](https://policies.google.com/technologies/partner-sites).',
         ],
       },
@@ -1057,36 +1107,49 @@ const pt: Texts = {
         ],
       },
       {
-        h: 'Atualizações do app',
+        h: 'Denúncias e e-mails para nós',
         p: [
-          'O app pode baixar código atualizado do jogo – por exemplo, textos novos, um visual novo e correções de erros – direto do nosso próprio servidor do jogo, sem passar pelo Google Play ou pela App Store. A atualização vem do mesmo servidor do jogo, e nenhum dado pessoal é enviado a terceiros para isso.',
+          'No app você pode denunciar um anúncio (menu do perfil → Denunciar um anúncio, ou depois do anúncio em tela cheia) e um nome de usuário na mesa (menu do jogo → Denunciar um nome de usuário, quando há outros jogadores de verdade na mesa). Isso está disponível a partir da versão 1.3 no iPhone e no iPad e da versão 0.1.20 no Android.',
+          'O app não envia nada sozinho. Ele abre um e-mail pronto no seu próprio app de e-mail, para support@spitakolus.com, e você decide se quer enviá-lo. O e-mail contém o que você escrever, o número da versão do app e, quando você denuncia um nome, esse nome de usuário. Nós também recebemos o seu endereço de e-mail e o nome de remetente que o seu app de e-mail mostra.',
+          'Usamos a denúncia para analisá-la: bloqueamos anúncios inadequados no Google AdMob e mudamos ou removemos nomes de usuário que violam os termos de uso. Então, se alguém denunciar o seu nome de usuário, recebemos esse nome em um e-mail. E-mails que você envia para support@spitakolus.com por outros motivos são usados só para responder a você.',
+        ],
+      },
+      {
+        h: 'O app e as atualizações',
+        p: [
+          'A partir da versão 1.3 no iPhone e no iPad e da versão 0.1.20 no Android, o jogo inteiro está dentro do app, inclusive as fontes (tipos de letra). O app não baixa nenhum código para o jogo ou para as funções do app, nem de nós nem de ninguém. Os anúncios e o pedido de consentimento do Google vêm do Google (veja Anúncios). As novas versões chegam só pela App Store e pelo Google Play.',
+          'As versões antigas (1.0 a 1.2 no iPhone e no iPad, e as versões anteriores à 0.1.20 no Android) têm uma função que baixa o código do jogo do nosso próprio servidor do jogo. Desde 3 de novembro de 2026, o máximo que elas podem receber de lá é o mesmo código da versão 1.2 no iPhone e no iPad, nunca um código novo. Nenhum dado pessoal é enviado a terceiros para isso. As versões antigas também carregam as fontes do Google Fonts, e aí o Google recebe o endereço IP do celular. O Google é uma empresa americana, então pode haver transferência do endereço IP para os Estados Unidos. O Google está coberto pelo marco de proteção de dados entre a UE e os Estados Unidos (EU-U.S. Data Privacy Framework). O carregamento das fontes se baseia no nosso interesse legítimo em que as versões antigas funcionem (artigo 6.1 f do GDPR; no Brasil, artigo 7º, IX, da LGPD). A partir da versão 1.3 no iPhone e no iPad e da versão 0.1.20 no Android, o jogo não carrega nenhuma fonte do Google.',
         ],
       },
       {
         h: 'Por quê e com qual base legal?',
         ul: [
-          '**Para oferecer o jogo** (conta, login, nome de usuário, partidas, estatísticas, ranking, bloqueio de tempo, Premium e atualizações do app): necessário para cumprir o contrato com você, ou seja, os termos de uso (artigo 6.1 b do GDPR).',
+          '**Para oferecer o jogo** (conta, login, nome de usuário, partidas, estatísticas, ranking, bloqueio de tempo, Premium e, nas versões antigas do app, o download do código do jogo): necessário para cumprir o contrato com você, ou seja, os termos de uso (artigo 6.1 b do GDPR).',
+          '**Recibos de compras do Premium depois que você exclui a conta**, que guardamos por no máximo um ano depois do fim da assinatura: o nosso interesse legítimo em poder responder a perguntas sobre a compra e cuidar de reembolsos (artigo 6.1 f do GDPR; no Brasil, artigo 7º, IX, da LGPD).',
           '**Anúncios personalizados**: na UE/EEE, no Reino Unido e na Suíça, o seu consentimento (artigo 6.1 a do GDPR). Nos outros países, o nosso interesse legítimo em financiar o jogo gratuito com anúncios (artigo 6.1 f do GDPR; no Brasil, artigo 7º, IX, da LGPD). Você pode se opor a qualquer momento desativando os anúncios personalizados nas configurações do celular.',
+          '**Anúncios não personalizados** (para quem não tem o Premium): o nosso interesse legítimo em financiar o jogo gratuito com anúncios (artigo 6.1 f do GDPR; no Brasil, artigo 7º, IX, da LGPD).',
           '**Segurança, correção de erros e combate a trapaças e abusos** (inclusive os registros técnicos): o nosso interesse legítimo em um serviço seguro, justo e que funcione bem (artigo 6.1 f do GDPR).',
           '**Amigos** (código de amigo, lista de amigos, pedidos, contas bloqueadas, status online, convites e mesas de amigos): necessário para cumprir o contrato com você (artigo 6.1 b do GDPR).',
           '**Notificações** (endereço de push, idioma, configurações de notificações e horas de silêncio), depois que você permite as notificações: necessário para cumprir o contrato com você (artigo 6.1 b do GDPR). Você pode desativá-las quando quiser.',
           '**Limites de tentativas de código, de pedidos e de convites, e os bloqueios de contas**, para impedir abusos e proteger os jogadores: o nosso interesse legítimo em um serviço seguro (artigo 6.1 f do GDPR).',
+          '**Denúncias e e-mails para o suporte**: o nosso interesse legítimo em um serviço seguro e em poder responder a você (artigo 6.1 f do GDPR; no Brasil, artigo 7º, IX, da LGPD).',
         ],
       },
       {
         h: 'Onde ficam os dados e quem nos ajuda?',
         ul: [
-          '**Supabase** – contas (e-mail, nome de usuário, hash da senha, estatísticas, resultados do ranking, Premium e bloqueio de tempo) e amigos (código de amigo, lista de amigos, pedidos, contas bloqueadas e a configuração do status online) e notificações (endereços de push e configurações de notificações), em servidores na UE (Estocolmo, Suécia).',
+          '**Supabase** – contas (e-mail, nome de usuário, hash da senha, estatísticas, resultados do ranking, Premium e bloqueio de tempo) e amigos (código de amigo, lista de amigos, pedidos, contas bloqueadas e a configuração do status online) e notificações (endereços de push e configurações de notificações), em servidores na UE (Estocolmo, Suécia). A Supabase é uma empresa de Singapura, e os dados podem ser transferidos para países fora da UE, como Singapura e os Estados Unidos, no suporte e na operação do serviço. A transferência é protegida pelas Cláusulas Contratuais Padrão da UE.',
           '**Railway** – o servidor do jogo, na região da UE (Amsterdã, Holanda). A Railway é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. A transferência é protegida pelas Cláusulas Contratuais Padrão da UE.',
           '**Resend** – envia o e-mail quando você toca em “Esqueceu a senha?” e, para isso, recebe o seu e-mail. A Resend é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. A transferência é protegida pelas Cláusulas Contratuais Padrão da UE.',
           '**RevenueCat** – verifica as compras do Premium (veja acima). A RevenueCat é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. A transferência é protegida pelas Cláusulas Contratuais Padrão da UE.',
-          '**Google AdMob** – anúncios, para quem não tem o Premium (veja acima).',
-          '**Google Firebase Cloud Messaging** – envia as notificações e, para isso, recebe o endereço de push e o texto da notificação. O Google é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. A transferência é protegida pelas Cláusulas Contratuais Padrão da UE. No iPhone, a notificação é repassada pelo **Apple Push Notification service**.',
+          '**Google AdMob** – anúncios, para quem não tem o Premium (veja a seção 6). O Google recebe então o endereço IP do celular, dados sobre o celular e o app (por exemplo modelo, sistema operacional e idioma), quais anúncios aparecem e se você toca neles, relatórios de erros da parte de anúncios e, quando isso é permitido, o ID de publicidade do aparelho. O Google usa os dados como controlador independente, pelos termos de publicidade do Google. O Google é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. O Google está coberto pelo marco de proteção de dados entre a UE e os Estados Unidos (EU-U.S. Data Privacy Framework).',
+          '**Google Firebase Cloud Messaging** – envia as notificações e, para isso, recebe o endereço de push, o texto da notificação e os números de identificação que ela contém. O Google é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. A transferência é protegida pelas Cláusulas Contratuais Padrão da UE. No iPhone e no iPad, a notificação é repassada pelo **Apple Push Notification service**.',
           '**Google Play e Apple App Store** – compras do Premium. Eles cuidam do pagamento como controladores independentes, pelos próprios termos.',
           '**Vercel** – hospeda o site spitakolus.com, com, entre outras, esta política, a página para excluir a conta e a página do link de códigos de amigo. A Vercel guarda registros técnicos das visitas (entre eles o endereço IP e o endereço visitado – na página do link, isso inclui o código de amigo) por um período limitado. A Vercel é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. A transferência é protegida pelas Cláusulas Contratuais Padrão da UE.',
+          '**Loopia** – recebe e guarda os e-mails enviados para support@spitakolus.com, inclusive as denúncias, em servidores na Suécia.',
         ],
         after: [
-          'A Supabase, a Railway, a Resend, a RevenueCat, a Vercel e o Google Firebase tratam os dados só em nosso nome e não podem usá-los para mais nada. Nunca vendemos os seus dados. Tudo é enviado de forma criptografada.',
+          'A Supabase, a Railway, a Resend, a RevenueCat, a Vercel, a Loopia e o Google Firebase tratam os dados só em nosso nome e não podem usá-los para mais nada. Todos com quem compartilhamos dados devem protegê-los pelo menos tão bem quanto esta política descreve: os operadores acima, pelos contratos conosco, e o Google, pelos termos de publicidade do Google. Nunca vendemos os seus dados. Tudo o que o app, o servidor do jogo e o site enviam é criptografado.',
         ],
       },
       {
@@ -1095,7 +1158,8 @@ const pt: Texts = {
           'Os dados da conta, as estatísticas e os resultados do ranking ficam guardados enquanto você tiver a conta. As partidas em andamento só existem enquanto a partida está sendo jogada. Quando você exclui a conta, a conta, o nome de usuário, as estatísticas e os resultados do ranking são apagados na hora e para sempre. Os registros técnicos (veja acima) são apagados automaticamente após um período limitado.',
           'O código de amigo e a lista de amigos ficam guardados até você trocar o código, remover um amigo ou excluir a conta. Um pedido de amizade fica guardado por no máximo 30 dias. Os bloqueios de contas ficam guardados até você desfazê-los ou até uma das contas ser excluída. O status online e os convites nunca são guardados.',
           'Um endereço de push fica guardado até você sair da conta ou excluí-la, ou até o Google ou a Apple avisarem que ele não vale mais. Um endereço de push que não é usado há 180 dias é apagado automaticamente. Não guardamos as notificações depois que são enviadas.',
-          'Os dados de compras do Premium (recibos ligados ao número de identificação da sua conta) não são apagados quando você exclui a conta. Eles ficam na RevenueCat e no Google Play/na App Store pelo tempo necessário para a contabilidade e para reclamações.',
+          'Os dados de compras do Premium (recibos ligados ao número de identificação da sua conta) não são apagados na hora quando você exclui a conta. Nós os guardamos na RevenueCat por no máximo um ano depois do fim da assinatura, para poder responder a perguntas sobre a compra e cuidar de reembolsos (o nosso interesse legítimo, artigo 6.1 f do GDPR). Depois, nós os apagamos. O Google Play e a App Store guardam a compra pelos próprios termos.',
+          'Os e-mails para support@spitakolus.com, inclusive as denúncias, ficam guardados enquanto o caso estiver em andamento e depois por no máximo 12 meses, para podermos ver perguntas anteriores se você entrar em contato de novo. Depois, nós os apagamos, inclusive as nossas próprias cópias.',
         ],
       },
       {
@@ -1132,11 +1196,11 @@ const pt: Texts = {
       },
       {
         h: 'Idade',
-        p: ['O app Mesa 11 é para pessoas com 13 anos ou mais.'],
+        p: ['O app Mesa 11 é para pessoas com 13 anos ou mais. O app não pergunta a sua idade. Se você tem menos de 16 anos, pergunte a um dos seus pais antes de responder sim aos anúncios personalizados no pedido do Google.'],
       },
       {
         h: 'Mudanças',
-        p: ['Se mudarmos esta política, atualizamos a data no topo. Em mudanças maiores, também avisamos no app.'],
+        p: ['Se mudarmos esta política, atualizamos a data no topo. Em mudanças maiores, também escrevemos no topo da página o que há de novo.'],
       },
       {
         h: 'Contato',
@@ -1148,15 +1212,16 @@ const pt: Texts = {
     metaTitle: 'Termos de Uso do app Mesa 11 – Spitakolus AB',
     metaDescription: 'As regras para jogar Buraco no app Mesa 11: jogo limpo, nomes de usuário, Premium, ranking e mais.',
     title: 'Termos de Uso',
-    updated: 'Atualizados em 6 de novembro de 2026',
+    updated: 'Atualizados em 8 de novembro de 2026',
     intro: [
       'Estes termos valem quando você usa o app Mesa 11 (o jogo de cartas Buraco) da Spitakolus AB (empresa sueca, nº de registro 559554-6101). Ao criar uma conta você aceita os termos. Leia também a nossa [política de privacidade](/buraco/integritet).',
+      'Novo em 8 de novembro de 2026: como denunciar um nome de usuário (seção 3) e um anúncio (seção 6), o anúncio depois da partida e o Premium (seção 6) e que podemos mudar funções em novas versões do app (seção 9).',
     ],
     sections: [
       {
         h: 'O serviço',
         p: [
-          'No app Mesa 11 você joga Buraco dois contra dois, contra jogadores de verdade ou jogadores do computador. Em Jogar agora, procuramos jogadores de verdade online para você; se um lugar continuar vazio depois de 10 segundos, um jogador do computador ocupa o lugar. Na mesa de amigos você joga com seus amigos, e os lugares que nenhum amigo ocupa ficam com jogadores do computador. Você também pode treinar contra jogadores do computador. Os jogadores do computador aparecem com um robô (a partir da versão 1.3, também com a palavra ROBÔ), para você ver quem é jogador de verdade e quem é do computador. Você escolhe o modo (Aberto, Fechado ou Rigoroso).',
+          'No app Mesa 11 você joga Buraco dois contra dois, contra jogadores de verdade ou jogadores do computador. Em Jogar agora, procuramos jogadores de verdade online para você; se um lugar continuar vazio depois de 10 segundos, um jogador do computador ocupa o lugar. Na mesa de amigos você joga com seus amigos, e os lugares que nenhum amigo ocupa ficam com jogadores do computador. Você também pode treinar contra jogadores do computador. Os jogadores do computador aparecem com um robô (a partir da versão 1.3 no iPhone e no iPad e da versão 0.1.20 no Android, também com a palavra ROBÔ), para você ver quem é jogador de verdade e quem é do computador. Você escolhe o modo (Aberto, Fechado ou Rigoroso).',
         ],
       },
       {
@@ -1175,7 +1240,10 @@ const pt: Texts = {
           'se passar por outra pessoa, por exemplo outro jogador ou a Spitakolus,',
           'conter dados pessoais, propaganda ou links.',
         ],
-        after: ['Podemos mudar ou remover um nome de usuário que quebre essas regras.'],
+        after: [
+          'Podemos mudar ou remover um nome de usuário que quebre essas regras.',
+          'Se você vir um nome assim na mesa, pode denunciá-lo no app (menu do jogo → Denunciar um nome de usuário, a partir da versão 1.3 no iPhone e no iPad e da versão 0.1.20 no Android). Isso abre um e-mail para support@spitakolus.com. Analisamos cada denúncia.',
+        ],
       },
       {
         h: 'Jogo limpo',
@@ -1196,7 +1264,8 @@ const pt: Texts = {
         h: 'Anúncios e Premium',
         ul: [
           'O app Mesa 11 é grátis e tem anúncios: uma faixa de anúncio e um anúncio em tela cheia depois de cada partida.',
-          'O **Premium** remove todos os anúncios e dá um lugar no ranking. Ele não dá nenhuma vantagem no jogo em si – as regras, as mesas e a espera são iguais para todos.',
+          'Os anúncios vêm do Google AdMob, e o app pede só anúncios adequados a partir de 13 anos. Se você vir um anúncio inadequado, pode denunciá-lo no app (menu do perfil → Denunciar um anúncio, ou depois do anúncio em tela cheia, a partir da versão 1.3 no iPhone e no iPad e da versão 0.1.20 no Android). Isso abre um e-mail para support@spitakolus.com, e bloqueamos os anúncios inadequados no Google.',
+          'O **Premium** remove todos os anúncios e dá um lugar no ranking. Ele não dá nenhuma vantagem no jogo em si – as regras, as mesas e os 5 minutos de espera depois de sair de uma partida são iguais para todos. Com o Premium você também não precisa esperar o anúncio depois da partida.',
           'O Premium é uma assinatura comprada pelo Google Play ou pela App Store, renovada automaticamente até você cancelar lá. O preço aparece na loja antes da compra. Pagamento, recibos, cancelamento e reembolsos são feitos pela loja, pelos termos dela.',
         ],
       },
@@ -1218,7 +1287,7 @@ const pt: Texts = {
       {
         h: 'Mudanças no serviço',
         p: [
-          'Estamos sempre desenvolvendo o jogo e podemos mudar, incluir ou remover funções, pausar o serviço ou encerrá-lo. Se mudarmos os termos, atualizamos a data no topo, e em mudanças maiores avisamos no app.',
+          'Desenvolvemos o jogo e podemos mudar, incluir ou remover funções em novas versões do app. Também podemos pausar o serviço ou encerrá-lo. Se mudarmos os termos, atualizamos a data no topo e, em mudanças maiores, também escrevemos ali o que há de novo.',
         ],
       },
       {
