@@ -185,6 +185,7 @@ const sv: Texts = {
     updated: 'Senast ändrad [publiceringsdagen]',
     intro: [
       'Här beskriver vi vilka personuppgifter appen Mesa 11 (kortspelet Buraco) och dess spelserver behandlar, varför, var de finns och vilka rättigheter du har enligt dataskyddsförordningen (GDPR).',
+      'Nytt [publiceringsdagen]: avsnitt 8 om anmälningar och mejl till oss, avsnitt 9 om appen och uppdateringar, mer om vad Google får för annonserna (avsnitt 6 och 11), Loopia (avsnitt 11) och hur länge vi sparar kvitton och mejl (avsnitt 12).',
     ],
     sections: [
       {
@@ -245,7 +246,7 @@ const sv: Texts = {
           '**Tysta timmar** väljer du själv i appen under Vänner. När de är på sparas telefonens tidszon (till exempel Europe/Stockholm), så att timmarna följer din klocka. Inbjudningar i appen kommer alltid fram medan appen är öppen.',
           '**Om appen är öppen** eller i bakgrunden vet spelservern medan du är ansluten, så att du inte får en notis om något du redan ser. Det finns bara i serverns minne och sparas inte.',
           'Du kan stänga av notiserna i appen eller i telefonens inställningar när du vill.',
-          'Notiserna skickas via **Firebase Cloud Messaging** från Google och, till iPhone, vidare via Apples tjänst för notiser. Vi använder inte Firebase Analytics eller någon annan spårning från Firebase.',
+          'Notiserna skickas via **Firebase Cloud Messaging** från Google och, till iPhone och iPad, vidare via Apples tjänst för notiser. Vi använder inte Firebase Analytics eller någon annan spårning från Firebase.',
         ],
       },
       {
@@ -269,23 +270,23 @@ const sv: Texts = {
         p: [
           'I appen kan du anmäla en annons (profilmenyn → Anmäl en annons, eller efter helskärmsannonsen) och ett användarnamn vid bordet (spelets meny → Anmäl ett användarnamn, när andra riktiga spelare sitter vid bordet). Det finns från version 1.3 på iPhone och iPad och version 0.1.20 på Android.',
           'Appen skickar inget själv. Den öppnar ett färdigt mejl i din egen e-postapp, till support@spitakolus.com, och du bestämmer om du vill skicka det. Mejlet innehåller det du skriver, appens versionsnummer och, när du anmäler ett namn, det användarnamnet. Vi får också din e-postadress och det avsändarnamn som din e-postapp visar.',
-          'Vi använder anmälan bara för att gå igenom den: vi spärrar olämpliga annonser hos Google AdMob och byter eller tar bort användarnamn som bryter mot användarvillkoren. Anmäler någon ditt användarnamn får vi alltså ditt användarnamn i ett mejl. Mejl som du skickar till support@spitakolus.com av andra skäl använder vi bara för att svara dig.',
+          'Vi använder anmälan för att gå igenom den: vi spärrar olämpliga annonser hos Google AdMob och byter eller tar bort användarnamn som bryter mot användarvillkoren. Anmäler någon ditt användarnamn får vi alltså ditt användarnamn i ett mejl. Mejl som du skickar till support@spitakolus.com av andra skäl använder vi bara för att svara dig.',
         ],
       },
       {
         h: 'Appen och uppdateringar',
         p: [
           'Från version 1.3 på iPhone och iPad och version 0.1.20 på Android finns hela spelet i appen, också typsnitten. Appen hämtar ingen kod för spelet eller appens funktioner, varken från oss eller från någon annan. Annonserna och Googles fråga om samtycke hämtas från Google (se Annonser). Nya versioner kommer bara via App Store och Google Play.',
-          'Äldre versioner (1.0–1.2 på iPhone och iPad och versioner före 0.1.20 på Android) har en funktion som hämtar spelets kod från vår egen spelserver. Sedan 3 november 2026 kan de därifrån som mest få samma kod som i version 1.2 på iPhone och iPad, aldrig ny kod. Inga personuppgifter skickas till någon annan för det. De äldre versionerna hämtar också typsnitten från Google Fonts, och då får Google telefonens IP-adress. Google är ett amerikanskt bolag, så IP-adressen kan föras över till USA. Google omfattas av EU:s och USA:s ramverk för dataskydd (EU-U.S. Data Privacy Framework). Det sker med stöd av vårt berättigade intresse av att de äldre versionerna ska fungera (artikel 6.1 f GDPR). Från version 1.3 på iPhone och iPad och version 0.1.20 på Android hämtas inga typsnitt från Google.',
+          'Äldre versioner (1.0–1.2 på iPhone och iPad och versioner före 0.1.20 på Android) har en funktion som hämtar spelets kod från vår egen spelserver. Sedan 3 november 2026 kan de därifrån som mest få samma kod som i version 1.2 på iPhone och iPad, aldrig ny kod. Inga personuppgifter skickas till någon annan för det. De äldre versionerna hämtar också typsnitten från Google Fonts, och då får Google telefonens IP-adress. Google är ett amerikanskt bolag, så IP-adressen kan föras över till USA. Google omfattas av EU:s och USA:s ramverk för dataskydd (EU-U.S. Data Privacy Framework). Hämtningen av typsnitten sker med stöd av vårt berättigade intresse av att de äldre versionerna ska fungera (artikel 6.1 f GDPR, och i Brasilien artikel 7 IX LGPD). Från version 1.3 på iPhone och iPad och version 0.1.20 på Android hämtar spelet inga typsnitt från Google.',
         ],
       },
       {
         h: 'Varför och med vilken rätt?',
         ul: [
           '**För att ge dig spelet** (konto, inloggning, användarnamn, partier, statistik, ranking, tidsspärr, Premium och, i äldre versioner av appen, hämtningen av spelets kod): det behövs för att uppfylla avtalet med dig, alltså användarvillkoren (artikel 6.1 b GDPR).',
-          '**Kvitton för köp av Premium**, som vi behåller i högst ett år efter att prenumerationen har upphört: vårt berättigade intresse av att kunna svara på frågor om köpet och hantera återbetalningar (artikel 6.1 f GDPR).',
+          '**Kvitton för köp av Premium när du har tagit bort kontot**, som vi behåller i högst ett år efter att prenumerationen har upphört: vårt berättigade intresse av att kunna svara på frågor om köpet och hantera återbetalningar (artikel 6.1 f GDPR, och i Brasilien artikel 7 IX LGPD).',
           '**Anpassade annonser**: i EU/EES, Storbritannien och Schweiz ditt samtycke (artikel 6.1 a GDPR). I andra länder vårt berättigade intresse av att finansiera det kostnadsfria spelet med reklam (artikel 6.1 f GDPR, och i Brasilien artikel 7 IX LGPD). Du kan när som helst invända genom att stänga av anpassade annonser i telefonens inställningar.',
-          '**Annonser som inte är anpassade** (för dig som inte har Premium): vårt berättigade intresse av att finansiera det kostnadsfria spelet med reklam (artikel 6.1 f GDPR).',
+          '**Annonser som inte är anpassade** (för dig som inte har Premium): vårt berättigade intresse av att finansiera det kostnadsfria spelet med reklam (artikel 6.1 f GDPR, och i Brasilien artikel 7 IX LGPD).',
           '**Säkerhet, felsökning och att stoppa fusk och missbruk** (bland annat tekniska loggar): vårt berättigade intresse av en trygg, fungerande och schysst tjänst (artikel 6.1 f GDPR).',
           '**Vänner** (vänkod, vänlista, förfrågningar, blockeringar, onlinestatus, inbjudningar och vänbord): det behövs för att uppfylla avtalet med dig (artikel 6.1 b GDPR).',
           '**Notiser** (push-adress, språk, notisinställningar och tysta timmar), när du har tillåtit notiser: det behövs för att uppfylla avtalet med dig (artikel 6.1 b GDPR). Du kan stänga av dem när du vill.',
@@ -301,13 +302,13 @@ const sv: Texts = {
           '**Resend** – skickar mejlet när du har tryckt på ”Glömt lösenordet?” och får då din e-postadress. Resend är ett amerikanskt bolag, så uppgifter kan föras över till USA. Överföringen skyddas med EU:s standardavtalsklausuler.',
           '**RevenueCat** – kontrollerar köp av Premium (se ovan). RevenueCat är ett amerikanskt bolag, så uppgifter kan föras över till USA. Överföringen skyddas med EU:s standardavtalsklausuler.',
           '**Google AdMob** – annonser, för dig som inte har Premium (se avsnitt 6). Google får då telefonens IP-adress, uppgifter om telefonen och appen (till exempel modell, operativsystem och språk), vilka annonser som visas och om du trycker på dem, felrapporter från annonsdelen och, när det är tillåtet, telefonens annons-id. Google använder uppgifterna som självständigt personuppgiftsansvarig enligt Googles villkor för annonser. Google är ett amerikanskt bolag, så uppgifter kan föras över till USA. Google omfattas av EU:s och USA:s ramverk för dataskydd (EU-U.S. Data Privacy Framework).',
-          '**Google Firebase Cloud Messaging** – skickar notiserna och får då push-adressen, notisens text och id-numren i den. Google är ett amerikanskt bolag, så uppgifter kan föras över till USA. Överföringen skyddas med EU:s standardavtalsklausuler. Till iPhone går notisen vidare via **Apple Push Notification service**.',
+          '**Google Firebase Cloud Messaging** – skickar notiserna och får då push-adressen, notisens text och id-numren i den. Google är ett amerikanskt bolag, så uppgifter kan föras över till USA. Överföringen skyddas med EU:s standardavtalsklausuler. Till iPhone och iPad går notisen vidare via **Apple Push Notification service**.',
           '**Google Play och Apple App Store** – köp av Premium. De hanterar betalningen som egna personuppgiftsansvariga enligt sina egna villkor.',
           '**Vercel** – driver webbplatsen spitakolus.com, med bland annat den här policyn, sidan för att ta bort kontot och länksidan för vänkoder. Vercel sparar tekniska loggar över besöken (bland annat IP-adress och besökt adress – för länksidan alltså vänkoden) en begränsad tid. Vercel är ett amerikanskt bolag, så uppgifter kan föras över till USA. Överföringen skyddas med EU:s standardavtalsklausuler.',
           '**Loopia** – tar emot och lagrar mejl till support@spitakolus.com, också anmälningar, på servrar i Sverige.',
         ],
         after: [
-          'Supabase, Railway, Resend, RevenueCat, Vercel, Loopia och Google Firebase behandlar uppgifterna bara för vår räkning och får inte använda dem till något annat. Vi säljer aldrig dina uppgifter. Allt som appen, spelservern och webbplatsen skickar går krypterat.',
+          'Supabase, Railway, Resend, RevenueCat, Vercel, Loopia och Google Firebase behandlar uppgifterna bara för vår räkning och får inte använda dem till något annat. Alla som vi delar uppgifter med ska skydda dem minst lika väl som den här policyn beskriver: biträdena ovan enligt sina avtal med oss och Google enligt Googles villkor för annonser. Vi säljer aldrig dina uppgifter. Allt som appen, spelservern och webbplatsen skickar går krypterat.',
         ],
       },
       {
@@ -375,6 +376,7 @@ const sv: Texts = {
     updated: 'Senast ändrade [publiceringsdagen]',
     intro: [
       'De här villkoren gäller när du använder appen Mesa 11 (kortspelet Buraco) från Spitakolus AB (org.nr 559554-6101). När du skapar ett konto godkänner du villkoren. Läs också vår [integritetspolicy](/buraco/integritet).',
+      'Nytt [publiceringsdagen]: hur du anmäler ett användarnamn (avsnitt 3) och en annons (avsnitt 6), annonsen efter partiet och Premium (avsnitt 6) och att funktioner ändras i nya versioner av appen (avsnitt 9).',
     ],
     sections: [
       {
@@ -605,6 +607,7 @@ const en: Texts = {
     updated: 'Last updated [publication date]',
     intro: [
       'This policy explains what personal data the Mesa 11 app (the card game Buraco) and its game server process, why, where it is kept and what rights you have under the General Data Protection Regulation (GDPR).',
+      'New on [publication date]: section 8 on reports and emails to us, section 9 on the app and updates, more about what Google receives for the ads (sections 6 and 11), Loopia (section 11) and how long we keep receipts and emails (section 12).',
     ],
     sections: [
       {
@@ -665,7 +668,7 @@ const en: Texts = {
           '**Quiet hours** are your own choice in the app under Friends. When they are on, your phone’s time zone (for example Europe/Stockholm) is stored so that the hours follow your clock. Invites in the app always arrive while the app is open.',
           '**Whether the app is open** or in the background is known to the game server while you are connected, so that you are not notified about something you can already see. It exists only in the server’s memory and is not stored.',
           'You can turn notifications off in the app or in your phone’s settings at any time.',
-          'Notifications are sent through **Firebase Cloud Messaging** from Google and, for iPhone, passed on through Apple’s notification service. We do not use Firebase Analytics or any other tracking from Firebase.',
+          'Notifications are sent through **Firebase Cloud Messaging** from Google and, for iPhone and iPad, passed on through Apple’s notification service. We do not use Firebase Analytics or any other tracking from Firebase.',
         ],
       },
       {
@@ -689,23 +692,23 @@ const en: Texts = {
         p: [
           'In the app you can report an ad (profile menu → Report an ad, or after the full-screen ad) and a username at the table (game menu → Report a username, when other real players are at the table). This is available from version 1.3 on iPhone and iPad and version 0.1.20 on Android.',
           'The app sends nothing by itself. It opens a ready-made email in your own email app, addressed to support@spitakolus.com, and you decide whether to send it. The email contains what you write, the app’s version number and, when you report a name, that username. We also receive your email address and the sender name your email app shows.',
-          'We use a report only to go through it: we block unsuitable ads in Google AdMob and change or remove usernames that break the terms of use. So if someone reports your username, we receive your username in an email. Emails you send to support@spitakolus.com for other reasons are used only to answer you.',
+          'We use a report to review it: we block unsuitable ads in Google AdMob and change or remove usernames that break the terms of use. So if someone reports your username, we receive your username in an email. Emails you send to support@spitakolus.com for other reasons are used only to answer you.',
         ],
       },
       {
         h: 'The app and updates',
         p: [
-          'From version 1.3 on iPhone and iPad and version 0.1.20 on Android, the whole game is inside the app, including the fonts. The app downloads no code for the game or the app’s features, neither from us nor from anyone else. The ads and Google’s consent form are loaded from Google (see Ads). New versions come only through the App Store and Google Play.',
-          'Older versions (1.0–1.2 on iPhone and iPad, and versions before 0.1.20 on Android) have a feature that downloads the game’s code from our own game server. Since 3 November 2026 the most they can get from there is the same code as in version 1.2 on iPhone and iPad, never new code. No personal data is sent to anyone else for it. The older versions also load the fonts from Google Fonts, which means Google receives the phone’s IP address. Google is a US company, so the IP address may be transferred to the United States. Google is covered by the EU-U.S. Data Privacy Framework. This is based on our legitimate interest in keeping the older versions working (Article 6(1)(f) GDPR). From version 1.3 on iPhone and iPad and version 0.1.20 on Android, no fonts are loaded from Google.',
+          'From version 1.3 on iPhone and iPad and version 0.1.20 on Android, the whole game is inside the app, including the fonts. The app does not download any code for the game or the app’s features, either from us or from anyone else. The ads and Google’s consent form are loaded from Google (see Ads). New versions come only through the App Store and Google Play.',
+          'Older versions (1.0–1.2 on iPhone and iPad, and versions before 0.1.20 on Android) have a feature that downloads the game’s code from our own game server. Since 3 November 2026 the most they can get from there is the same code as in version 1.2 on iPhone and iPad, never new code. No personal data is sent to anyone else for it. The older versions also load the fonts from Google Fonts, which means Google receives the phone’s IP address. Google is a US company, so the IP address may be transferred to the United States. Google is covered by the EU-U.S. Data Privacy Framework. Loading the fonts is based on our legitimate interest in keeping the older versions working (Article 6(1)(f) GDPR; in Brazil, Article 7(IX) LGPD). From version 1.3 on iPhone and iPad and version 0.1.20 on Android, the game loads no fonts from Google.',
         ],
       },
       {
         h: 'Why, and on what legal basis?',
         ul: [
           '**To provide the game** (account, login, username, games, statistics, ranking, time-out, Premium and, in older versions of the app, downloading the game’s code): necessary to perform our contract with you, i.e. the terms of use (Article 6(1)(b) GDPR).',
-          '**Receipts for Premium purchases**, which we keep for at most one year after the subscription has ended: our legitimate interest in being able to answer questions about the purchase and handle refunds (Article 6(1)(f) GDPR).',
+          '**Receipts for Premium purchases after you delete your account**, which we keep for at most one year after the subscription has ended: our legitimate interest in being able to answer questions about the purchase and handle refunds (Article 6(1)(f) GDPR; in Brazil, Article 7(IX) LGPD).',
           '**Personalised ads**: in the EU/EEA, the UK and Switzerland, your consent (Article 6(1)(a) GDPR). In other countries, our legitimate interest in funding the free game with ads (Article 6(1)(f) GDPR; in Brazil, Article 7(IX) LGPD). You can object at any time by turning off personalised ads in your phone’s settings.',
-          '**Non-personalised ads** (for players without Premium): our legitimate interest in funding the free game with ads (Article 6(1)(f) GDPR).',
+          '**Non-personalised ads** (for players without Premium): our legitimate interest in funding the free game with ads (Article 6(1)(f) GDPR; in Brazil, Article 7(IX) LGPD).',
           '**Security, troubleshooting and stopping cheating and abuse** (including technical logs): our legitimate interest in a safe, reliable and fair service (Article 6(1)(f) GDPR).',
           '**Friends** (friend code, friends list, requests, blocks, online status, invites and friends tables): necessary to perform our contract with you (Article 6(1)(b) GDPR).',
           '**Notifications** (push address, language, notification settings and quiet hours), once you have allowed notifications: necessary to perform our contract with you (Article 6(1)(b) GDPR). You can turn them off at any time.',
@@ -721,13 +724,13 @@ const en: Texts = {
           '**Resend** – sends the email when you tap “Forgot your password?”, and receives your email address for that. Resend is a US company, so data may be transferred to the United States. The transfer is protected by the EU Standard Contractual Clauses.',
           '**RevenueCat** – verifies Premium purchases (see above). RevenueCat is a US company, so data may be transferred to the United States. The transfer is protected by the EU Standard Contractual Clauses.',
           '**Google AdMob** – ads, for players without Premium (see section 6). Google then receives your device’s IP address, information about the device and the app (such as model, operating system and language), which ads are shown and whether you tap them, error reports from the ad component and, where allowed, your device’s advertising ID. Google uses the data as an independent controller under Google’s advertising terms. Google is a US company, so data may be transferred to the United States. Google is covered by the EU-U.S. Data Privacy Framework.',
-          '**Google Firebase Cloud Messaging** – sends the notifications and, to do so, receives the push address, the notification text and the IDs in it. Google is a US company, so data may be transferred to the United States. The transfer is protected by the EU Standard Contractual Clauses. For iPhone, the notification is passed on through **Apple Push Notification service**.',
+          '**Google Firebase Cloud Messaging** – sends the notifications and, to do so, receives the push address, the notification text and the IDs in it. Google is a US company, so data may be transferred to the United States. The transfer is protected by the EU Standard Contractual Clauses. For iPhone and iPad, the notification is passed on through **Apple Push Notification service**.',
           '**Google Play and the Apple App Store** – Premium purchases. They handle the payment as independent controllers under their own terms.',
           '**Vercel** – runs the spitakolus.com website, including this policy, the account deletion page and the link page for friend codes. Vercel keeps technical logs of visits (including IP address and the address visited – for the link page, that includes the friend code) for a limited time. Vercel is a US company, so data may be transferred to the United States. The transfer is protected by the EU Standard Contractual Clauses.',
           '**Loopia** – receives and stores emails to support@spitakolus.com, including reports, on servers in Sweden.',
         ],
         after: [
-          'Supabase, Railway, Resend, RevenueCat, Vercel, Loopia and Google Firebase process the data only on our behalf and may not use it for anything else. We never sell your data. Everything the app, the game server and the website send is encrypted.',
+          'Supabase, Railway, Resend, RevenueCat, Vercel, Loopia and Google Firebase process the data only on our behalf and may not use it for anything else. Everyone we share data with must protect it at least as well as this policy describes: the processors above under their agreements with us, and Google under Google’s advertising terms. We never sell your data. Everything the app, the game server and the website send is encrypted.',
         ],
       },
       {
@@ -793,6 +796,7 @@ const en: Texts = {
     updated: 'Last updated [publication date]',
     intro: [
       'These terms apply when you use the Mesa 11 app (the card game Buraco) from Spitakolus AB (Swedish company reg. no. 559554-6101). By creating an account you accept these terms. Please also read our [privacy policy](/buraco/integritet).',
+      'New on [publication date]: how to report a username (section 3) and an ad (section 6), the ad after a game and Premium (section 6), and that features are changed in new versions of the app (section 9).',
     ],
     sections: [
       {
@@ -1022,6 +1026,7 @@ const pt: Texts = {
     updated: 'Atualizada em [data da publicação]',
     intro: [
       'Esta política explica quais dados pessoais o app Mesa 11 (o jogo de cartas Buraco) e o servidor do jogo tratam, por quê, onde ficam e quais direitos você tem pelo Regulamento Geral de Proteção de Dados da UE (GDPR) e pela LGPD.',
+      'Novo em [data da publicação]: a seção 8 sobre denúncias e e-mails para nós, a seção 9 sobre o app e as atualizações, mais sobre o que o Google recebe com os anúncios (seções 6 e 11), a Loopia (seção 11) e por quanto tempo guardamos recibos e e-mails (seção 12).',
     ],
     sections: [
       {
@@ -1082,7 +1087,7 @@ const pt: Texts = {
           '**As horas de silêncio** você escolhe no app, em Amigos. Quando estão ativadas, guardamos o fuso horário do celular (por exemplo America/Sao_Paulo), para que as horas sigam o seu relógio. Os convites no app sempre chegam enquanto o app está aberto.',
           '**Se o app está aberto** ou em segundo plano, o servidor do jogo sabe enquanto você está conectado, para não te mandar uma notificação sobre algo que você já está vendo. Isso fica só na memória do servidor e não é guardado.',
           'Você pode desativar as notificações no app ou nas configurações do celular quando quiser.',
-          'As notificações são enviadas pelo **Firebase Cloud Messaging**, do Google, e, no iPhone, repassadas pelo serviço de notificações da Apple. Não usamos o Firebase Analytics nem nenhum outro rastreamento do Firebase.',
+          'As notificações são enviadas pelo **Firebase Cloud Messaging**, do Google, e, no iPhone e no iPad, repassadas pelo serviço de notificações da Apple. Não usamos o Firebase Analytics nem nenhum outro rastreamento do Firebase.',
         ],
       },
       {
@@ -1104,25 +1109,25 @@ const pt: Texts = {
       {
         h: 'Denúncias e e-mails para nós',
         p: [
-          'No app você pode denunciar um anúncio (menu do perfil → Denunciar um anúncio, ou depois do anúncio em tela cheia) e um nome de usuário na mesa (menu do jogo → Denunciar um nome de usuário, quando há outros jogadores de verdade na mesa). Isso existe a partir da versão 1.3 no iPhone e no iPad e da versão 0.1.20 no Android.',
+          'No app você pode denunciar um anúncio (menu do perfil → Denunciar um anúncio, ou depois do anúncio em tela cheia) e um nome de usuário na mesa (menu do jogo → Denunciar um nome de usuário, quando há outros jogadores de verdade na mesa). Isso está disponível a partir da versão 1.3 no iPhone e no iPad e da versão 0.1.20 no Android.',
           'O app não envia nada sozinho. Ele abre um e-mail pronto no seu próprio app de e-mail, para support@spitakolus.com, e você decide se quer enviá-lo. O e-mail contém o que você escrever, o número da versão do app e, quando você denuncia um nome, esse nome de usuário. Nós também recebemos o seu endereço de e-mail e o nome de remetente que o seu app de e-mail mostra.',
-          'Usamos a denúncia só para analisá-la: bloqueamos anúncios inadequados no Google AdMob e mudamos ou removemos nomes de usuário que violam os termos de uso. Então, se alguém denunciar o seu nome de usuário, recebemos esse nome em um e-mail. E-mails que você envia para support@spitakolus.com por outros motivos são usados só para responder a você.',
+          'Usamos a denúncia para analisá-la: bloqueamos anúncios inadequados no Google AdMob e mudamos ou removemos nomes de usuário que violam os termos de uso. Então, se alguém denunciar o seu nome de usuário, recebemos esse nome em um e-mail. E-mails que você envia para support@spitakolus.com por outros motivos são usados só para responder a você.',
         ],
       },
       {
         h: 'O app e as atualizações',
         p: [
           'A partir da versão 1.3 no iPhone e no iPad e da versão 0.1.20 no Android, o jogo inteiro está dentro do app, inclusive as fontes (tipos de letra). O app não baixa nenhum código para o jogo ou para as funções do app, nem de nós nem de ninguém. Os anúncios e o pedido de consentimento do Google vêm do Google (veja Anúncios). As novas versões chegam só pela App Store e pelo Google Play.',
-          'As versões antigas (1.0 a 1.2 no iPhone e no iPad, e as versões anteriores à 0.1.20 no Android) têm uma função que baixa o código do jogo do nosso próprio servidor do jogo. Desde 3 de novembro de 2026, o máximo que elas podem receber de lá é o mesmo código da versão 1.2 no iPhone e no iPad, nunca um código novo. Nenhum dado pessoal é enviado a terceiros para isso. As versões antigas também carregam as fontes do Google Fonts, e aí o Google recebe o endereço IP do celular. O Google é uma empresa americana, então pode haver transferência do endereço IP para os Estados Unidos. O Google está coberto pelo marco de proteção de dados entre a UE e os Estados Unidos (EU-U.S. Data Privacy Framework). Isso se baseia no nosso interesse legítimo em que as versões antigas funcionem (artigo 6.1 f do GDPR). A partir da versão 1.3 no iPhone e no iPad e da versão 0.1.20 no Android, nenhuma fonte é carregada do Google.',
+          'As versões antigas (1.0 a 1.2 no iPhone e no iPad, e as versões anteriores à 0.1.20 no Android) têm uma função que baixa o código do jogo do nosso próprio servidor do jogo. Desde 3 de novembro de 2026, o máximo que elas podem receber de lá é o mesmo código da versão 1.2 no iPhone e no iPad, nunca um código novo. Nenhum dado pessoal é enviado a terceiros para isso. As versões antigas também carregam as fontes do Google Fonts, e aí o Google recebe o endereço IP do celular. O Google é uma empresa americana, então pode haver transferência do endereço IP para os Estados Unidos. O Google está coberto pelo marco de proteção de dados entre a UE e os Estados Unidos (EU-U.S. Data Privacy Framework). O carregamento das fontes se baseia no nosso interesse legítimo em que as versões antigas funcionem (artigo 6.1 f do GDPR; no Brasil, artigo 7º, IX, da LGPD). A partir da versão 1.3 no iPhone e no iPad e da versão 0.1.20 no Android, o jogo não carrega nenhuma fonte do Google.',
         ],
       },
       {
         h: 'Por quê e com qual base legal?',
         ul: [
           '**Para oferecer o jogo** (conta, login, nome de usuário, partidas, estatísticas, ranking, bloqueio de tempo, Premium e, nas versões antigas do app, o download do código do jogo): necessário para cumprir o contrato com você, ou seja, os termos de uso (artigo 6.1 b do GDPR).',
-          '**Recibos de compras do Premium**, que guardamos por no máximo um ano depois do fim da assinatura: o nosso interesse legítimo em poder responder a perguntas sobre a compra e cuidar de reembolsos (artigo 6.1 f do GDPR).',
+          '**Recibos de compras do Premium depois que você exclui a conta**, que guardamos por no máximo um ano depois do fim da assinatura: o nosso interesse legítimo em poder responder a perguntas sobre a compra e cuidar de reembolsos (artigo 6.1 f do GDPR; no Brasil, artigo 7º, IX, da LGPD).',
           '**Anúncios personalizados**: na UE/EEE, no Reino Unido e na Suíça, o seu consentimento (artigo 6.1 a do GDPR). Nos outros países, o nosso interesse legítimo em financiar o jogo gratuito com anúncios (artigo 6.1 f do GDPR; no Brasil, artigo 7º, IX, da LGPD). Você pode se opor a qualquer momento desativando os anúncios personalizados nas configurações do celular.',
-          '**Anúncios não personalizados** (para quem não tem o Premium): o nosso interesse legítimo em financiar o jogo gratuito com anúncios (artigo 6.1 f do GDPR).',
+          '**Anúncios não personalizados** (para quem não tem o Premium): o nosso interesse legítimo em financiar o jogo gratuito com anúncios (artigo 6.1 f do GDPR; no Brasil, artigo 7º, IX, da LGPD).',
           '**Segurança, correção de erros e combate a trapaças e abusos** (inclusive os registros técnicos): o nosso interesse legítimo em um serviço seguro, justo e que funcione bem (artigo 6.1 f do GDPR).',
           '**Amigos** (código de amigo, lista de amigos, pedidos, contas bloqueadas, status online, convites e mesas de amigos): necessário para cumprir o contrato com você (artigo 6.1 b do GDPR).',
           '**Notificações** (endereço de push, idioma, configurações de notificações e horas de silêncio), depois que você permite as notificações: necessário para cumprir o contrato com você (artigo 6.1 b do GDPR). Você pode desativá-las quando quiser.',
@@ -1138,13 +1143,13 @@ const pt: Texts = {
           '**Resend** – envia o e-mail quando você toca em “Esqueceu a senha?” e, para isso, recebe o seu e-mail. A Resend é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. A transferência é protegida pelas Cláusulas Contratuais Padrão da UE.',
           '**RevenueCat** – verifica as compras do Premium (veja acima). A RevenueCat é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. A transferência é protegida pelas Cláusulas Contratuais Padrão da UE.',
           '**Google AdMob** – anúncios, para quem não tem o Premium (veja a seção 6). O Google recebe então o endereço IP do celular, dados sobre o celular e o app (por exemplo modelo, sistema operacional e idioma), quais anúncios aparecem e se você toca neles, relatórios de erros da parte de anúncios e, quando isso é permitido, o ID de publicidade do aparelho. O Google usa os dados como controlador independente, pelos termos de publicidade do Google. O Google é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. O Google está coberto pelo marco de proteção de dados entre a UE e os Estados Unidos (EU-U.S. Data Privacy Framework).',
-          '**Google Firebase Cloud Messaging** – envia as notificações e, para isso, recebe o endereço de push, o texto da notificação e os números de identificação que ela contém. O Google é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. A transferência é protegida pelas Cláusulas Contratuais Padrão da UE. No iPhone, a notificação é repassada pelo **Apple Push Notification service**.',
+          '**Google Firebase Cloud Messaging** – envia as notificações e, para isso, recebe o endereço de push, o texto da notificação e os números de identificação que ela contém. O Google é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. A transferência é protegida pelas Cláusulas Contratuais Padrão da UE. No iPhone e no iPad, a notificação é repassada pelo **Apple Push Notification service**.',
           '**Google Play e Apple App Store** – compras do Premium. Eles cuidam do pagamento como controladores independentes, pelos próprios termos.',
           '**Vercel** – hospeda o site spitakolus.com, com, entre outras, esta política, a página para excluir a conta e a página do link de códigos de amigo. A Vercel guarda registros técnicos das visitas (entre eles o endereço IP e o endereço visitado – na página do link, isso inclui o código de amigo) por um período limitado. A Vercel é uma empresa americana, então pode haver transferência de dados para os Estados Unidos. A transferência é protegida pelas Cláusulas Contratuais Padrão da UE.',
           '**Loopia** – recebe e guarda os e-mails enviados para support@spitakolus.com, inclusive as denúncias, em servidores na Suécia.',
         ],
         after: [
-          'A Supabase, a Railway, a Resend, a RevenueCat, a Vercel, a Loopia e o Google Firebase tratam os dados só em nosso nome e não podem usá-los para mais nada. Nunca vendemos os seus dados. Tudo o que o app, o servidor do jogo e o site enviam é criptografado.',
+          'A Supabase, a Railway, a Resend, a RevenueCat, a Vercel, a Loopia e o Google Firebase tratam os dados só em nosso nome e não podem usá-los para mais nada. Todos com quem compartilhamos dados devem protegê-los pelo menos tão bem quanto esta política descreve: os operadores acima, pelos contratos conosco, e o Google, pelos termos de publicidade do Google. Nunca vendemos os seus dados. Tudo o que o app, o servidor do jogo e o site enviam é criptografado.',
         ],
       },
       {
@@ -1210,6 +1215,7 @@ const pt: Texts = {
     updated: 'Atualizados em [data da publicação]',
     intro: [
       'Estes termos valem quando você usa o app Mesa 11 (o jogo de cartas Buraco) da Spitakolus AB (empresa sueca, nº de registro 559554-6101). Ao criar uma conta você aceita os termos. Leia também a nossa [política de privacidade](/buraco/integritet).',
+      'Novo em [data da publicação]: como denunciar um nome de usuário (seção 3) e um anúncio (seção 6), o anúncio depois da partida e o Premium (seção 6) e que as funções mudam em novas versões do app (seção 9).',
     ],
     sections: [
       {
