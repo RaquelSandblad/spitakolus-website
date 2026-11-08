@@ -278,14 +278,14 @@ export default function Produkter() {
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">Kortspelet Buraco – två mot två, online</h3>
                 <p className="text-gray-600 mb-6">
                   Mesa 11 är appen för Buraco, det klassiska kortspelet där två lag spelar mot varandra med två
-                  kortlekar. Välj nivå och spelsätt, tryck på Spela – så hittar appen tre andra spelare åt dig. Kommer
+                  kortlekar. Välj spelsätt och tryck på Spela nu – så hittar appen tre andra spelare åt dig. Kommer
                   ingen inom tio sekunder fyller datorspelare de tomma platserna, och du kan alltid öva mot datorn.
                 </p>
                 <div className="mb-8">
                   <h4 className="font-semibold text-gray-900 mb-2">I spelet:</h4>
                   <ul className="list-disc list-inside text-gray-600 space-y-2">
                     <li>Tre spelsätt: Öppen, Stängd och Strikt</li>
-                    <li>Nybörjarbord för dig som lär dig, Mästarbord för vana spelare</li>
+                    <li>Spela med vänner vid ett vänbord – ingen chatt, bara kortspelet</li>
                     <li>Handritade kort och ett bord gjort för mobilen</li>
                     <li>På svenska, engelska och portugisiska</li>
                     <li>Gratis med reklam – med Premium spelar du helt utan reklam och är med i rankingen</li>
