@@ -19,9 +19,11 @@ export default async function Cluckwards({ searchParams }: Props) {
     <Shell lang={lang}>
       <section className="py-8 text-center sm:py-12">
         <Hen className="mx-auto h-32 w-32 rounded-[32px] border-[4px] border-[#3a1f0b] shadow-[0_6px_0_#3a1f0b] sm:h-40 sm:w-40" />
-        <span className="mt-8 inline-block rounded-full border-[3px] border-[#3a1f0b] bg-[#fff8e7] px-4 py-1 text-sm font-semibold">
-          {h.badge}
-        </span>
+        {h.badge && (
+          <span className="mt-8 inline-block rounded-full border-[3px] border-[#3a1f0b] bg-[#fff8e7] px-4 py-1 text-sm font-semibold">
+            {h.badge}
+          </span>
+        )}
         <h1 className="mt-5 text-5xl font-extrabold tracking-tight sm:text-7xl">{tx.name}</h1>
         <p className="mt-2 text-sm font-semibold text-[#6b4a2b]">{h.otherName}</p>
         <p className="mt-5 text-2xl font-extrabold text-[#c2311f] sm:text-3xl">{h.tagline}</p>
