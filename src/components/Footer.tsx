@@ -28,8 +28,8 @@ export default function Footer() {
                   <a href="https://www.nastahem.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors text-xs">
                     Hemsida
                   </a>
-                  <a href="https://apps.apple.com/se/app/n%C3%A4sta-hem/id6749783267" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors text-xs">
-                    App Store
+                  <a href="https://www.nastahem.com/download" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors text-xs">
+                    iPhone
                   </a>
                   <a href="https://play.google.com/store/apps/details?id=com.nastahem.app&hl=sv" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors text-xs">
                     Google Play
@@ -42,8 +42,8 @@ export default function Footer() {
                   <a href="https://flocken.info" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors text-xs">
                     Hemsida
                   </a>
-                  <a href="https://apps.apple.com/se/app/flocken/id6755424578" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors text-xs">
-                    App Store
+                  <a href="https://flocken.info/download" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors text-xs">
+                    iPhone
                   </a>
                   <a href="https://play.google.com/store/apps/details?id=com.bastavan.app&hl=sv" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors text-xs">
                     Google Play
@@ -56,8 +56,8 @@ export default function Footer() {
                   <a href="https://nara.spitakolus.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors text-xs">
                     Hemsida
                   </a>
-                  <a href="https://apps.apple.com/se/app/n%C3%A4ra-v%C3%A4nskap-p%C3%A5-riktigt/id6801097642" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors text-xs">
-                    App Store
+                  <a href="https://nara.spitakolus.com/app" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors text-xs">
+                    iPhone
                   </a>
                   <a href="https://play.google.com/store/apps/details?id=com.spitakolus.nara&hl=sv" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-white transition-colors text-xs">
                     Google Play

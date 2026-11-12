@@ -34,7 +34,7 @@ function codeFromPath(raw: string): string | null {
 }
 
 // Sidan som länken och QR-koden från "Spela med vänner" i appen öppnar: visar vänkoden, hur man lägger
-// till den i appen och knappar till butikerna. Sidan frågar aldrig spelservern – den vet inte vems
+// till den i appen och knappen till Google Play. Sidan frågar aldrig spelservern – den vet inte vems
 // koden är eller om den finns, och visar därför aldrig något användarnamn.
 export default async function BuracoVanLank({ params, searchParams }: Props) {
   const lang = await getLang(searchParams);
