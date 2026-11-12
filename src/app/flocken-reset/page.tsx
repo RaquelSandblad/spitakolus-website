@@ -4,8 +4,8 @@ import Image from 'next/image';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-const APP_STORE_URL = 'https://apps.apple.com/'; // Replace when listing is live
-const PLAY_STORE_URL = 'https://play.google.com/';
+const IPHONE_URL = 'https://app.flocken.info';
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.bastavan.app';
 
 function FlockenResetContent() {
   const searchParams = useSearchParams();
@@ -135,7 +135,7 @@ function FlockenResetContent() {
 
             <div className="my-8 flex justify-center gap-4">
               <a
-                href={APP_STORE_URL}
+                href={IPHONE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="max-w-[200px] flex-1 rounded-lg bg-[#3E3B32] px-5 py-3 text-center text-sm text-white transition-all hover:bg-[#6B7A3A]"
@@ -158,7 +158,7 @@ function FlockenResetContent() {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={qrDataUrl} alt="QR-kod" className="mx-auto h-[200px] w-[200px]" />
               ) : (
-                <p className="text-sm text-[#999]">Kunde inte generera QR-kod. Använd App Store-länkarna ovan.</p>
+                <p className="text-sm text-[#999]">Kunde inte generera QR-kod. Använd länkarna ovan.</p>
               )}
             </div>
           </div>

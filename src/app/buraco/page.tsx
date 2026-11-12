@@ -33,7 +33,7 @@ const ACCENTS = ['#f2b84b', '#6cb6ff', '#ff8a65', '#9be3c1'];
 export default async function Buraco({ searchParams }: Props) {
   const lang = await getLang(searchParams);
   const { home, common } = t(lang);
-  // QR-koden för den som är på datorn: mobilen öppnar /buraco/download, som skickar vidare till rätt butik.
+  // QR-koden för den som är på datorn: mobilen öppnar /buraco/download, som skickar Android vidare till Google Play.
   const qrSvg = await QRCode.toString(
     `https://www.spitakolus.com/buraco/download?lang=${lang}&utm_source=spitakolus.com&utm_medium=qr`,
     { type: 'svg', margin: 0, color: { dark: '#04150f', light: '#fbf8f1' } },
@@ -55,7 +55,7 @@ export default async function Buraco({ searchParams }: Props) {
           <h1 className="mt-5 font-[family-name:var(--font-buraco-display)] text-6xl font-semibold italic tracking-tight sm:text-7xl">{APP_NAME}</h1>
           <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-[#cfe3da] lg:mx-0">{home.lead}</p>
           <StoreButtons lang={lang} className="mt-7" />
-          {/* Bara på datorn: en telefon har redan knapparna ovanför. */}
+          {/* Bara på datorn: en telefon har redan knappen ovanför. */}
           {qrSvg && (
             <div className="mt-8 hidden items-center gap-4 rounded-2xl border border-[#fbf8f1]/15 bg-[#04150f]/35 p-4 text-left lg:flex">
               <div

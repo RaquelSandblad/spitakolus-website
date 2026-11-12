@@ -70,9 +70,8 @@ export type Texts = {
     badge: string;
     playButton: string;
     playUrl: string;
-    appStoreButton: string;
-    /** Appen i App Store: landets butik för sv och pt, för en utan land (Apple väljer besökarens land). */
-    appStoreUrl: string;
+    /** Raden under Google Play-knappen. */
+    androidOnly: string;
     /** QR-koden på datorn, som öppnar /buraco/download i mobilen. */
     qrTitle: string;
     qrText: string;
@@ -140,14 +139,13 @@ const sv: Texts = {
   },
   home: {
     metaTitle: 'Mesa 11 – kortspelet Buraco två mot två, online',
-    metaDescription: 'Mesa 11 är appen för Buraco, kortspelet två mot två, online. Finns på Google Play och i App Store.',
-    badge: 'Nu på Google Play och i App Store',
+    metaDescription: 'Mesa 11 är appen för Buraco, kortspelet två mot två, online. Finns på Google Play för Android.',
+    badge: 'Nu på Google Play',
     playButton: 'Ladda ner på Google Play',
     playUrl: 'https://play.google.com/store/apps/details?id=com.spitakolus.buraco&hl=sv',
-    appStoreButton: 'Ladda ner på App Store',
-    appStoreUrl: 'https://apps.apple.com/se/app/mesa-11-buraco-kortspel/id6817430182',
+    androidOnly: 'Spelet finns just nu för Android.',
     qrTitle: 'Ladda ner till mobilen',
-    qrText: 'Rikta mobilens kamera mot koden, så öppnas rätt butik – App Store på iPhone och Google Play på Android.',
+    qrText: 'Rikta Android-telefonens kamera mot koden, så öppnas Google Play.',
     lead: 'Det klassiska kortspelet Buraco, två mot två, online. Samarbeta med din partner, lägg ut serier och bygg kanastor innan motståndarna hinner före.',
     features: [
       {
@@ -562,14 +560,13 @@ const en: Texts = {
   },
   home: {
     metaTitle: 'Mesa 11 – Buraco, the two-against-two card game, online',
-    metaDescription: 'Mesa 11 is the app for Buraco, the card game played two against two, online. Available on Google Play and the App Store.',
-    badge: 'Now on Google Play and the App Store',
+    metaDescription: 'Mesa 11 is the app for Buraco, the card game played two against two, online. Available on Google Play for Android.',
+    badge: 'Now on Google Play',
     playButton: 'Get it on Google Play',
     playUrl: 'https://play.google.com/store/apps/details?id=com.spitakolus.buraco&hl=en',
-    appStoreButton: 'Download on the App Store',
-    appStoreUrl: 'https://apps.apple.com/app/id6817430182',
+    androidOnly: 'The game is currently available for Android.',
     qrTitle: 'Get it on your phone',
-    qrText: 'Point your phone camera at the code to open the right store – the App Store on iPhone, Google Play on Android.',
+    qrText: 'Point your Android phone’s camera at the code to open Google Play.',
     lead: 'The classic card game Buraco, two against two, online. Team up with your partner, lay down melds and build canastas before your opponents do.',
     features: [
       {
@@ -981,14 +978,13 @@ const pt: Texts = {
   },
   home: {
     metaTitle: 'Mesa 11 – Buraco, o jogo de cartas em dupla, online',
-    metaDescription: 'Mesa 11 é o app de Buraco, o jogo de cartas em dupla, dois contra dois, online. Para Android e iPhone, no Google Play e na App Store.',
-    badge: 'Já no Google Play e na App Store',
+    metaDescription: 'Mesa 11 é o app de Buraco, o jogo de cartas em dupla, dois contra dois, online. Para Android, no Google Play.',
+    badge: 'Já no Google Play',
     playButton: 'Baixar no Google Play',
     playUrl: 'https://play.google.com/store/apps/details?id=com.spitakolus.buraco&hl=pt_BR',
-    appStoreButton: 'Baixar na App Store',
-    appStoreUrl: 'https://apps.apple.com/br/app/mesa-11-buraco-online/id6817430182',
+    androidOnly: 'No momento, o jogo está disponível para Android.',
     qrTitle: 'Baixe no celular',
-    qrText: 'Aponte a câmera do celular para o código e a loja certa abre – App Store no iPhone e Google Play no Android.',
+    qrText: 'Aponte a câmera do celular Android para o código e o Google Play abre.',
     lead: 'Buraco, o clássico jogo de cartas em dupla, dois contra dois, online. Jogue junto com seu parceiro, baixe jogos e forme canastras antes dos adversários.',
     features: [
       {
